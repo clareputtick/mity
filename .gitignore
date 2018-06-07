@@ -1,0 +1,7 @@
+*.vcf.gz
+*.vcf.gz.tbi
+*DS_Store
+*.bam
+*.bai
+*.R
+*.fa*
