@@ -5,7 +5,7 @@ import subprocess
 
 if __name__ == '__main__':
 	
-	parser = argparse.ArgumentParser(description='Run mity-call')
+	parser = argparse.ArgumentParser(description='Run mity-merge')
 	parser.add_argument('--mity', action='store', help = 'mity VCF', required=True)
 	parser.add_argument('--hc', action='store', help = 'HaplotypeCaller VCF', required=True)
 
