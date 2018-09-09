@@ -132,7 +132,8 @@ if __name__ == '__main__':
 	nuclear_header = [x for x in nuclear_header if "##reference" not in x]
 
 	# make new reference line and add to merged header
-	new_ref_line = "##reference=If CHR=MT: " + mity_ref + ". Otherwise: " + nuclear_ref
+	new_ref_line = ("##reference=If CHR=MT: " + mity_ref + ". Otherwise: " +  
+	nuclear_ref)
 	
 	# remove all the lines in the mity header that are also in the nuclear 
 	# header. This should remove contig lines if they are the same
@@ -146,23 +147,28 @@ if __name__ == '__main__':
 	sep = ","
 	merged_header = []
 	mity_ids = [x.split(sep)[0] for x in mity_header]
-	print(mity_ids)
+	# print(mity_ids)
 	# loop through the nuclear_header
-	for nuclear_line in nuclear_header:
-		nuclear_id = nuclear_line.split(sep, 1)[0]
+	for nuclear_header_line in nuclear_header:
+		nuclear_id = nuclear_header_line.split(sep, 1)[0]
 		if nuclear_id in mity_ids:
-			print(nuclear_line)
-			mity_line_idx = mity_ids.index(nuclear_id)
-			mity_line = mity_header[mity_line_idx]
-			print(mity_line)
+			# print("nuclear_id in mity_ids")
+			# print(nuclear_header_line)
+			# mity_line_idx = mity_ids.index(nuclear_id)
+			# mity_line = mity_header[mity_line_idx]
+			# mity_line = [line for line in mity_header if line.startswith(nuclear_id)][0]
+			mity_header_idx = ( [idx for idx, s in enumerate(mity_header) 
+				if s.startswith(nuclear_id)][0] )
+			mity_header_line = mity_header[mity_header_idx]
+			print(mity_header_line)
 
 			# check the number is the same - if not put "."
 			# as the VCF format specifies for unknown number
-			mity_number = mity_line.split("Number=")[1]
+			mity_number = mity_header_line.split("Number=")[1]
 			mity_number = mity_number.split(",")[0]
 			# print(mity_number)
 
-			nuclear_number = nuclear_line.split("Number=")[1]
+			nuclear_number = nuclear_header_line.split("Number=")[1]
 			nuclear_number = nuclear_number.split(",")[0]
 			# print(nuclear_number)
 
@@ -171,14 +177,13 @@ if __name__ == '__main__':
 			else:
 				new_number = "."
 
-			# check the type is the same, if not will have to stop the app 
-			# with an error as there is no way of saying unknown type in the 
-			# VCF format
-			mity_type = mity_line.split("Type=")[1]
+			# check the type is the same, if not will set it to the nuclear 
+			# type as there is no way of saying unknown type in the VCF format
+			mity_type = mity_header_line.split("Type=")[1]
 			mity_type = mity_type.split(",")[0]
 			# print(mity_type)
 
-			nuclear_type = nuclear_line.split("Type=")[1]
+			nuclear_type = nuclear_header_line.split("Type=")[1]
 			nuclear_type = nuclear_type.split(",")[0]
 			# print(nuclear_type)
 
@@ -186,30 +191,31 @@ if __name__ == '__main__':
 				new_type = nuclear_type
 			else:
 				new_type = nuclear_type
-				# print("")
-				# sys.exit("TODO")
 
-			nuclear_description = nuclear_line.split('Description="')[1]
+			nuclear_description = nuclear_header_line.split('Description="')[1]
 			# remove the last ">
 			nuclear_description = nuclear_description[:-2]
 			# print(nuclear_description)
 
-
-			mity_description = mity_line.split('Description="')[1]
+			mity_description = mity_header_line.split('Description="')[1]
 			# remove the last ">
 			mity_description = mity_description[:-2]
 			# print(mity_description)
 
-			new_header_line = nuclear_id + ",Number=" + new_number + ",Type=" + new_type + ",Description=\"If CHR=MT: \'" + mity_description + "\'. Otherwise: \'" + nuclear_description + "\' \">"
-			# print(new_header_line)
+			new_header_line = ( nuclear_id + ",Number=" + new_number + 
+			",Type=" + new_type + ",Description=\"If CHR=MT: \'" + 
+			mity_description + "\'. Otherwise: \'" + nuclear_description + 
+			"\' \">" )
+			print(new_header_line)
 			merged_header.append(new_header_line)
 
 			# remove the line from the mity_header
-			del mity_header[mity_line_idx]
-			# print(len(mity_header))
+			del mity_header[mity_header_idx]
+			print(mity_header)
 		else:
-			merged_header.append(nuclear_line)
+			merged_header.append(nuclear_header_line)
 		
+	# sys.exit()
 	# now add the rest of the mity_header to the merge header
 	merged_header = merged_header + mity_header
 	merged_header = sorted(merged_header)
@@ -218,8 +224,9 @@ if __name__ == '__main__':
 	
 
 
-	# for line in merged_header:
-	# 	print(line)
+	for line in merged_header:
+		print(line)
+	sys.exit()
 
 	#now check that the sample names are in the right order
 
