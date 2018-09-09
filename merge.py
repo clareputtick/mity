@@ -8,13 +8,26 @@
 # Notes
 # This code assumes that the VCFs are of the form specified in 
 # https://samtools.github.io/hts-specs/VCFv4.2.pdf
-# i.e. VCF v4.2. In particular it assumes that
-# 
+# i.e. VCF v4.2. 
+# In particular it assumes that:
+# Lines starting with # are the header
+# The last line starting with a # contains the column names of the variants, 
+# e.g. CHROM, POS ect
+# File format is in the first line of the header
+# One line of header contains the reference starting with ##reference
+
 # If the nuclear VCF and the mity VCF are different versions (e.g. 4.1 and 
 # 4.2), the default behaviour is to report a warning, but set the resulting 
 # VCF to the nuclear VCF version. This behaviour can be changes with TODO
 #
 # The resulting VCF will be the nuclear VCF name, with a mity suffix added.
+
+# TODO 
+# Instead of removing mity date, why not keep it and append with mity? 
+# The contigs in the header could be made more simple if we remove the MT
+# contig from the nuclear header, and only add the MT contig from the mity 
+# header. Difficulty is knowing which contig line is the MT (chrM, or MT), 
+# depends on the reference used
 
 import sys
 import gzip
@@ -26,8 +39,10 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='''Run mity-merge. Merges
 		a nuclear VCF and a mity VCF, such that the MT variants in the nuclear
 		VCF are replaces with the mity variants, and the headers are merged.''')
-	parser.add_argument('--mity', action='store', help = 'mity VCF', required=True)
-	parser.add_argument('--nuclear', action='store', help = 'Nuclear VCF', required=True)
+	parser.add_argument('--mity', action='store', help = 'mity VCF', 
+		required=True)
+	parser.add_argument('--nuclear', action='store', help = 'Nuclear VCF', 
+		required=True)
 
 	args = parser.parse_args()
 
@@ -38,7 +53,7 @@ if __name__ == '__main__':
 	
 	nuclear_file = gzip.open(nuclear_vcf, 'rt')
 
-	# split the header and the variants into two seperate lists
+	# split the nuclear VCF header and variants into two seperate lists
 	nuclear_header = []
 	nuclear_variants = []
 	for line in nuclear_file:
@@ -47,16 +62,15 @@ if __name__ == '__main__':
 			nuclear_header.append(line)
 		else:
 			line = line.strip()
-			# line = line.split('\t')
 			nuclear_variants.append(line)
 	
+	# get the column names from the nuclear VCF
 	nuclear_col_names = nuclear_header[-1]
 	del nuclear_header[-1]
 
 	mity_file = gzip.open(mity_vcf, 'rt')
 
-	# split the header and the variants into two seperate lists
-	# TODO: to speed up, do we actually need to get nuclear variants?
+	# split the mity VCF header and the variants into two seperate lists
 	mity_header = []
 	mity_variants = []
 	for line in mity_file:
@@ -67,14 +81,13 @@ if __name__ == '__main__':
 			line = line.strip()
 			line = line.split('\t')
 			mity_variants.append(line)
-	
+
+	# get the column names from the mity VCF
 	mity_col_names = mity_header[-1]
 	del mity_header[-1]
 
-	# print(mity_header)
-	# print(nuclear_header)
-
-	# remove file format (e.g. 4.1/4.2) for mity and nuclear add manually to the merged header
+	# remove file format (e.g. 4.1/4.2) for mity and nuclear 
+	# will add manually to the merged header
 	del mity_header[0]
 	del nuclear_header[0]
 
@@ -89,55 +102,62 @@ if __name__ == '__main__':
 	
 	# should only be one line in the mity header that has reference in it
 	if len(mity_ref) > 1:
-		err_msg = "Mity header has more than lines that define a reference: \n"
+		err_msg = '''mity VCF header has more than lines that 
+		define a reference: \n'''
 		for x in mity_ref:
 			err_msg = err_msg + x
 			err_msg = err_msg + '\n'
 		sys.exit(err_msg)
 
 	mity_ref = mity_ref[0].split('##reference=')[1]
-	# print(mity_ref)
-	# remove mity reference from header because we will add it with nuclear reference later
+	
+	# remove mity reference from header because we will add it with nuclear 
+	# reference later
 	mity_header = [x for x in mity_header if "##reference" not in x]
 
 	# get nuclear reference then remove from header
 	nuclear_ref = [x for x in nuclear_header if "##reference" in x]
 	# should only be one line in the nuclear header that has reference in it
 	if len(nuclear_ref) > 1:
-		err_msg = "HC header has more than lines that define a reference: \n"
+		err_msg = '''Nuclear VCF header has more than lines that 
+		define a reference: \n'''
 		for x in nuclear_ref:
 			err_msg = err_msg + x
 			err_msg = err_msg + '\n'
 		sys.exit(err_msg)
 
 	nuclear_ref = nuclear_ref[0].split('##reference=')[1]
-	# remove nuclear reference from header because we will add it with mity reference later
+	# remove nuclear reference from header because we will add it with mity 
+	# reference later
 	nuclear_header = [x for x in nuclear_header if "##reference" not in x]
 
 	# make new reference line and add to merged header
 	new_ref_line = "##reference=If CHR=MT: " + mity_ref + ". Otherwise: " + nuclear_ref
 	
-	# remove all the lines in the mity header that are also in the HC header
-	# this should remove contig lines if they are the same
+	# remove all the lines in the mity header that are also in the nuclear 
+	# header. This should remove contig lines if they are the same
 	mity_header = [x for x in mity_header if x not in nuclear_header]
 
-	# now if there are two lines in mity_header and nuclear_header that 
-	# that have the same eg "##INFO=<ID=SRR,", then they have different definitions for the same 
-	# ID. need to make nuclear and mity specific definitions.
+	# If there is a line in mity_header and nuclear_header that 
+	# has the same eg "##INFO=<ID=SRR,", then they have different 
+	# definitions for the same  ID (because otherwise if the lines were 
+	# exactly the same they would have already been removed from the mity 
+	# header) So we need to make nuclear and mity specific definitions.
 	sep = ","
 	merged_header = []
 	mity_ids = [x.split(sep)[0] for x in mity_header]
-	# print(mity_ids)
+	print(mity_ids)
 	# loop through the nuclear_header
 	for nuclear_line in nuclear_header:
 		nuclear_id = nuclear_line.split(sep, 1)[0]
 		if nuclear_id in mity_ids:
-			# print(nuclear_line)
+			print(nuclear_line)
 			mity_line_idx = mity_ids.index(nuclear_id)
 			mity_line = mity_header[mity_line_idx]
-			# print(mity_line)
+			print(mity_line)
 
 			# check the number is the same - if not put "."
+			# as the VCF format specifies for unknown number
 			mity_number = mity_line.split("Number=")[1]
 			mity_number = mity_number.split(",")[0]
 			# print(mity_number)
@@ -151,10 +171,9 @@ if __name__ == '__main__':
 			else:
 				new_number = "."
 
-			# check the type is the same
-			# if not will have to stop the app with an error
-			# no way of saying unknown type
-			# and they really should be the same anyway
+			# check the type is the same, if not will have to stop the app 
+			# with an error as there is no way of saying unknown type in the 
+			# VCF format
 			mity_type = mity_line.split("Type=")[1]
 			mity_type = mity_type.split(",")[0]
 			# print(mity_type)
