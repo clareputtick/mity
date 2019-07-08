@@ -15,18 +15,15 @@ import sys
 import argparse
 
 if __name__ == '__main__':
-    # for line in sys.stdin:
-        # print(line)
-    # print("hi")
     parser = argparse.ArgumentParser(description='Make regions from bam header')
     parser.add_argument('--chunk_size', action="store", dest='chunk_size')
     parser.add_argument('--region', action="store", dest='region')
-    parser.add_argument('--bam_header_path', action="store", dest='bam__header_path')
+    parser.add_argument('--bam_header_path', action="store", dest='bam_header_path')
     
     args = parser.parse_args()
     chunk_size = args.chunk_size
     region = args.region
-    header_path = args.bam__header_path
+    header_path = args.bam_header_path
 
     if chunk_size is None and region is not None:
         print("Error: chunk_size is a required input if region is inputted")
