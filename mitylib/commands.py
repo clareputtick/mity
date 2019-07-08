@@ -1,10 +1,8 @@
 """mity API and command-line interface"""
 import argparse
 import logging
-import os
-import sys
 
-from . import (call, normalise)
+from . import (call, normalise, report)
 from ._version import __version__
 
 __all__ = []
@@ -61,6 +59,29 @@ P_normalise = AP_subparsers.add_parser('normalise', help=_cmd_normalise.__doc__)
 P_normalise.add_argument('--vcf', action='store', required=True, help="vcf.gz file from running mity")
 P_normalise.add_argument('--outfile', action='store', required=True, help="output VCF file in bgzip compressed format")
 P_normalise.set_defaults(func=_cmd_normalise)
+
+# report 
+# ------------------------------------------------------------------------
+
+do_report = public(report.do_report)
+
+
+def _cmd_report(args):
+    """Generate mity report"""
+    logging.info("mity %s", __version__)
+    logging.info("Generating mity report")
+    report.do_report(args.vcf, args.outfile)
+
+
+P_report = AP_subparsers.add_parser('report', help=_cmd_report.__doc__)
+P_report.add_argument('--vcf', action='append', nargs='+', required=True,
+                      help="mity vcf files to create a report from")
+P_call.add_argument('--prefix', action='store',
+                    help='Output files will be named with PREFIX')
+P_call.add_argument('--min_vaf', action='store', type=float, default=0, help=
+'A variant must have at least this VAF to be included in the report. Default: '
+'0.')
+P_report.set_defaults(func=_cmd_report)
 
 
 # version ------------------------------------------------------------------------

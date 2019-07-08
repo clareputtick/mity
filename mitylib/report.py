@@ -5,7 +5,7 @@ import pandas
 import csv
 import argparse
 import subprocess
-
+from .util import check_missing_file
 
 def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
     table = []
@@ -410,64 +410,16 @@ def find_index(string, pattern):
     return [i for i, ltr in enumerate(string) if ltr == pattern]
 
 
-if __name__ == '__main__':
+def do_report(vcf, prefix, min_vaf):
+    vcf = vcf[0]
     
-    parser = argparse.ArgumentParser(description='Run mity-report')
-    parser.add_argument('--minVAF', action='store', type=float, default=0,
-                        help='A variant must have at least this VAF to be '
-                             'included in the report. Default: 0.')
-    parser.add_argument('vcf', action='append', nargs='+',
-                        help='VCF files to make the report on.')
-    parser.add_argument('--prefix', action='store',
-                        help='Output files will be named with PREFIX')
-    
-    args = parser.parse_args()
-    
-    # the only positional arguments are vcf files
-    vcf = args.vcf[0]
-    minVAF = args.minVAF
-    
-    # Check if no prefix set that there is only one bam
-    if args.prefix is None and len(vcf) > 1:
-        sys.exit("Error: If more than one VCF, --prefix must be set")
-    
-    if args.prefix is None:
-        # then only one bam file
-        prefix = vcf[0].split(".")[0]
-    else:
-        prefix = args.prefix
-    
-    # print(vcf)
-    # print(minVAF)
-    # print(prefix)
-    # sys.exit()
-    
-    # check that the min VAF can be converted to a float
-    # try:
-    #   minVAF = float(minVAF)
-    # except ValueError:
-    #   sys.exit(" Input: minVAF=" + str(minVAF) + "\n Bad input, <min_VAF> 
-    #   must convert to a float \n Usage: python3 make_mity_variant_table.py 
-    #   <min_VAF> <VCFs>") 
-    
-    # # check that there is at least one vcf    
-    # if len(vcf) == 0:
-    #   sys.exit(" Bad input, need at least one gziped vcf file \n Usage: 
-    #   python3 make_mity_variant_table.py <min_VAF> <VCFs>")
-    
-    # check that the VCF files exist
-    vcf_file_not_exist = []
-    for x in vcf:
-        vcf_file_not_exist.append(not os.path.exists(x))
-    bad_vcf_index = [i for i, x in enumerate(vcf_file_not_exist) if x]
-    
-    if len(bad_vcf_index) > 0:
-        err_msg = "Bad input, these files dont exist:\n"
-        for x in bad_vcf_index:
-            err_msg = err_msg + str(vcf[x]) + "\n"
-        # err_msg = err_msg + "Usage: python3 make_mity_variant_table.py 
-        # <min_VAF> <VCFs>"
-        sys.exit(err_msg)
+    if len(vcf) == 0:
+        raise ValueError("At least one VCF file must be supplied")
+    if prefix is None and len(vcf) > 1:
+        raise ValueError("If there is more than one vcf file, --prefix must be set")
+    check_missing_file(vcf, die=True)
+
+    prefix = [vcf[0].split(".")[0], prefix][prefix is not None]
     
     # loop over all the files that are input
     variant_list = []
@@ -485,28 +437,28 @@ if __name__ == '__main__':
         # for each file get the first line that doesnt start with # to get 
         # the sample names
         
-        header_varaints = split_header_variants(file)
+        header_variants = split_header_variants(file)
         
         # there will be multiple sample names per vcf (if joint called)
         # each set of samples a sublist. One vcf has a set of samples
-        samples.append(header_varaints[0])
+        samples.append(header_variants[0])
         
         # one set of col names per vcf
         # each set of column names a sublist
-        file_col_names = header_varaints[1]
+        file_col_names = header_variants[1]
         col_names.append(file_col_names)
         
         # one set of variants per vcf
         # each set of variants a sublist
-        file_variants = header_varaints[2]
+        file_variants = header_variants[2]
         variants.append(file_variants)
         
         # each vcf is either vepped or not
         # list of true false for "if vepped"
-        is_vepped = is_vepped + [header_varaints[3]]
-        vep_header.append(header_varaints[4])
+        is_vepped = is_vepped + [header_variants[3]]
+        vep_header.append(header_variants[4])
         
-        header_text = header_text + header_varaints[5]
+        header_text = header_text + header_variants[5]
     # print(header_text)
     # for the Documentation sheet in the output, get the VCF headers
     # we want the header that explains INFO, FILTER or FORMAT fields
@@ -608,7 +560,7 @@ if __name__ == '__main__':
     # print("making table")
     for vcf_num in range(0, len(variants)):
         v = make_table(variants[vcf_num], samples[vcf_num], vep_header, impacts,
-                       minVAF)
+                       min_vaf)
         # variant_table.append(v)w
         variant_table = variant_table + v
     # To print just the variants:
@@ -654,8 +606,6 @@ if __name__ == '__main__':
                                                     how='left',
                                                     on=['CHR', 'POS', 'REF',
                                                         'ALT'])
-    # mitomap_panel_annotated_variants.to_csv(
-    # "python_annotated_variants.csv", index = False)
     
     ########## Merge with gene names and biotype
     # this depends on chrom, pos
@@ -789,7 +739,7 @@ if __name__ == '__main__':
     annotated_variants1['allele_frequency_mitomap'] = gb_perc
     # sys.exit()
     
-    # TODO: to make this more general, choose some imporant cols to go first
+    # TODO: to make this more general, choose some important cols to go first
     # if they are in the header then do this sorting
     # otherwise dont
     if is_vepped:
