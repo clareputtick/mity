@@ -1,8 +1,17 @@
-"""mity API and command-line interface"""
+"""
+Mity: a sensitive variant analysis pipeline optimised for WGS data
+
+
+
+Usage: See the online manual for details: http://github.com/KCCG/mity
+Authors: Clare Puttick, Mark Cowley
+License: Open source for research use: see LICENSE.txt
+
+"""
 import argparse
 import logging
 
-from . import (call, normalise, report)
+from . import (call, normalise, report, merge)
 from ._version import __version__
 
 __all__ = []
@@ -12,13 +21,11 @@ def public(fn):
     __all__.append(fn.__name__)
     return fn
 
+usage = __doc__.split('\n\n\n')
 
-AP = argparse.ArgumentParser(
-        description="mity, a Mitochondrial DNA variant analysis toolkit.",
-        epilog=f"See the online manual for details: "
-        f"http://github.com/KCCG/mity. Version {__version__}")
+AP = argparse.ArgumentParser(description=usage[0], epilog=usage[1])
 AP_subparsers = AP.add_subparsers(
-        help="Sub-commands (use with -h for more info)")
+        help="mity sub-commands (use with -h for more info)")
 
 # call -------------------------------------------------------------------------
 
@@ -98,6 +105,7 @@ P_normalise.add_argument('--outfile', action='store', required=True,
                          help="output VCF file in bgzip compressed format")
 P_normalise.set_defaults(func=_cmd_normalise)
 
+
 # report -----------------------------------------------------------------------
 
 do_report = public(report.do_report)
@@ -119,6 +127,26 @@ P_report.add_argument('--min_vaf', action='store', type=float, default=0, help=
 'A variant must have at least this VAF to be included in the report. Default: '
 '0.')
 P_report.set_defaults(func=_cmd_report)
+
+
+# merge -----------------------------------------------------------------------
+
+do_merge = public(merge.do_merge)
+
+def _cmd_merge(args):
+    """Merging mity VCF with nuclear VCF"""
+    logging.info("mity %s", __version__)
+    logging.info("mity vcf merge")
+    merge.do_merge(args.vcf, args.prefix, args.min_vaf)
+
+P_merge = AP_subparsers.add_parser('merge', help=_cmd_merge.__doc__)
+P_merge.add_argument('--mity_vcf', action='store', required=True,
+                      help="mity vcf file")
+P_merge.add_argument('--nuclear_vcf', action='append', required=True,
+                     help="nuclear vcf file")
+P_merge.add_argument('--prefix', action='store',
+                      help='Output files will be named with PREFIX')
+P_merge.set_defaults(func=_cmd_merge)
 
 
 # version ----------------------------------------------------------------------
