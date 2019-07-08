@@ -2,7 +2,7 @@
 
 import sys
 import gzip
-import argparse
+import re
 import logging
 
 def unchanged(List):
@@ -1121,164 +1121,199 @@ def add_filter(variant_list):
   return(new_vcf) 
 
 
-# input is a single vcf which can be single-sample, or a multi-sample VCF
-def do_normalise(vcf, chromsome="MT"):
+def update_header(col_names, header_lines):
+  ##############################
+  ####### Process Header lines
+  header_lines.append([
+                        '##ALT=<ID=NON_REF,Description="Represents any '
+                        'possible alternative allele at this location">'])
+  ##############################
+  ######## INFO lines
+  # DP - across all the samples. Is this then summed across all the samples?
+  header_lines.append([
+                        '##INFO=<ID=DP,Number=1,Type=Integer,'
+                        'Description="Approximate read depth; some reads may '
+                        'have been filtered">'])
+  # MQM - according to freebayes there should be one per allele (Number=A). 
+  header_lines.append([
+                        '##INFO=<ID=MQM,Number=A,Type=Float,Description="Mean '
+                        'mapping quality of observed alternate alleles">'])
+  # MRMR only ever one. Could also add to format field, see MQM
+  header_lines.append([
+                        '##INFO=<ID=MQMR,Number=1,Type=Float,'
+                        'Description="Mean mapping quality of observed '
+                        'reference alleles">'])
+  # QA Again one per allele. But there are sample specific alleles in the 
+  # format field
+  header_lines.append([
+                        '##INFO=<ID=QA,Number=A,Type=Integer,'
+                        'Description="Alternate allele quality sum in phred">'])
+  # QR only one per reference. Sample specific in the format field
+  header_lines.append([
+                        '##INFO=<ID=QR,Number=1,Type=Integer,'
+                        'Description="Reference allele quality sum in phred">'])
+  # SAF, SAR, SRF, SRR - onle per allele, averaged over all samples. Consider
+  # adding sample specific SBR and SBA
+  header_lines.append([
+                        '##INFO=<ID=SAF,Number=A,Type=Integer,'
+                        'Description="Total number of alternate observations '
+                        'on the forward strand">'])
+  header_lines.append([
+                        '##INFO=<ID=SAR,Number=A,Type=Integer,'
+                        'Description="Total number of alternate observations '
+                        'on the reverse strand">'])
+  header_lines.append([
+                        '##INFO=<ID=SBA,Number=1,Type=Float,'
+                        'Description="Strand bias of the alternate reads, '
+                        'SBA=SAF/(SAF+SAR)">'])
+  header_lines.append([
+                        '##INFO=<ID=SBR,Number=1,Type=Float,'
+                        'Description="Strand bias of the reference reads, '
+                        'SBR=SRF/(SRF+SRR)">'])
+  header_lines.append([
+                        '##INFO=<ID=SRF,Number=1,Type=Integer,'
+                        'Description="Number of reference observations on the '
+                        'forward strand">'])
+  header_lines.append([
+                        '##INFO=<ID=SRR,Number=1,Type=Integer,'
+                        'Description="Number of reference observations on the '
+                        'reverse strand">'])
+  header_lines.append([
+                        '##INFO=<ID=TYPE,Number=1,Type=String,'
+                        'Description="normalised := TODO, complex := TODO">'])
+  # vaf - will be one for each allele. it is very useful so its good to be in
+  # the INFO field
+  ##############################
+  ######## FILTER lines: @TODO, remove the _FIL suffix
+  header_lines.append([
+                        '##FILTER=<ID=POS_FIL,Description="Variant falls in '
+                        'the blacklist of positions: MT:302-319, '
+                        'MT:3105-3108">'])
+  header_lines.append([
+                        '##FILTER=<ID=SBR_FIL,Description="For all alleles RO '
+                        '> 15 and (SBR > 0.8 or SBR < 0.2)">'])
+  header_lines.append([
+                        '##FILTER=<ID=SBA_FIL,Description="For all alleles RO '
+                        '> 15 and (SBA > 0.8 or SBA < 0.2)">'])
+  header_lines.append(
+          ['##FILTER=<ID=MQMR_FIL,Description="For all alleles MQMR<30">'])
+  header_lines.append(
+          ['##FILTER=<ID=AQR_FIL,Description="For all alleles AQR<20">'])
+  # header_lines.append(['##FILTER=<ID=VAF,Number=A,Type=Float,
+  # Description="Allele frequency in the range (0,1] - the ratio of the 
+  # number of alternate reads to reference reads">'])
+  ##############################
+  ######## FORMAT lines
+  # GT, DP, RO, AO, QR, QA, AD
+  header_lines.append([
+                        '##FORMAT=<ID=AD,Number=.,Type=Integer,'
+                        'Description="Allelic depths for the ref and alt '
+                        'alleles in the order listed">'])
+  ##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the 
+  # ref and alt alleles in the order listed">
+  header_lines.append([
+                        '##FORMAT=<ID=AO,Number=1,Type=String,'
+                        'Description="Alternate observations">'])
+  header_lines.append([
+                        '##FORMAT=<ID=AQA,Number=A,Type=Float,'
+                        'Description="Average base quality of the alternate '
+                        'reads, AQA=QA/AO">'])
+  header_lines.append([
+                        '##FORMAT=<ID=AQR,Number=A,Type=Float,'
+                        'Description="Average base quality of the reference '
+                        'reads, AQR=QR/RO">'])
+  header_lines.append([
+                        '##FORMAT=<ID=DP,Number=1,Type=Integer,'
+                        'Description="Read depth, AO+RO">'])
+  header_lines.append([
+                        '##FORMAT=<ID=GT,Number=1,Type=String,'
+                        'Description="Genotype. If VAF>0.9 then genotype is '
+                        '1/1, if VAF>0 then genotype is 0/1, otherwise if VAF '
+                        '= 0 genotype is 0/0">'])
+  header_lines.append([
+                        '##FORMAT=<ID=QA,Number=A,Type=Integer,Description="Alternate allele quality sum in phred">'])
+  header_lines.append([
+                        '##FORMAT=<ID=QR,Number=1,Type=Integer,Description="Reference allele quality sum in phred">'])
+  header_lines.append([
+                        '##FORMAT=<ID=RO,Number=1,Type=String,Description="Reference observations">'])
+  header_lines.append([
+                        '##FORMAT=<ID=VAF,Number=A,Type=Float,Description="Allele frequency in the range (0,1] - the ratio of the number of alternate reads to reference reads">'])
+  ##############################
+  ######## Add col names back in
+  header_lines.append([col_names])
+  # for line in header_lines:
+  # print(line) 
 
+def do_normalise(vcf, chromosome=None):
+  """
+  Normalise and FILTER a mity VCF file.
+  
+  This function splits multi-allelic variants and MNPs, whilst taking care to split the
+  VCF header properly. After normalising, it also updates the FILTER, to remove poor 
+  quality variants.
+  
+  :param vcf: the path to a vcf.gz file. It can be single-sample, or multi-sample, and
+       should have been generated by mity call, or FreeBayes
+  :type vcf: str
+  :param chromosome: discard variants not on this chromosome. If None, then all variants
+      will be processed.
+  :type chromosome: str
+  
+  :returns: Nothing. currently, it prints a VCF to stdout
+  :rtype: None
+  """
+  
   file = gzip.open(vcf, 'rt')
-
+  
   # split the header and the variants into two seperate lists
   # TODO: could split this into a seperate function/script so it only happens once
-  # TODO: could also change to use argparse
   logging.info('Splitting header and variants\n')
-  if chromosome is None:
-    logging.debug("no chromosome")
-    header = []
-    variants = []
-    for line in file:
-      if line[0] == "#":
-        line = line.strip()
-        header.append(line)
-      else:
-        line = line.strip()
+  col_names = None
+  header_lines = []
+  variants = []
+  for line in file:
+    if line[0] == "#":
+      if re.match("#CHROM", line):
+        col_names = line
+      if re.match("##FORMAT", line) or re.match("##INFO", line):
+        continue
+      # only keep the non-FORMAT and non-INFO lines. We'll add these back later.
+      line = line.strip()
+      header_lines.append(line)
+    else:
+      line = line.strip()
+      line_chromosome = line.split('\t')[0]
+      logging.debug(line_chromosome)
+      logging.debug(chromosome)
+      if chromosome is None or line_chromosome == chromosome:
         variants.append(line)
-  else:
-    logging.debug(f"chromosome .{chromosome}")
-    header = []
-    variants = []
-    for line in file:
-      if line[0] == "#":
-        line = line.strip()
-        header.append(line)
-      else:
-        line = line.strip()
-        line_chromosome = line.split('\t')[0]
-        logging.debug(line_chromosome)
-        logging.debug(chromosome)
-        if line_chromosome == chromosome:
-          variants.append(line)
-
+  
   if len(variants) == 0:
     logging.warning('No variants in VCF with specified chromosome/s\n')
   else:
-    # sys.exit()
-    # print(variants)
-    # sys.exit()
-
-    # for line in variants:
-    #   line = line.strip()
-    #   print(line)
-
-    ## split up the multi allelics into different lines
     logging.info('Splitting multiallelic\n')
     single_allele = split_multi_allelic(variants)
-    # print(single_allele)
-    # for vcf_line in single_allele:
-    #   if vcf_line[1] == '3103':
-        # print(vcf_line)
-      # print(*vcf_line, sep = '\t')
-
-    # reduce the MNPs
+    
     logging.info('Splitting MNPs\n')
-    no_mnp = split_MNP(single_allele) 
-    # print(no_mnp)
-    # sys.exit()
+    no_mnp = split_MNP(single_allele)
     # for line in no_mnp:
-    #   print(*line, sep = '\t')  
-
-    # for vcf_line in single_allele:
-    #   if vcf_line[1] == '3103':
-    #     print(vcf_line)
-
+    # print(*line, sep = '\t')  
+    # sys.exit()
     logging.info('Combining duplicated variants\n')
     combined_variants = combine_lines(no_mnp)
     # for line in combined_variants:
-      # print(*line, sep = '\t')  
+    # print(*line, sep = '\t')  
     # sys.exit()
     logging.info('Adding filter variants\n')
     filtered_variants = add_filter(combined_variants)
     # for line in filtered_variants:
     #   print(*line, sep = '\t')  
     # sys.exit()
-    header_lines = []
-    # print(header)
-    for line in header:
-        # only keep the header lines that are not info or format as they will be added later
-        
-        if line[0] == '#' and line[1] == '#' and line[2] != "I" and line[2] != "F":
-          # then its a header filed thats not format or info
-          # is there a better way to do this in python?
-          line = line.strip()
-          header_lines.append([line])
-          
-        if line[0] == '#' and line[1] != '#':
-          line = line.strip()
-          col_names=line
-    # print(col_names)
-    # sys.exit()
-    ##############################
-    ####### Header lines
-    header_lines.append(['##ALT=<ID=NON_REF,Description="Represents any possible alternative allele at this location">'])
-
-    ##############################
-    ######## INFO lines
-
-    # DP - across all the samples. Is this then summed across all the samples?
-    header_lines.append(['##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">'])
-    # MQM - according to freebayes there should be one per allele (Number=A). 
-    header_lines.append(['##INFO=<ID=MQM,Number=A,Type=Float,Description="Mean mapping quality of observed alternate alleles">'])
-    # MRMR only ever one. Could also add to format field, see MQM
-    header_lines.append(['##INFO=<ID=MQMR,Number=1,Type=Float,Description="Mean mapping quality of observed reference alleles">'])
-    # QA Again one per allele. But there are sample specific alleles in the format field
-    header_lines.append(['##INFO=<ID=QA,Number=A,Type=Integer,Description="Alternate allele quality sum in phred">'])
-    # QR only one per reference. Sample specific in the format field
-    header_lines.append(['##INFO=<ID=QR,Number=1,Type=Integer,Description="Reference allele quality sum in phred">'])
-    # SAF, SAR, SRF, SRR - onle per allele, averaged over all samples. Consider adding sample specific SBR and SBA
-    header_lines.append(['##INFO=<ID=SAF,Number=A,Type=Integer,Description="Total number of alternate observations on the forward strand">'])
-    header_lines.append(['##INFO=<ID=SAR,Number=A,Type=Integer,Description="Total number of alternate observations on the reverse strand">'])
-    header_lines.append(['##INFO=<ID=SBA,Number=1,Type=Float,Description="Strand bias of the alternate reads, SBA=SAF/(SAF+SAR)">'])
-    header_lines.append(['##INFO=<ID=SBR,Number=1,Type=Float,Description="Strand bias of the reference reads, SBR=SRF/(SRF+SRR)">'])
-    header_lines.append(['##INFO=<ID=SRF,Number=1,Type=Integer,Description="Number of reference observations on the forward strand">'])
-    header_lines.append(['##INFO=<ID=SRR,Number=1,Type=Integer,Description="Number of reference observations on the reverse strand">'])
-    header_lines.append(['##INFO=<ID=TYPE,Number=1,Type=String,Description="normalised := TODO, complex := TODO">'])
-
-    # vaf - will be one for each allele. it is very useful so its good to be in the INFO field
-
-
-    ##############################
-    ######## FILTER lines
-    header_lines.append(['##FILTER=<ID=POS_FIL,Description="Variant falls in the blacklist of positions: MT:302-319, MT:3105-3108">'])  
-    header_lines.append(['##FILTER=<ID=SBR_FIL,Description="For all alleles RO > 15 and (SBR > 0.8 or SBR < 0.2)">'])
-    header_lines.append(['##FILTER=<ID=SBA_FIL,Description="For all alleles RO > 15 and (SBA > 0.8 or SBA < 0.2)">'])
-    header_lines.append(['##FILTER=<ID=MQMR_FIL,Description="For all alleles MQMR<30">'])
-    header_lines.append(['##FILTER=<ID=AQR_FIL,Description="For all alleles AQR<20">'])
-    # header_lines.append(['##FILTER=<ID=VAF,Number=A,Type=Float,Description="Allele frequency in the range (0,1] - the ratio of the number of alternate reads to reference reads">'])
-
-    ##############################
-    ######## FORMAT lines
-    # GT, DP, RO, AO, QR, QA, AD
-    header_lines.append(['##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">'])
-    ##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
-    header_lines.append(['##FORMAT=<ID=AO,Number=1,Type=String,Description="Alternate observations">'])
-
-    header_lines.append(['##FORMAT=<ID=AQA,Number=A,Type=Float,Description="Average base quality of the alternate reads, AQA=QA/AO">'])
-    header_lines.append(['##FORMAT=<ID=AQR,Number=A,Type=Float,Description="Average base quality of the reference reads, AQR=QR/RO">'])
-    header_lines.append(['##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth, AO+RO">'])
-    header_lines.append(['##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype. If VAF>0.9 then genotype is 1/1, if VAF>0 then genotype is 0/1, otherwise if VAF = 0 genotype is 0/0">'])
-    header_lines.append(['##FORMAT=<ID=QA,Number=A,Type=Integer,Description="Alternate allele quality sum in phred">'])
-    header_lines.append(['##FORMAT=<ID=QR,Number=1,Type=Integer,Description="Reference allele quality sum in phred">'])
-    header_lines.append(['##FORMAT=<ID=RO,Number=1,Type=String,Description="Reference observations">'])
-    header_lines.append(['##FORMAT=<ID=VAF,Number=A,Type=Float,Description="Allele frequency in the range (0,1] - the ratio of the number of alternate reads to reference reads">'])
-
-
-    ##############################
-    ######## Add col names back in
-    header_lines.append([col_names])
-
-    # for line in header_lines:
-      # print(line)
+    
+    update_header(col_names, header_lines)
     # print(filtered_variants)
     # sys.exit()
     logging.info('Writing normalised vcf\n')
-    new_vcf = header_lines + filtered_variants  
+    new_vcf = header_lines + filtered_variants
     for vcf_line in new_vcf:
-      print(*vcf_line, sep = '\t') 
+      print(*vcf_line, sep = '\t')
