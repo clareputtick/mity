@@ -30,6 +30,8 @@ samtools faidx $HOME/data/gatk-resource-bundle/2.8/b37/human_g1k_v37_decoy.fasta
 ## local tests
     mkdir test
     dx download project-F5bzbyQ0Jzv62xBg0P0Q5ygq:/test/kccg-mity-call/inputs/* -o test/
-    mity.py call --reference $B37D5 --prefix test1 test/A1.dedup.realigned.recalibrated.chrMT.bam
+    mity call --reference $B37D5 --prefix test1 test/A1.dedup.realigned.recalibrated.chrMT.bam
     
     freebayes -f /Users/marcow/data/gatk-resource-bundle/2.8/b37/human_g1k_v37_decoy.fasta -b test/A1.dedup.realigned.recalibrated.chrMT.bam -r MT:1-1000 --min-mapping-quality 30 --min-base-quality 20 --min-alternate-fraction 0.5 --min-alternate-count 4 --ploidy 2 --vcf unnormalised.vcf.gz
+    
+    mity normalise --vcf test1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz --outfile test1.dedup.realigned.recalibrated.chrMT.mity.norm.vcf.gz
