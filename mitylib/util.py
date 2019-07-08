@@ -1,17 +1,17 @@
 import logging
 import subprocess
 
-def tabix(outfile):
+def tabix(f):
     """
     Generate a tabix index for a bgzipped file
     
-    :param outfile: path to a bgzip compressed file
-    :type outfile: str
+    :param f: path to a bgzip compressed file
+    :type f: str
     
     :returns: Nothing
     :rtype: None
     """
-    tabix_call = "tabix " + outfile
+    tabix_call = "tabix " + f
     logging.debug(tabix_call)
     subprocess.run(tabix_call, shell=True)
 
