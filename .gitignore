@@ -5,3 +5,7 @@
 *.bai
 *.R
 *.fa*
+venv
+*.iml
+.idea
+mitylib/__pycache__
