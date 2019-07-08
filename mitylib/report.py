@@ -407,7 +407,7 @@ def find_index(string, pattern):
     return [i for i, ltr in enumerate(string) if ltr == pattern]
 
 
-def do_report(vcf, prefix, min_vaf):
+def do_report(vcf, prefix, min_vaf=0.0):
     vcf = vcf[0]
     
     if len(vcf) == 0:

@@ -16,8 +16,7 @@ AP = argparse.ArgumentParser(
 AP_subparsers = AP.add_subparsers(
         help="Sub-commands (use with -h for more info)")
 
-
-# call ------------------------------------------------------------------------
+# call -------------------------------------------------------------------------
 
 do_call = public(call.do_call)
 
@@ -44,7 +43,7 @@ P_call.add_argument('--normalise', action='store_true', help = 'Normalise the re
 P_call.set_defaults(func=_cmd_call)
 
 
-# normalise ------------------------------------------------------------------------
+# normalise --------------------------------------------------------------------
 
 do_normalise = public(normalise.do_normalise)
 
@@ -60,31 +59,29 @@ P_normalise.add_argument('--vcf', action='store', required=True, help="vcf.gz fi
 P_normalise.add_argument('--outfile', action='store', required=True, help="output VCF file in bgzip compressed format")
 P_normalise.set_defaults(func=_cmd_normalise)
 
-# report 
-# ------------------------------------------------------------------------
+# report -----------------------------------------------------------------------
 
 do_report = public(report.do_report)
-
 
 def _cmd_report(args):
     """Generate mity report"""
     logging.info("mity %s", __version__)
     logging.info("Generating mity report")
-    report.do_report(args.vcf, args.outfile)
+    report.do_report(args.vcf, args.prefix, args.min_vaf)
 
 
 P_report = AP_subparsers.add_parser('report', help=_cmd_report.__doc__)
 P_report.add_argument('--vcf', action='append', nargs='+', required=True,
                       help="mity vcf files to create a report from")
-P_call.add_argument('--prefix', action='store',
+P_report.add_argument('--prefix', action='store',
                     help='Output files will be named with PREFIX')
-P_call.add_argument('--min_vaf', action='store', type=float, default=0, help=
+P_report.add_argument('--min_vaf', action='store', type=float, default=0, help=
 'A variant must have at least this VAF to be included in the report. Default: '
 '0.')
 P_report.set_defaults(func=_cmd_report)
 
 
-# version ------------------------------------------------------------------------
+# version ----------------------------------------------------------------------
 
 def print_version(_args):
     """Display this program's version."""
