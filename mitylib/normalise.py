@@ -4,6 +4,8 @@ import sys
 import gzip
 import re
 import logging
+import subprocess
+from .util import tabix
 
 def unchanged(List):
   # check that all numbers in the list are the same
@@ -1238,13 +1240,13 @@ def update_header(col_names, header_lines):
                         '##FORMAT=<ID=RO,Number=1,Type=String,Description="Reference observations">'])
   header_lines.append([
                         '##FORMAT=<ID=VAF,Number=A,Type=Float,Description="Allele frequency in the range (0,1] - the ratio of the number of alternate reads to reference reads">'])
+  
   ##############################
   ######## Add col names back in
   header_lines.append([col_names])
-  # for line in header_lines:
-  # print(line) 
 
-def do_normalise(vcf, chromosome=None):
+
+def do_normalise(vcf, outfile=None, chromosome=None):
   """
   Normalise and FILTER a mity VCF file.
   
@@ -1266,7 +1268,6 @@ def do_normalise(vcf, chromosome=None):
   file = gzip.open(vcf, 'rt')
   
   # split the header and the variants into two seperate lists
-  # TODO: could split this into a seperate function/script so it only happens once
   logging.info('Splitting header and variants\n')
   col_names = None
   header_lines = []
@@ -1275,6 +1276,7 @@ def do_normalise(vcf, chromosome=None):
     if line[0] == "#":
       if re.match("#CHROM", line):
         col_names = line
+        continue
       if re.match("##FORMAT", line) or re.match("##INFO", line):
         continue
       # only keep the non-FORMAT and non-INFO lines. We'll add these back later.
@@ -1296,24 +1298,26 @@ def do_normalise(vcf, chromosome=None):
     
     logging.info('Splitting MNPs\n')
     no_mnp = split_MNP(single_allele)
-    # for line in no_mnp:
-    # print(*line, sep = '\t')  
-    # sys.exit()
+    # debug_print_vcf_lines(no_mnp)
     logging.info('Combining duplicated variants\n')
     combined_variants = combine_lines(no_mnp)
-    # for line in combined_variants:
-    # print(*line, sep = '\t')  
-    # sys.exit()
+    # debug_print_vcf_lines(combined_variants)
     logging.info('Adding filter variants\n')
     filtered_variants = add_filter(combined_variants)
-    # for line in filtered_variants:
-    #   print(*line, sep = '\t')  
-    # sys.exit()
-    
+    # debug_print_vcf_lines(filtered_variants)
     update_header(col_names, header_lines)
-    # print(filtered_variants)
-    # sys.exit()
+    # debug_print_vcf_lines(filtered_variants)
     logging.info('Writing normalised vcf\n')
     new_vcf = header_lines + filtered_variants
+    p = subprocess.Popen(f"bgzip -c > {outfile}", shell=True, stdin=subprocess.PIPE)
     for vcf_line in new_vcf:
       print(*vcf_line, sep = '\t')
+    p.communicate()
+
+    tabix(outfile)
+
+
+def debug_print_vcf_lines(x):
+  for line in x:
+    print(*line, sep = '\t')
+  sys.exit()
