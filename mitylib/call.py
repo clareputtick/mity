@@ -16,8 +16,6 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=20,
     #####
     # Checks
     #####
-    # TODO: check bam and bai match, or just input bam and find bai in directory
-    # TODO: check sites parameters only has 8 columns
     # TODO: need to check what the mitochondria is called in the bam header? 
     
 
