@@ -1,10 +1,7 @@
 import sys
-import os.path
+import logging
 import gzip
 import pandas
-import csv
-import argparse
-import subprocess
 from .util import check_missing_file
 
 def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
@@ -902,7 +899,7 @@ def do_report(vcf, prefix, min_vaf):
     
     documentation_df = pandas.DataFrame(documentation)
     
-    ## change the coluns that are numberical data types to numerical
+    ## change the columns that are numerical data types to numerical
     annotated_variants1['variant_heteroplasmy'] = annotated_variants1[
         'variant_heteroplasmy'].astype('float64')
     annotated_variants1['ref_depth'] = annotated_variants1['ref_depth'].astype(
@@ -936,7 +933,8 @@ def do_report(vcf, prefix, min_vaf):
         'float64')
     annotated_variants1['SBA_INFO'] = annotated_variants1['SBA_INFO'].astype(
         'float64')
-    
+
+    logging.info("saving xlsx report")
     xlsx_name = prefix + '.annotated_variants.xlsx'
     writer = pandas.ExcelWriter(xlsx_name, engine='xlsxwriter')
     documentation_df.to_excel(writer, sheet_name='Documentation', index=False,
@@ -944,7 +942,7 @@ def do_report(vcf, prefix, min_vaf):
     annotated_variants1.to_excel(writer, sheet_name='Variants', index=False)
     writer.save()
     
-    # print("saving")
+    logging.info("saving csv report")
     csv_name = prefix + '.annotated_variants.csv'
     annotated_variants1.to_csv(csv_name, index=False, )
     # numpy.savetxt('data.csv', delimiter=',', X = annotated_variants1)
