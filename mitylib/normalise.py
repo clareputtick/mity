@@ -117,7 +117,7 @@ def split_multi_allelic(variants):
     
     # if there is only one value, i.e. just for the reference, repeat it the number of alleles times
     # so that it can be picked out later when each allele is put on a new line
-    INFO_values = [x*n_alleles if len(x) == 1 else x for x in INFO_values]  
+    INFO_values = [x*n_alleles if len(x) == 1 else x for x in INFO_values]
     # info_values = [x*n_alleles if len(x)<n_alleles else x for x in info_values]
     # print(INFO_values)
     # INFO_values = [['7575', '7575'], ['70', '60'], ['0', '0'], ['75397', '5623'], ['0', '0'], ['1289', '100'], ['1351', '103'], ['0', '0'], ['0', '0']]
@@ -127,8 +127,7 @@ def split_multi_allelic(variants):
     ###### GENO/FORMAT field
     FORMAT_name = lineparts[8]
     FORMAT_name = FORMAT_name.split(":")
-    # print(FORMAT_name)
-    # print("hi")
+    logging.debug(FORMAT_name)
     # FORMAT_name = ['GT', 'DP', 'AD', 'RO', 'QR', 'AO', 'QA', 'GL']
 
     FORMAT_values = lineparts[9:]
@@ -139,12 +138,15 @@ def split_multi_allelic(variants):
     # print(FORMAT_values)
   
     # remove GL as we dont really know what to do with it yet
-    del FORMAT_name[7]
-    for x in FORMAT_values:
-      del x[7]
-    # print(FORMAT_values)
-    # FORMAT_values = [['2/2', '2915', '0,0,88', '0', '0', '0,88', '0,2441'], ['2/2', '1936', '0,0,67', '0', '0', '0,67', '0,1833'], ['1/1', '2724', '0,2640,48', '0', '0', '2640,48', '75397,1349']]
-    
+    try:
+      idx = FORMAT_name.index("GL")
+      del FORMAT_name[idx]
+      for x in FORMAT_values:
+        del x[idx]
+      # print(FORMAT_values)
+      # FORMAT_values = [['2/2', '2915', '0,0,88', '0', '0', '0,88', '0,2441'], ['2/2', '1936', '0,0,67', '0', '0', '0,67', '0,1833'], ['1/1', '2724', '0,2640,48', '0', '0', '2640,48', '75397,1349']]
+    except ValueError:
+      pass
     n_samples = len(FORMAT_values)
     # print(n_samples)
 
@@ -152,29 +154,30 @@ def split_multi_allelic(variants):
     ####### Create new line
 
     for allele in range(0, n_alleles):
-      
+  
       # build up the new line
       new_line = [chromosome, pos, ID, ref, alt[allele], QUAL, Filter]
-
+  
       # build up new INFO field
       # will not be affected by number of samples
       # pick out the allele'th value from each of the info values
       new_info_values = [x[allele] for x in INFO_values]
       # create empty list that will be the new info field 
-      new_info = [None]*(len(new_info_values)+len(INFO_names))
+      new_info = [None] * (len(new_info_values) + len(INFO_names))
       # fill it with the info names and new values
       new_info[::2] = INFO_names
       new_info[1::2] = new_info_values
-      # paste the name with the corresponding value (which will be directly after the name in the list)
-      si=iter(new_info)
-      new_info = [x+next(si,'') for x in si]
+      # paste the name with the corresponding value (which will be directly 
+      # after the name in the list)
+      si = iter(new_info)
+      new_info = [x + next(si, '') for x in si]
       # print(new_info)
       # join all of the info fields with ;
       new_info = ";".join(new_info)
-
+  
       # add new INFO field to new_line
       new_line.append(new_info)
-
+  
       # add the FORMAT names to the new line
       new_FORMAT_name = ":".join(FORMAT_name)
       new_line.append(new_FORMAT_name)
@@ -187,7 +190,7 @@ def split_multi_allelic(variants):
       
       for samp in range(0, n_samples):
         temp_format = FORMAT_values[samp]
-        # print(temp_format)
+        logging.debug(temp_format)
 
         # split the allele values in the FORMAT
         temp_format = [x.split(",") for x in temp_format]
@@ -1309,13 +1312,12 @@ def do_normalise(vcf, outfile=None, chromosome=None):
     # debug_print_vcf_lines(filtered_variants)
     logging.info('Writing normalised vcf\n')
     new_vcf = header_lines + filtered_variants
-    p = subprocess.Popen(f"bgzip -c > {outfile}", shell=True, stdin=subprocess.PIPE)
+    p = subprocess.Popen(f"| sort -k1,1 -k2,2n | bgzip -c > {outfile}", shell=True, stdin=subprocess.PIPE)
     for vcf_line in new_vcf:
       print(*vcf_line, sep = '\t')
     p.communicate()
 
     tabix(outfile)
-
 
 def debug_print_vcf_lines(x):
   for line in x:
