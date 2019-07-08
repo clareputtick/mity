@@ -20,14 +20,12 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=20,
     # TODO: check sites parameters only has 8 columns
     # TODO: need to check what the mitochondria is called in the bam header? 
     
-    # Check if no prefix set that there is only one bam
-    if len(bam_files) == 0:
-        raise ValueError("At least one BAM file must be supplied")
+
     if len(bam_files) > 1 and prefix is None:
         raise ValueError(
                 "If there is more than one bam file, --prefix must be set")
     
-    check_missing_files(bam_files, die=True)
+    check_missing_file(bam_files, die=True)
     
     prefix = [bam_files[0].split(".")[0], prefix][prefix is not None]
     
