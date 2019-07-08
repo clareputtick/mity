@@ -3,6 +3,7 @@
 import sys
 import gzip
 import argparse
+import logging
 
 def unchanged(List):
   # check that all numbers in the list are the same
@@ -349,7 +350,7 @@ def combine_lines(variant_list):
   new_vcf = []
   # we loop over the chromsomes to fill new_vcf
   for uniq_chrom in unique_chromosomes:
-    sys.stderr.write('  Doing chromoome ' + str(uniq_chrom) +'\n')
+    logging.info('  Doing chromoome ' + str(uniq_chrom) +'\n')
     chromo_variant_list = [line for line in variant_list if line[0] == uniq_chrom]
     # print(chromo_variant_list)
     # sys.exit()
@@ -1120,29 +1121,17 @@ def add_filter(variant_list):
   return(new_vcf) 
 
 
-# input is a single vcf which can be joint called or single sample
-if __name__ == '__main__':
+# input is a single vcf which can be single-sample, or a multi-sample VCF
+def do_normalise(vcf, chromsome="MT"):
 
-  parser = argparse.ArgumentParser(description='Normalise a freebayes VCF')
-  parser.add_argument('--vcf', action="store", dest='vcf')
-  parser.add_argument('--chromosome', action="store", dest='chromosome')
-
-  args = parser.parse_args()
-  subset_chromosome = args.chromosome
-  vcf = args.vcf
-
-  # vcf = sys.argv[1]
-  # print(subset_chromosome)
-  # sys.exit()
   file = gzip.open(vcf, 'rt')
-  # subset_chromosome = sys.argv[2]
 
   # split the header and the variants into two seperate lists
   # TODO: could split this into a seperate function/script so it only happens once
   # TODO: could also change to use argparse
-  sys.stderr.write('Splitting header and variants\n')
-  if subset_chromosome is None:
-    # print("no chromosome")
+  logging.info('Splitting header and variants\n')
+  if chromosome is None:
+    logging.debug("no chromosome")
     header = []
     variants = []
     for line in file:
@@ -1153,8 +1142,7 @@ if __name__ == '__main__':
         line = line.strip()
         variants.append(line)
   else:
-    # print("chromosome")
-    # print(subset_chromosome)
+    logging.debug(f"chromosome .{chromosome}")
     header = []
     variants = []
     for line in file:
@@ -1164,14 +1152,13 @@ if __name__ == '__main__':
       else:
         line = line.strip()
         line_chromosome = line.split('\t')[0]
-        # print(line_chromosome)
-        # print(subset_chromosome)
-        if line_chromosome == subset_chromosome:
-          # print(line)
+        logging.debug(line_chromosome)
+        logging.debug(chromosome)
+        if line_chromosome == chromosome:
           variants.append(line)
 
   if len(variants) == 0:
-    sys.stderr.write('No variants in VCF with specified chromosome/s\n')
+    logging.warning('No variants in VCF with specified chromosome/s\n')
   else:
     # sys.exit()
     # print(variants)
@@ -1182,7 +1169,7 @@ if __name__ == '__main__':
     #   print(line)
 
     ## split up the multi allelics into different lines
-    sys.stderr.write('Splitting multiallelic\n')
+    logging.info('Splitting multiallelic\n')
     single_allele = split_multi_allelic(variants)
     # print(single_allele)
     # for vcf_line in single_allele:
@@ -1191,7 +1178,7 @@ if __name__ == '__main__':
       # print(*vcf_line, sep = '\t')
 
     # reduce the MNPs
-    sys.stderr.write('Splitting MNPs\n')
+    logging.info('Splitting MNPs\n')
     no_mnp = split_MNP(single_allele) 
     # print(no_mnp)
     # sys.exit()
@@ -1202,12 +1189,12 @@ if __name__ == '__main__':
     #   if vcf_line[1] == '3103':
     #     print(vcf_line)
 
-    sys.stderr.write('Combining duplicated variants\n')
+    logging.info('Combining duplicated variants\n')
     combined_variants = combine_lines(no_mnp)
     # for line in combined_variants:
       # print(*line, sep = '\t')  
     # sys.exit()
-    sys.stderr.write('Adding filter variants\n')
+    logging.info('Adding filter variants\n')
     filtered_variants = add_filter(combined_variants)
     # for line in filtered_variants:
     #   print(*line, sep = '\t')  
@@ -1230,14 +1217,12 @@ if __name__ == '__main__':
     # sys.exit()
     ##############################
     ####### Header lines
-    ##ALT=<ID=NON_REF,Description="Represents any possible alternative allele at this location">
     header_lines.append(['##ALT=<ID=NON_REF,Description="Represents any possible alternative allele at this location">'])
 
     ##############################
     ######## INFO lines
 
-    # depth - across all the samples. Is this then summed across all the samples?
-
+    # DP - across all the samples. Is this then summed across all the samples?
     header_lines.append(['##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">'])
     # MQM - according to freebayes there should be one per allele (Number=A). 
     header_lines.append(['##INFO=<ID=MQM,Number=A,Type=Float,Description="Mean mapping quality of observed alternate alleles">'])
@@ -1256,7 +1241,7 @@ if __name__ == '__main__':
     header_lines.append(['##INFO=<ID=SRR,Number=1,Type=Integer,Description="Number of reference observations on the reverse strand">'])
     header_lines.append(['##INFO=<ID=TYPE,Number=1,Type=String,Description="normalised := TODO, complex := TODO">'])
 
-    # vaf - will be one for each allele. it is very useful so its good to be in the INFO filed
+    # vaf - will be one for each allele. it is very useful so its good to be in the INFO field
 
 
     ##############################
@@ -1293,10 +1278,7 @@ if __name__ == '__main__':
       # print(line)
     # print(filtered_variants)
     # sys.exit()
-    sys.stderr.write('Writing out\n')
+    logging.info('Writing normalised vcf\n')
     new_vcf = header_lines + filtered_variants  
     for vcf_line in new_vcf:
       print(*vcf_line, sep = '\t') 
-
-
-      

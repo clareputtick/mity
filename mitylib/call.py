@@ -7,7 +7,7 @@ import os.path
 #from . import normalise ## @TODO
 
 def do_call(bam_files, reference, prefix=None, sites=None, min_mq=30, min_bq=20, min_af=0.5, min_ac=4, ploidy=2):
-    bam_files = bam_files[0] ## @clare: why was this here?
+    bam_files = bam_files[0] ## @TODO check this still works with >1 BAM file
 
     #####
     # Checks
@@ -19,7 +19,7 @@ def do_call(bam_files, reference, prefix=None, sites=None, min_mq=30, min_bq=20,
     # Check if no prefix set that there is only one bam
     if len(bam_files) == 0:
       raise ValueError("At least one BAM file must be supplied (-b)")
-    if len(bam_files) > 1 and args.prefix is None:
+    if len(bam_files) > 1 and prefix is None:
       raise ValueError("If there is more than one bam file, --prefix must be set")
 
     prefix = [bam_files[0].split(".")[0],prefix][prefix!=None]
