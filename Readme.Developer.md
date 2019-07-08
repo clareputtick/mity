@@ -30,11 +30,26 @@ samtools faidx $HOME/data/gatk-resource-bundle/2.8/b37/human_g1k_v37_decoy.fasta
 ## local tests
     mkdir test
     dx download project-F5bzbyQ0Jzv62xBg0P0Q5ygq:/test/kccg-mity-call/inputs/* -o test/
+    freebayes -f /Users/marcow/data/gatk-resource-bundle/2.8/b37/human_g1k_v37_decoy.fasta -b test/A1.dedup.realigned.recalibrated.chrMT.bam -r MT:1-1000 --min-mapping-quality 30 --min-base-quality 20 --min-alternate-fraction 0.5 --min-alternate-count 4 --ploidy 2 --vcf unnormalised.vcf.gz
     mity call --reference $B37D5 --prefix test1 test/A1.dedup.realigned.recalibrated.chrMT.bam
     
-    freebayes -f /Users/marcow/data/gatk-resource-bundle/2.8/b37/human_g1k_v37_decoy.fasta -b test/A1.dedup.realigned.recalibrated.chrMT.bam -r MT:1-1000 --min-mapping-quality 30 --min-base-quality 20 --min-alternate-fraction 0.5 --min-alternate-count 4 --ploidy 2 --vcf unnormalised.vcf.gz
-    
     mity normalise --vcf test1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz --outfile test1.dedup.realigned.recalibrated.chrMT.mity.norm.vcf.gz
+    ...
+    ValueError: 'AD' is not in list
+
+    mity report --vcf test1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz 
+    ...
+    ValueError: 'SBR' is not in list
+
+    dx ls project-F5bzbyQ0Jzv62xBg0P0Q5ygq:/test/kccg-mity-merge/inputs --brief | parallel dx download
+    mity merge --mity_vcf test/15F00004.mity.vcf.gz --nuclear_vcf test/15F00004.hc.vqsr.vcf.gz --prefix xxx
+
+### errors due to freebayes incompatibility?
+local freebayes: version:  v1.0.2-dirty
+kccg-freebayes: MD5 (resources/usr/bin/freebayes) = 88504cd29b834989f471cc119b748463
+kccg-mity:      MD5 (resources/usr/bin/freebayes) = 88504cd29b834989f471cc119b748463
+based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or maybe even 0.9.9
+
 
 
 # TODO setup python package on pip

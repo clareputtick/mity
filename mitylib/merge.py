@@ -4,30 +4,15 @@ This merges a nuclear VCF and a mity VCF, such that the MT variants in the
 nuclear VCF are replaces with the mity variants, and the headers are merged
 """
 
-#
-# mity-merge
-#
-# Usage:
-# merge.py -h
-#
 # Notes
-# This code assumes that the VCFs are of the form specified in 
-# https://samtools.github.io/hts-specs/VCFv4.2.pdf
-# i.e. VCF v4.2. 
-# In particular it assumes that:
-# Lines starting with # are the header
-# The last line starting with a # contains the column names of the variants, 
-# e.g. CHROM, POS ect
-# File format is in the first line of the header
-# One line of header contains the reference starting with ##reference
-
+#
 # If the nuclear VCF and the mity VCF are different versions (e.g. 4.1 and 
 # 4.2), the default behaviour is to report a warning, but set the resulting 
 # VCF to the nuclear VCF version. This behaviour can be changes with TODO
 #
 # The resulting VCF will be the nuclear VCF name, with a mity suffix added.
 
-# TODO 
+# @TODO
 # Instead of removing mity date, why not keep it and append with mity? 
 # The contigs in the header could be made more simple if we remove the MT
 # contig from the nuclear header, and only add the MT contig from the mity 
@@ -76,6 +61,7 @@ def do_merge(mity_vcf, hc_vcf, prefix=None):
             mity_variants.append(line)
     
     # get the column names from the mity VCF
+    mity_col_names = mity_header[-1]
     del mity_header[-1]
     
     # remove file format (e.g. 4.1/4.2) for mity and nuclear 
