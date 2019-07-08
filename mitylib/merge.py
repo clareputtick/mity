@@ -1,4 +1,9 @@
-#!/Users/clareputtick/anaconda/bin/python3
+"""
+Run mity-merge.
+This merges a nuclear VCF and a mity VCF, such that the MT variants in the
+nuclear VCF are replaces with the mity variants, and the headers are merged
+"""
+
 #
 # mity-merge
 #
@@ -31,47 +36,34 @@
 
 import sys
 import gzip
-import argparse
 import subprocess
 
-if __name__ == '__main__':
+def do_merge(mity_vcf, hc_vcf, prefix=None):
     
-    parser = argparse.ArgumentParser(description='''Run mity-merge. Merges
-		a nuclear VCF and a mity VCF, such that the MT variants in the nuclear
-		VCF are replaces with the mity variants, and the headers are 
-		merged.''')
-    parser.add_argument('--mity', action='store', help='mity VCF',
-                        required=True)
-    parser.add_argument('--nuclear', action='store', help='Nuclear VCF',
-                        required=True)
+    hc_vcf
+    mity_vcf
+    prefix = [hc_vcf.split(".vcf.gz")[0], prefix][prefix is not None]
+    new_vcf_name = prefix + ".mity.vcf"
     
-    args = parser.parse_args()
+    hc_file = gzip.open(hc_vcf, 'rt')
     
-    nuclear_vcf = args.nuclear
-    mity_vcf = args.mity
-    new_vcf_prefix = nuclear_vcf.split(".vcf.gz")[0]
-    new_vcf_name = new_vcf_prefix + ".mity.vcf"
-    
-    nuclear_file = gzip.open(nuclear_vcf, 'rt')
-    
-    # split the nuclear VCF header and variants into two seperate lists
-    nuclear_header = []
-    nuclear_variants = []
-    for line in nuclear_file:
+    # split the nuclear VCF header and variants into separate lists
+    hc_header = []
+    hc_variants = []
+    for line in hc_file:
         if line[0] == "#":
             line = line.strip()
-            nuclear_header.append(line)
+            hc_header.append(line)
         else:
             line = line.strip()
-            nuclear_variants.append(line)
+            hc_variants.append(line)
     
-    # get the column names from the nuclear VCF
-    nuclear_col_names = nuclear_header[-1]
-    del nuclear_header[-1]
+    hc_col_names = hc_header[-1]
+    del hc_header[-1]
     
     mity_file = gzip.open(mity_vcf, 'rt')
     
-    # split the mity VCF header and the variants into two seperate lists
+    # split the mity VCF header and the variants into separate lists
     mity_header = []
     mity_variants = []
     for line in mity_file:
@@ -84,13 +76,12 @@ if __name__ == '__main__':
             mity_variants.append(line)
     
     # get the column names from the mity VCF
-    mity_col_names = mity_header[-1]
     del mity_header[-1]
     
     # remove file format (e.g. 4.1/4.2) for mity and nuclear 
     # will add manually to the merged header
     del mity_header[0]
-    del nuclear_header[0]
+    del hc_header[0]
     
     # remove phasing from mity header
     mity_header = [x for x in mity_header if "phasing=" not in x]
@@ -103,8 +94,7 @@ if __name__ == '__main__':
     
     # should only be one line in the mity header that has reference in it
     if len(mity_ref) > 1:
-        err_msg = '''mity VCF header has more than lines that 
-		define a reference: \n'''
+        err_msg = '''mity VCF header has more than lines that define a reference: \n'''
         for x in mity_ref:
             err_msg = err_msg + x
             err_msg = err_msg + '\n'
@@ -117,30 +107,29 @@ if __name__ == '__main__':
     mity_header = [x for x in mity_header if "##reference" not in x]
     
     # get nuclear reference then remove from header
-    nuclear_ref = [x for x in nuclear_header if "##reference" in x]
+    hc_ref = [x for x in hc_header if "##reference" in x]
     # should only be one line in the nuclear header that has reference in it
-    if len(nuclear_ref) > 1:
-        err_msg = '''Nuclear VCF header has more than lines that 
-		define a reference: \n'''
-        for x in nuclear_ref:
+    if len(hc_ref) > 1:
+        err_msg = '''Nuclear VCF header has more than lines that define a reference: \n'''
+        for x in hc_ref:
             err_msg = err_msg + x
             err_msg = err_msg + '\n'
         sys.exit(err_msg)
     
-    nuclear_ref = nuclear_ref[0].split('##reference=')[1]
+    hc_ref = hc_ref[0].split('##reference=')[1]
     # remove nuclear reference from header because we will add it with mity 
     # reference later
-    nuclear_header = [x for x in nuclear_header if "##reference" not in x]
+    hc_header = [x for x in hc_header if "##reference" not in x]
     
     # make new reference line and add to merged header
     new_ref_line = ("##reference=If CHR=MT: " + mity_ref + ". Otherwise: " +
-                    nuclear_ref)
+                    hc_ref)
     
     # remove all the lines in the mity header that are also in the nuclear 
     # header. This should remove contig lines if they are the same
-    mity_header = [x for x in mity_header if x not in nuclear_header]
+    mity_header = [x for x in mity_header if x not in hc_header]
     
-    # If there is a line in mity_header and nuclear_header that 
+    # If there is a line in mity_header and hc_header that 
     # has the same eg "##INFO=<ID=SRR,", then they have different 
     # definitions for the same  ID (because otherwise if the lines were 
     # exactly the same they would have already been removed from the mity 
@@ -149,18 +138,18 @@ if __name__ == '__main__':
     merged_header = []
     mity_ids = [x.split(sep)[0] for x in mity_header]
     # print(mity_ids)
-    # loop through the nuclear_header
-    for nuclear_header_line in nuclear_header:
-        nuclear_id = nuclear_header_line.split(sep, 1)[0]
-        if nuclear_id in mity_ids:
-            # print("nuclear_id in mity_ids")
-            # print(nuclear_header_line)
-            # mity_line_idx = mity_ids.index(nuclear_id)
+    # loop through the hc_header
+    for hc_header_line in hc_header:
+        hc_id = hc_header_line.split(sep, 1)[0]
+        if hc_id in mity_ids:
+            # print("hc_id in mity_ids")
+            # print(hc_header_line)
+            # mity_line_idx = mity_ids.index(hc_id)
             # mity_line = mity_header[mity_line_idx]
             # mity_line = [line for line in mity_header if line.startswith(
-            # nuclear_id)][0]
+            # hc_id)][0]
             mity_header_idx = ([idx for idx, s in enumerate(mity_header)
-                                if s.startswith(nuclear_id)][0])
+                                if s.startswith(hc_id)][0])
             mity_header_line = mity_header[mity_header_idx]
             print(mity_header_line)
             
@@ -170,12 +159,12 @@ if __name__ == '__main__':
             mity_number = mity_number.split(",")[0]
             # print(mity_number)
             
-            nuclear_number = nuclear_header_line.split("Number=")[1]
-            nuclear_number = nuclear_number.split(",")[0]
-            # print(nuclear_number)
+            hc_number = hc_header_line.split("Number=")[1]
+            hc_number = hc_number.split(",")[0]
+            # print(hc_number)
             
-            if str(nuclear_number) == str(mity_number):
-                new_number = nuclear_number
+            if str(hc_number) == str(mity_number):
+                new_number = hc_number
             else:
                 new_number = "."
             
@@ -185,30 +174,30 @@ if __name__ == '__main__':
             mity_type = mity_type.split(",")[0]
             # print(mity_type)
             
-            nuclear_type = nuclear_header_line.split("Type=")[1]
-            nuclear_type = nuclear_type.split(",")[0]
-            # print(nuclear_type)
+            hc_type = hc_header_line.split("Type=")[1]
+            hc_type = hc_type.split(",")[0]
+            # print(hc_type)
             
-            if str(nuclear_type) == str(mity_type):
-                new_type = nuclear_type
+            if str(hc_type) == str(mity_type):
+                new_type = hc_type
             else:
-                new_type = nuclear_type
+                new_type = hc_type
             
-            nuclear_description = nuclear_header_line.split('Description="')[1]
+            hc_description = hc_header_line.split('Description="')[1]
             # remove the last ">
-            nuclear_description = nuclear_description[:-2]
-            # print(nuclear_description)
+            hc_description = hc_description[:-2]
+            # print(hc_description)
             
             mity_description = mity_header_line.split('Description="')[1]
             # remove the last ">
             mity_description = mity_description[:-2]
             # print(mity_description)
             
-            new_header_line = (nuclear_id + ",Number=" + new_number +
+            new_header_line = (hc_id + ",Number=" + new_number +
                                ",Type=" + new_type + ",Description=\"If "
                                                      "CHR=MT: \'" +
                                mity_description + "\'. Otherwise: \'" + 
-                               nuclear_description +
+                               hc_description +
                                "\' \">")
             print(new_header_line)
             merged_header.append(new_header_line)
@@ -217,7 +206,7 @@ if __name__ == '__main__':
             del mity_header[mity_header_idx]
             print(mity_header)
         else:
-            merged_header.append(nuclear_header_line)
+            merged_header.append(hc_header_line)
     
     # sys.exit()
     # now add the rest of the mity_header to the merge header
@@ -228,26 +217,26 @@ if __name__ == '__main__':
     
     for line in merged_header:
         print(line)
-    sys.exit()
+    # sys.exit()
     
     # now check that the sample names are in the right order
     
     # get nuclear and mity sample names
     # assumes that sample names always start from 10th column
-    nuclear_col_names = nuclear_col_names.split('\t')
-    nuclear_samples = nuclear_col_names[9:]
-    # print(nuclear_samples)
+    hc_col_names = hc_col_names.split('\t')
+    hc_samples = hc_col_names[9:]
+    # print(hc_samples)
     
     mity_col_names = mity_col_names.split('\t')
     mity_samples = mity_col_names[9:]
     # print(mity_samples)
     
-    if nuclear_samples == mity_samples:
+    if hc_samples == mity_samples:
         sys.stderr.write(
             "samples in same order - can just add mity variants to nuclear vcf")
         # add the nuclear variants with the mity variants - will be ordered 
         # later
-        nuclear_col_names = ('\t').join(nuclear_col_names)
+        hc_col_names = ('\t').join(hc_col_names)
         
         new_mity_variants = []
         for line in mity_variants:
@@ -255,12 +244,12 @@ if __name__ == '__main__':
             new_mity_variants.append(new_line)
         
         new_vcf = merged_header + [
-            nuclear_col_names] + new_mity_variants + nuclear_variants
+            hc_col_names] + new_mity_variants + hc_variants
         for line in new_vcf:
             print(line)
     else:
         # check that they have the same sampels
-        if set(nuclear_samples) != set(mity_samples):
+        if set(hc_samples) != set(mity_samples):
             sys.exit("VCFs have different sample names")
         mity_variants_no_sample = [x[:9] for x in mity_variants]
         mity_variants_sample = [x[9:] for x in mity_variants]
@@ -269,11 +258,11 @@ if __name__ == '__main__':
         
         # get the order of the nuclear sampels
         # print("nuclear samples")
-        # print(nuclear_samples)
+        # print(hc_samples)
         # print("mity samples")
         # print(mity_samples)
-        # mity_samples_idx = [nuclear_samples.index(x) for x in mity_samples]
-        mity_samples_idx = [mity_samples.index(x) for x in nuclear_samples]
+        # mity_samples_idx = [hc_samples.index(x) for x in mity_samples]
+        mity_samples_idx = [mity_samples.index(x) for x in hc_samples]
         
         # print(mity_samples_idx)
         # sys.exit()
@@ -293,9 +282,9 @@ if __name__ == '__main__':
             new_mity_variants.append(new_line)
         
         # add the nuclear variants with the mity variants - will be ordered later
-        nuclear_col_names = ('\t').join(nuclear_col_names)
+        hc_col_names = ('\t').join(hc_col_names)
         new_vcf = merged_header + [
-            nuclear_col_names] + new_mity_variants + nuclear_variants
+            hc_col_names] + new_mity_variants + hc_variants
         
         new_vcf_file = open(new_vcf_name, 'w')
         for line in new_vcf:
