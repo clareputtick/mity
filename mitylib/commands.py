@@ -28,13 +28,12 @@ def _cmd_call(args):
   logging.info("mity %s", __version__)
   logging.info("Calling mitochondrial variants")
 
-  call.do_call(args.bam, args.reference, args.prefix, args.sites, args.min_mq, args.min_bq, args.min_af, args.min_ac, args.ploidy)
+  call.do_call(args.bam, args.reference, args.prefix, args.min_mq, args.min_bq, args.min_af, args.min_ac, args.ploidy)
 
 P_call = AP_subparsers.add_parser('call', help=_cmd_call.__doc__)
 P_call.add_argument('bam', action = 'append', nargs='+', help = 'BAM files to run the analysis on.')
 P_call.add_argument('--reference', action='store', required=True)
 P_call.add_argument('--prefix', action='store', help = 'Output files will be named with PREFIX')
-P_call.add_argument('--sites', action='store', help = 'Force freebayes to call variants at these sites. Should be vcf.gz.')
 P_call.add_argument('--min-mapping-quality', action='store', type = int, default = 30, help = 'Exclude alignments from analysis if they have a mapping quality less than MIN_MAPPING_QUALITY. Default: 30', dest="min_mq")
 P_call.add_argument('--min-base-quality', action='store', type = int, default = 20, help = 'Exclude alleles from analysis if their supporting base quality is less than MIN_BASE_QUALITY. Default: 20', dest="min_bq")
 P_call.add_argument('--min-alternate-fraction', action='store', type = float, default = 0.5, help = 'Require at least MIN_ALTERNATE_FRACTION observations supporting an alternate allele within a single individual in the in order to evaluate the position. Default: 0.0001, range = [0,1]', dest="min_af")
