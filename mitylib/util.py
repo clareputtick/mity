@@ -40,17 +40,21 @@ def tmp_mity_file_name():
     return f.name
 
 
-def create_prefix(vcf_name, prefix=None):
+def create_prefix(file_name, prefix=None):
     """
     Most mity functions have an optional prefix. If a prefix is not specified,
-    then use the vcf file name (minus the .vcf.gz suffix) as the prefix.
-    :param vcf_name: The vcf filename
+    then use the  file name (minus the .vcf.gz or .bam suffix) as the prefix.
+    :param file_name: The vcf, bam, bed filename
     :param prefix: The optional prefix. If None, then craete a prefix from 
     vcf_name, else return prefix
     :return: str prefix
     """
-    prefix = [os.path.basename(vcf_name).split(".vcf")[0], prefix][
-        prefix is not None]
+    if ".vcf.gz" in file_name:
+        prefix = [os.path.basename(file_name).split(".vcf")[0], prefix][prefix is not None]
+    elif ".bam" in file_name:
+        prefix = [os.path.basename(file_name).split(".bam")[0], prefix][prefix is not None]
+    else:
+        raise ValueError("Unsupported file type")
     return prefix
 
 
