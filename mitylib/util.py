@@ -12,7 +12,7 @@ def tabix(f):
     :returns: Nothing
     :rtype: None
     """
-    tabix_call = "tabix " + f
+    tabix_call = "tabix -f " + f
     logging.debug(tabix_call)
     subprocess.run(tabix_call, shell=True)
 
