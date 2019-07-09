@@ -63,6 +63,8 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     mity normalise --vcf test1.2.0.dedup.realigned.recalibrated.chrMT.mity.vcf.gz --outfile test1.2.0.dedup.realigned.recalibrated.chrMT.mity.norm.vcf.gz
     # this works v well
 
+    mity report --vcf test1.2.0.dedup.realigned.recalibrated.chrMT.mity.norm.vcf.gz
+
 # TODO setup python package on pip
 * https://packaging.python.org/tutorials/packaging-projects/
 * I made setup.py based on this tutorial, and it seemed to work locally.
