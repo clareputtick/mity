@@ -51,6 +51,8 @@ kccg-mity:      MD5 (resources/usr/bin/freebayes) = 88504cd29b834989f471cc119b74
 based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or maybe even 0.9.9
 
 #### install freebayes-1.2.0
+* This works great
+
     mkdir freebayes-1.2.0
     cd freebayes-1.2.0
     git clone --recursive --branch v1.2.0 git://github.com/ekg/freebayes.git
@@ -59,11 +61,11 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     which freebayes
     #freebayes-1.2.0/freebayes/bin/freebayes
     
-    mity call --reference $B37D5 --prefix test1 test/A1.dedup.realigned.recalibrated.chrMT.bam --normalise
+    mity call --reference $B37D5 --prefix test1.2.0 test/A1.dedup.realigned.recalibrated.chrMT.bam --normalise
+    mity call --reference $B37D5 --prefix test1.2.0 test/A1.dedup.realigned.recalibrated.chrMT.bam
     mity normalise --vcf test1.2.0.dedup.realigned.recalibrated.chrMT.mity.vcf.gz --outfile test1.2.0.dedup.realigned.recalibrated.chrMT.mity.norm.vcf.gz
-    # this works v well
-
     mity report --vcf test1.2.0.dedup.realigned.recalibrated.chrMT.mity.norm.vcf.gz
+    mity merge --nuclear_vcf test/15F00004.hc.vqsr.vcf.gz --mity_vcf test/15F00004.mity.vcf.gz
 
 # TODO setup python package on pip
 * https://packaging.python.org/tutorials/packaging-projects/
