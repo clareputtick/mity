@@ -11,11 +11,12 @@ import logging
 from mitylib import commands
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    #logging.basicConfig(level=logging.INFO, format="%(message)s")
     logging.basicConfig(level=logging.DEBUG, format="%(message)s")
     args = commands.parse_args()
-    try:
-        args.func(args)
-    except AttributeError:
-        print("For help, try mity -h")
-        pass
+    args.func(args)
+    # try:
+    #     args.func(args)
+    # except AttributeError:
+    #     print("For help, try mity -h")
+    #     pass

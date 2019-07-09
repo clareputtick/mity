@@ -5,16 +5,19 @@ nuclear VCF are replaces with the mity variants, and the headers are merged
 """
 import sys
 import gzip
+import logging
+from .util import write_merged_vcf
+from .util import create_prefix
 
-if __name__ == '__main__':
+def do_merge(mity_vcf, hc_vcf, prefix=None):
     
-    hc_vcf = sys.argv[1]
-    mity_vcf = sys.argv[2]
-    
-    # sys.exit()
+    prefix = create_prefix(hc_vcf, prefix)
+    outfile = prefix + ".mity.vcf.gz"
+
+    logging.info(f"importing hc_vcf: {hc_vcf}")
     hc_file = gzip.open(hc_vcf, 'rt')
     
-    # split the header and the variants into two seperate lists
+    # split the header and the variants into two separate lists
     hc_header = []
     hc_variants = []
     for line in hc_file:
@@ -28,10 +31,11 @@ if __name__ == '__main__':
     
     hc_col_names = hc_header[-1]
     del hc_header[-1]
-    
+
+    logging.info(f"importing mity_vcf: {mity_vcf}")
     mity_file = gzip.open(mity_vcf, 'rt')
     
-    # split the header and the variants into two seperate lists
+    # split the header and the variants into two separate lists
     # TODO: to speed up, do we actually need to get hc variants?
     mity_header = []
     mity_variants = []
@@ -94,8 +98,8 @@ if __name__ == '__main__':
     hc_header = [x for x in hc_header if "##reference" not in x]
     
     # make new reference line and add to merged header
-    new_ref_line = "##reference=If CHR=MT: " + mity_ref + ". Otherwise: " + \
-                   hc_ref
+    # @TODO add ##mity_reference, ##nuclear_reference, and set ##reference=hc_ref[0].split('##reference=')
+    new_ref_line = "##reference=If CHR=MT: " + mity_ref + ". Otherwise: " + hc_ref
     
     # remove all the lines in the mity header that are also in the HC header
     # this should remove contig lines if they are the same
@@ -249,5 +253,5 @@ if __name__ == '__main__':
         hc_col_names = ('\t').join(hc_col_names)
         new_vcf = merged_header + [
             hc_col_names] + new_mity_variants + hc_variants
-        for line in new_vcf:
-            print(line)
+
+        write_merged_vcf(new_vcf, outfile)

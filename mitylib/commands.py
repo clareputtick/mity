@@ -142,7 +142,7 @@ def _cmd_merge(args):
 P_merge = AP_subparsers.add_parser('merge', help=_cmd_merge.__doc__)
 P_merge.add_argument('--mity_vcf', action='store', required=True,
                       help="mity vcf file")
-P_merge.add_argument('--nuclear_vcf', action='append', required=True,
+P_merge.add_argument('--nuclear_vcf', action='store', required=True,
                      help="nuclear vcf file")
 P_merge.add_argument('--prefix', action='store',
                       help='Output files will be named with PREFIX. '

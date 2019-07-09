@@ -4,10 +4,7 @@ import sys
 import gzip
 import re
 import logging
-import subprocess
-import tempfile
-import os
-from .util import tabix
+from .util import write_vcf
 
 def unchanged(List):
   # check that all numbers in the list are the same
@@ -1319,18 +1316,8 @@ def do_normalise(vcf, outfile=None, chromosome=None):
     # debug_print_vcf_lines(filtered_variants)
     logging.info('Writing normalised vcf\n')
     new_vcf = header_lines + filtered_variants
-  
-    # just get the name of a tempfile
-    f = tempfile.NamedTemporaryFile(mode="wt", prefix='mity', suffix=".vcf", delete=False)
-    f.close()
-    logging.debug(f"Writing uncompressed vcf to {f.name}")
-    with open(f.name, mode='wt', encoding='utf-8') as myfile:
-      for vcf_line in new_vcf:
-        myfile.write('\t'.join([str(elem) for elem in vcf_line])+'\n')
-  
-    subprocess.run(f"sort -k1,1 -k2,2n {f.name} | bgzip -cf > {outfile}", shell=True)
-    tabix(outfile)
-    os.remove(f.name)
+
+    write_vcf(new_vcf, outfile)
 
 def debug_print_vcf_lines(x):
   for line in x:
