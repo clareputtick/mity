@@ -1,6 +1,7 @@
 import logging
 import subprocess
 import os
+import tempfile
 
 def tabix(f):
     """
@@ -24,4 +25,84 @@ def check_missing_file(file_list, die=True):
     if die and len(missing_files) > 0:
         raise ValueError(f"Missing these files: {missing_files}")
     return missing_files
+
+def tmp_mity_file_name():
+    """
+    Create a tmp mity vcf file
+    
+    #TODO There must be more pythonic ways of doing this.
+    """
+    f = tempfile.NamedTemporaryFile(mode="wt", prefix='mity', suffix=".vcf",
+                                    delete=False)
+    f.close()
+    assert isinstance(f.name, str)
+    return f.name
+
+
+def create_prefix(vcf_name, prefix=None):
+    """
+    Most mity functions have an optional prefix. If a prefix is not specified,
+    then use the vcf file name (minus the .vcf.gz suffix) as the prefix.
+    :param vcf_name: The vcf filename
+    :param prefix: The optional prefix. If None, then craete a prefix from 
+    vcf_name, else return prefix
+    :return: str prefix
+    """
+    prefix = [os.path.basename(vcf_name).split(".vcf")[0], prefix][
+        prefix is not None]
+    return prefix
+
+
+def write_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
+    """
+    write a vcf object to vcf.gz file with tbi index.
+    
+    This differs from write_merged_vcf, as mity merge doesn't split each VCF 
+    line on tabs, whereas mity normalise does
+    
+    @TODO: refactor to use pyvcf
+    :param new_vcf: new_vcf is a list of lists, created by normalise
+    :param out_file: the resulting filename. this should end in vcf.gz
+    :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
+    """
+    f = tmp_mity_file_name()
+    logging.debug(f"Writing uncompressed vcf to {f}")
+    with open(f, mode='wt', encoding='utf-8') as myfile:
+        for vcf_line in new_vcf:
+            myfile.write('\t'.join([str(elem) for elem in vcf_line]) + '\n')
+    logging.debug(f"Sorting, bgzipping {f} -> {out_file}")
+    subprocess.run(f"gsort {f} {genome_file} | bgzip -cf > {out_file}", shell=True)
+    logging.debug(f"Tabix indexing {out_file}")
+    tabix(out_file)
+    os.remove(f)
+
+def write_merged_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
+    """
+    write a vcf object to vcf.gz file with tbi index.
+    
+    This differs from write_vcf, as mity merge doesn't split each VCF line on 
+    tabs, whereas mity normalise does
+    
+    @TODO: refactor to use pyvcf
+    :param new_vcf: new_vcf is a list of strings, created by merge
+    :param out_file: the resulting filename. this should end in vcf.gz
+    :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
+    """
+    f = tmp_mity_file_name()
+    logging.debug(f"Writing uncompressed vcf to {f}")
+    with open(f, mode='wt', encoding='utf-8') as myfile:
+        for vcf_line in new_vcf:
+            myfile.write(vcf_line + '\n')
+    logging.debug(f"Sorting, bgzipping {f} -> {out_file}")
+    subprocess.run(f"gsort {f} {genome_file} | bgzip -cf > {out_file}", shell=True)
+    logging.debug(f"Tabix indexing {out_file}")
+    tabix(out_file)
+    os.remove(f)
+
+def write_genome_file(vcf_file, genome_file):
+    import vcf
+    vcf = vcf.Reader(filename=vcf_file)
+    with open(genome_file, mode='wt', encoding='utf-8') as genome_file:
+        for contig in vcf.contigs.keys():
+            genome_file.write('\t'.join(vcf.contigs[contig]))
 
