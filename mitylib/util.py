@@ -102,7 +102,7 @@ def write_merged_vcf(new_vcf, out_file, genome_file='annot/b37d5.genome'):
     tabix(out_file)
     os.remove(f)
 
-def write_genome_file(vcf_file, genome_file):
+def create_genome_file(vcf_file, genome_file):
     """
     gsort (https://github.com/brentp/gsort) requires a '.genome'
     file to tell it how to sort the vcf records. This function creates a

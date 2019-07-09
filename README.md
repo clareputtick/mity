@@ -12,3 +12,8 @@
 * pyvcf
 * xlsxwriter
 * pandas
+
+# Acknowledgements
+We thank the Kinghorn Centre for Clinical Genomics and collaborators, who helped
+with feedback for running mity. 
+We thank Eric Talevich who's CNVkit helped us structure mity as a package
