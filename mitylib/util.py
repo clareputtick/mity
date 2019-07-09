@@ -54,7 +54,7 @@ def create_prefix(vcf_name, prefix=None):
     return prefix
 
 
-def write_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
+def write_vcf(new_vcf, out_file, genome_file='annot/b37d5.genome'):
     """
     write a vcf object to vcf.gz file with tbi index.
     
@@ -76,7 +76,7 @@ def write_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
     tabix(out_file)
     os.remove(f)
 
-def write_merged_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
+def write_merged_vcf(new_vcf, out_file, genome_file='annot/b37d5.genome'):
     """
     write a vcf object to vcf.gz file with tbi index.
     
