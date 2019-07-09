@@ -5,6 +5,7 @@ import logging
 import os.path
 from .util import tabix
 from .util import check_missing_file
+from .util import create_prefix
 from .normalise import do_normalise as vcfnorm
 
 # from . import normalise ## @TODO
@@ -24,8 +25,7 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=20,
                 "If there is more than one bam file, --prefix must be set")
     
     check_missing_file(bam_files, die=True)
-    
-    prefix = [bam_files[0].split(".")[0], prefix][prefix is not None]
+    prefix = create_prefix(bam_files[0], prefix)
     
     # make outfile string
     file_string = []
