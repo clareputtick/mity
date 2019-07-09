@@ -2,6 +2,7 @@ import logging
 import subprocess
 import os
 import tempfile
+import vcf
 
 def tabix(f):
     """
@@ -60,7 +61,6 @@ def write_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
     This differs from write_merged_vcf, as mity merge doesn't split each VCF 
     line on tabs, whereas mity normalise does
     
-    @TODO: refactor to use pyvcf
     :param new_vcf: new_vcf is a list of lists, created by normalise
     :param out_file: the resulting filename. this should end in vcf.gz
     :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
@@ -83,7 +83,6 @@ def write_merged_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
     This differs from write_vcf, as mity merge doesn't split each VCF line on 
     tabs, whereas mity normalise does
     
-    @TODO: refactor to use pyvcf
     :param new_vcf: new_vcf is a list of strings, created by merge
     :param out_file: the resulting filename. this should end in vcf.gz
     :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
@@ -100,7 +99,16 @@ def write_merged_vcf(new_vcf, out_file, genome_file='b37d5.genome'):
     os.remove(f)
 
 def write_genome_file(vcf_file, genome_file):
-    import vcf
+    """
+    gsort (https://github.com/brentp/gsort) requires a '.genome'
+    file to tell it how to sort the vcf records. This function creates a
+    '.genome' file in the same order as the contig lines in the vcf header.
+
+    :param vcf_file: a vcf file with the correct contig names
+    :param genome_file: the resulting .genome file
+    :return: None. this creates a '.genome' file
+    """
+    
     vcf = vcf.Reader(filename=vcf_file)
     with open(genome_file, mode='wt', encoding='utf-8') as genome_file:
         for contig in vcf.contigs.keys():
