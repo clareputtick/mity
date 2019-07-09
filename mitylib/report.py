@@ -416,7 +416,7 @@ def do_report(vcf, prefix, min_vaf=0.0):
         raise ValueError("If there is more than one vcf file, --prefix must be set")
     check_missing_file(vcf, die=True)
 
-    prefix = [vcf[0].split(".")[0], prefix][prefix is not None]
+    prefix = [vcf[0].split(".vcf.gz")[0], prefix][prefix is not None]
     
     # loop over all the files that are input
     variant_list = []
