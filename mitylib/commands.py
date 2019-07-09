@@ -137,7 +137,7 @@ def _cmd_merge(args):
     """Merging mity VCF with nuclear VCF"""
     logging.info("mity %s", __version__)
     logging.info("mity vcf merge")
-    merge.do_merge(args.vcf, args.prefix, args.min_vaf)
+    merge.do_merge(args.mity_vcf, args.nuclear_vcf, args.prefix)
 
 P_merge = AP_subparsers.add_parser('merge', help=_cmd_merge.__doc__)
 P_merge.add_argument('--mity_vcf', action='store', required=True,
@@ -145,7 +145,8 @@ P_merge.add_argument('--mity_vcf', action='store', required=True,
 P_merge.add_argument('--nuclear_vcf', action='append', required=True,
                      help="nuclear vcf file")
 P_merge.add_argument('--prefix', action='store',
-                      help='Output files will be named with PREFIX')
+                      help='Output files will be named with PREFIX. '
+                     'The default is to use the nuclear vcf name')
 P_merge.set_defaults(func=_cmd_merge)
 
 
