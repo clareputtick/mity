@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mity",
-    version="0.0.1a",
+    version="0.0.1a0",
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -35,7 +35,7 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(),
     install_requires=[
-        'vcf',
+        'pyvcf',
         'pandas'
     ],
     python_requires='>=3',
