@@ -77,3 +77,16 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     keyring set https://test.pypi.org/legacy/ drmjc
     keyring set https://upload.pypi.org/legacy/ drmjc
 
+* test installation on a fresh osx box
+
+  python -m venv .
+  source bin/activate
+  bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1a1
+  
+* debugging
+  
+  bump the version number in setup.py
+  ./build.sh
+  # wait for test.pypi to index the new package
+  # in your venv grab the new version. it'll uninstall the previous one
+  bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1a3
