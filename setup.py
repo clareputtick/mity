@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mity",
-    version="0.0.1a0",
+    version="0.0.1a2",
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -39,14 +39,19 @@ setuptools.setup(
         'pandas'
     ],
     python_requires='>=3',
-    data_files=[
-        ('anticodon_positions.csv', ['annot/anticodon_positions.csv']),
-        ('b37d5.genome', ['annot/b37d5.genome']),
-        ('gtf_annotations.csv', ['annot/gtf_annotations.csv']),
-        ('haplotype_data.csv', ['annot/haplotype_data.csv']),
-        ('mgrb_variants.csv', ['annot/mgrb_variants.csv']),
-        ('mito_dna_func_loc.csv', ['annot/mito_dna_func_loc.csv']),
-        ('mitomap_panel_annotations.csv', ['annot/mitomap_panel_annotations.csv']),
-        ('mitotip_score_fixed_del.csv', ['annot/mitotip_score_fixed_del.csv'])
-    ]
+    data_files=[('annot', 
+        ['annot/anticodon_positions.csv',
+        'annot/b37d5.genome',
+        'annot/gtf_annotations.csv',
+        'annot/haplotype_data.csv',
+        'annot/mgrb_variants.csv',
+        'annot/mito_dna_func_loc.csv',
+        'annot/mitomap_panel_annotations.csv',
+        'annot/mitotip_score_fixed_del.csv'
+    ])],
+    entry_points={
+        'console_scripts': [
+            'mity=mity:main',
+        ],
+    },
 )

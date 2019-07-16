@@ -70,3 +70,10 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
 # TODO setup python package on pip
 * https://packaging.python.org/tutorials/packaging-projects/
 * I made setup.py based on this tutorial, and it seemed to work locally.
+* use pip-compile from pip-tools to make requirements.txt: https://pypi.org/project/pip-tools/
+* use build.sh to build sdist, bdist and then twine to upload to test pypi
+* save twine credentials into keyring (pip install keyring)
+
+    keyring set https://test.pypi.org/legacy/ drmjc
+    keyring set https://upload.pypi.org/legacy/ drmjc
+
