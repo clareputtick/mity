@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mity",
-    version="0.0.1a2",
+    version="0.0.1a3",
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -49,9 +49,5 @@ setuptools.setup(
         'annot/mitomap_panel_annotations.csv',
         'annot/mitotip_score_fixed_del.csv'
     ])],
-    entry_points={
-        'console_scripts': [
-            'mity=mity:main',
-        ],
-    },
+    scripts=["mity"]
 )
