@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mity",
-    version="0.0.1",
+    version="0.0.1a",
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -15,16 +15,23 @@ setuptools.setup(
     license="see LICENSE.txt",
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Intended Audience :: Bioinformaticians',
+        'Environment :: Console',
+        'Environment :: MacOS X',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Healthcare Industry',
+        'License :: Free for non-commercial use',
+        'Natural Language :: English',
+        "Operating System :: MacOS",
+        "Operating System :: POSIX",
+        "Operating System :: Unix",
         "Programming Language :: Python :: 3.7",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Topic :: Scientific/Engineering :: Bio-Informatics"
     ],
     keywords='mitochondrial DNA genomics variant SNV INDEL',
     project_urls={
-        'Documentation': 'https://github.com/KCCG/mity',
-        'KCCG': 'http://garvan.org.au/kccg',
-        'Mark Cowley, CCI': 'https://ccia.org.au/home/our-purpose/our-people/a-prof-mark-cowley/'
+        'Documentation': 'https://github.com/KCCG/mity/',
+        'Source': 'https://github.com/KCCG/mity/',
+        'Funding': 'http://garvan.org.au/kccg',
     },
     packages=setuptools.find_packages(),
     install_requires=[
