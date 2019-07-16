@@ -1,0 +1,11 @@
+argparse
+gzip
+logging
+os
+os.path
+pandas
+re
+setuptools
+subprocess
+sys
+vcf
