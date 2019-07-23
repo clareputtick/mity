@@ -8,12 +8,14 @@ License: Open source for research use: see LICENSE.txt
 
 import logging
 from mitylib import commands
-
-dependencies = ['freebayes', 'gsort', 'tabix', 'bgzip']
+from mitylib import util
 
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.INFO, format="%(message)s")
     logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+
+    util.check_dependencies()
+
     args = commands.parse_args()
     if len(vars(args)) == 0:
         logging.info("usage: mity -h")

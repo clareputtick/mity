@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import vcf
+import configparser
 
 def tabix(f):
     """
@@ -129,15 +130,26 @@ def check_dependency(dep, exit=True):
     :param exit: If True, then if the dependency isn't found, the session will exit.
     :return: True/False if dependency was found.
     """
-    logging.info("Checking for dependency: " + dep)
     found = False
     try:
-        res = subprocess.run(['which', dep], capture_output=True, check=True)
+        res = subprocess.run(['which', dep], capture_output=True, check=True, encoding="UTF8")
         found = True
-        logging.info("Found dependency: " + res)
+        logging.info("Found dependency: " + str(res.stdout).strip())
     except subprocess.CalledProcessError:
         logging.error("Missing dependency: " + dep)
         if exit:
             sys.exit(1)
-    finally:
-        return found
+    return found
+
+
+def check_dependencies(f='verchew.ini'):
+    """
+    Check that all of the dependencies that are listed in the INI format exist.
+    :param f: an INI formatted file. see verchew [https://verchew.readthedocs.io/en/latest/]
+    :return:
+    """
+    config = configparser.ConfigParser()
+    config.read(f)
+    for section in config.sections():
+        dependency = config[section]['cli']
+        check_dependency(dependency)
