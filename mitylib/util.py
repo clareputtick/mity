@@ -1,6 +1,7 @@
 import logging
 import subprocess
 import os
+import sys
 import tempfile
 import vcf
 
@@ -118,3 +119,25 @@ def create_genome_file(vcf_file, genome_file):
         for contig in vcf.contigs.keys():
             genome_file.write('\t'.join(vcf.contigs[contig]))
 
+def check_dependency(dep, exit=True):
+    """
+    Check if a dependency exists.
+
+    >>> check_dependency("ls")
+    >>> check_dependency("freebayes")
+    :param dep: name of the dependency
+    :param exit: If True, then if the dependency isn't found, the session will exit.
+    :return: True/False if dependency was found.
+    """
+    logging.info("Checking for dependency: " + dep)
+    found = False
+    try:
+        res = subprocess.run(['which', dep], capture_output=True, check=True)
+        found = True
+        logging.info("Found dependency: " + res)
+    except subprocess.CalledProcessError:
+        logging.error("Missing dependency: " + dep)
+        if exit:
+            sys.exit(1)
+    finally:
+        return found
