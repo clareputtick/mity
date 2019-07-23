@@ -2,7 +2,6 @@
 """
 Mity: a sensitive variant analysis pipeline optimised for WGS data
 
-
 Authors: Clare Puttick, Mark Cowley
 License: Open source for research use: see LICENSE.txt
 """
@@ -10,13 +9,13 @@ License: Open source for research use: see LICENSE.txt
 import logging
 from mitylib import commands
 
+dependencies = ['freebayes', 'gsort', 'tabix', 'bgzip']
+
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.INFO, format="%(message)s")
     logging.basicConfig(level=logging.DEBUG, format="%(message)s")
     args = commands.parse_args()
-    args.func(args)
-    # try:
-    #     args.func(args)
-    # except AttributeError:
-    #     print("For help, try mity -h")
-    #     pass
+    if len(vars(args)) == 0:
+        logging.info("usage: mity -h")
+    else:
+        args.func(args)
