@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mity",
-    version="0.0.1a3",
+    version="0.0.1a4",
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -39,15 +39,18 @@ setuptools.setup(
         'pandas'
     ],
     python_requires='>=3',
-    data_files=[('annot', 
-        ['annot/anticodon_positions.csv',
-        'annot/b37d5.genome',
-        'annot/gtf_annotations.csv',
-        'annot/haplotype_data.csv',
-        'annot/mgrb_variants.csv',
-        'annot/mito_dna_func_loc.csv',
-        'annot/mitomap_panel_annotations.csv',
-        'annot/mitotip_score_fixed_del.csv'
-    ])],
+    data_files=[
+        (".", ['verchew.ini']),
+        ('annot', [
+            'annot/anticodon_positions.csv',
+            'annot/b37d5.genome',
+            'annot/gtf_annotations.csv',
+            'annot/haplotype_data.csv',
+            'annot/mgrb_variants.csv',
+            'annot/mito_dna_func_loc.csv',
+            'annot/mitomap_panel_annotations.csv',
+            'annot/mitotip_score_fixed_del.csv'
+        ])
+    ],
     scripts=["mity"]
 )
