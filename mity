@@ -9,6 +9,9 @@ License: Open source for research use: see LICENSE.txt
 import logging
 from mitylib import commands
 from mitylib import util
+import sys
+
+assert sys.version_info >= (3, 7)
 
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.INFO, format="%(message)s")
