@@ -76,8 +76,7 @@ P_call.add_argument('--min-alternate-count', action='store', type=int,
 P_call.add_argument('--ploidy', action='store', type=int, default=2,
                     help='Expected ploidy of the sample. Default: 2.')
 P_call.add_argument('--normalise', action='store_true',
-                    help='Normalise the resulting VCF? This is currently '
-                         'broken')
+                    help='Normalise the resulting VCF?')
 # parser.add_argument('--parallel', action='store_true', help = 'Run 
 # freebayes in parallel.')
 # parser.add_argument('--ncpu', action='store', type = int, help = 'Number of
