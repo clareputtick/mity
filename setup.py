@@ -3,9 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("mitylib/_version.py", "r") as fh:
+    version = fh.read().replace("__version__ = ", "").strip('""\n')
 setuptools.setup(
     name="mity",
-    version="0.0.1a4",
+    version=version,
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
     long_description_content_type="text/markdown",
