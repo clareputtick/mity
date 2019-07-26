@@ -90,3 +90,17 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
   # wait for test.pypi to index the new package
   # in your venv grab the new version. it'll uninstall the previous one
   bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1a3
+  
+# test data
+
+    dx make_download_url --duration 1y kccg-freebayes-mity-resources:/test/kccg-mity-call/inputs/A1.dedup.realigned.recalibrated.chrMT.bam
+    dx make_download_url --duration 1y kccg-freebayes-mity-resources:/test/kccg-mity-call/inputs/A1.dedup.realigned.recalibrated.chrMT.bam.bai
+    dx make_download_url --duration 1y kccg-freebayes-mity-resources:/assets/hs37d5.fasta-index.tar.gz
+
+# make reference genome
+
+    wget https://dl.dnanex.us/F/D/pVG7PjZy4qKBB6ZKbkkF0X6kB0kxf7ZzjpK7fXjY/hs37d5.fasta-index.tar.gz
+    tar -xzvf hs37d5.fasta-index.tar.gz; mv genome.dict hs37d5.dict; mv genome.fa hs37d5.fa; mv genome.fa.fai hs37d5.fa.fai
+    samtools faidx hs37d5.fa MT -o hs37d5.MT.fa
+    samtools faidx hs37d5.MT.fa
+    dx upload hs37d5.MT.fa* -o 
