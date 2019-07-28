@@ -38,8 +38,7 @@ def _cmd_call(args):
     logging.info("Calling mitochondrial variants")
     
     call.do_call(args.bam, args.reference, args.prefix, args.min_mq,
-                 args.min_bq, args.min_af, args.min_ac, args.ploidy,
-                 args.normalise)
+                 args.min_bq, args.min_af, args.min_ac, args.p, args.normalise)
 
 
 P_call = AP_subparsers.add_parser('call', help=_cmd_call.__doc__)
@@ -73,15 +72,13 @@ P_call.add_argument('--min-alternate-count', action='store', type=int,
                          'individual in order to evaluate the position. '
                          'Default: 4',
                     dest="min_ac")
-P_call.add_argument('--ploidy', action='store', type=int, default=2,
-                    help='Expected ploidy of the sample. Default: 2.')
+P_call.add_argument('--p', action='store', type=float,
+                    default=0.002,
+                    help='Minimum noise level. This is used to calculate QUAL score'
+                         'Default: 0.002, range = [0,1]',
+                    dest="p")
 P_call.add_argument('--normalise', action='store_true',
                     help='Normalise the resulting VCF?')
-# parser.add_argument('--parallel', action='store_true', help = 'Run 
-# freebayes in parallel.')
-# parser.add_argument('--ncpu', action='store', type = int, help = 'Number of
-# CPUs to use when running in parallel.')
-
 P_call.set_defaults(func=_cmd_call)
 
 # normalise --------------------------------------------------------------------

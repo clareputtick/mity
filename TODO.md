@@ -4,6 +4,7 @@
 
 # normalise
 * migrate to pyvcf where possible
+* i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. 
 
 # merge
 * migrate to pyvcf where possible (started in dev/merge2.py)

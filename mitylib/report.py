@@ -17,44 +17,8 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
         alt = lineparts[4]
         QUAL = lineparts[5]
         FILTER = lineparts[6]
-        
-        # make HGVS syntax
-        if len(alt) > 1 or len(ref) > 1:
-            # this is an indel
-            if len(ref) > len(alt):
-                # this is a del
-                delet = ref[1:]
-                if len(delet) == 1:
-                    hgvs_pos = int(pos) + 1
-                    # print(hgvs_pos)
-                elif len(delet) > 1:
-                    hvgs_pos_start = int(pos) + 1
-                    hvgs_pos_end = int(pos) + len(delet)
-                    hgvs_pos = str(hvgs_pos_start) + "_" + str(hvgs_pos_end)
-                    # print(hgvs_pos)
-                # print(hgvs_pos)   
-                hgvs = "m." + str(hgvs_pos) + "del"
-                # print(hgvs)
-            
-            else:
-                # print("ins")
-                # this is an ins    
-                ins = alt[1:]
-                if len(ins) == 1:
-                    hgvs_pos = int(pos) + 1
-                    # print(hgvs_pos)
-                elif len(ins) > 1:
-                    hvgs_pos_start = int(pos) + 1
-                    hvgs_pos_end = int(pos) + len(ins)
-                    hgvs_pos = str(hvgs_pos_start) + "_" + str(hvgs_pos_end)
-                    # print(hgvs_pos)
-                # print(hgvs_pos)   
-                hgvs = "m." + str(hgvs_pos) + "ins"
-                # print(hgvs)
-        
-        else:
-            # this is a SNP
-            hgvs = "m." + str(pos) + str(ref) + ">" + str(alt)
+
+        hgvs = make_hgvs(pos, ref, alt)
         # print(hgvs)
         info = lineparts[7]
         info = info.split(";")
@@ -123,7 +87,7 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
             # annotations
             consequence_idx = vep_headers.index('Consequence')
             
-            # get the index of the annotations that dont contain the word stream
+            # get the index of the annotations that don't contain the word stream
             not_stream = ['stream' not in x[consequence_idx] for x in VEP]
             stream_idx = [i for i, x in enumerate(not_stream) if x]
             # print(stream_idx)
@@ -342,6 +306,47 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
     return (table)
 
 
+def make_hgvs(pos, ref, alt):
+    # make HGVS syntax
+    if len(alt) > 1 or len(ref) > 1:
+        # this is an indel
+        if len(ref) > len(alt):
+            # this is a del
+            delet = ref[1:]
+            if len(delet) == 1:
+                hgvs_pos = int(pos) + 1
+                # print(hgvs_pos)
+            elif len(delet) > 1:
+                hvgs_pos_start = int(pos) + 1
+                hvgs_pos_end = int(pos) + len(delet)
+                hgvs_pos = str(hvgs_pos_start) + "_" + str(hvgs_pos_end)
+                # print(hgvs_pos)
+            # print(hgvs_pos)
+            hgvs = "m." + str(hgvs_pos) + "del"
+            # print(hgvs)
+
+        else:
+            # print("ins")
+            # this is an ins
+            ins = alt[1:]
+            if len(ins) == 1:
+                hgvs_pos = int(pos) + 1
+                # print(hgvs_pos)
+            elif len(ins) > 1:
+                hvgs_pos_start = int(pos) + 1
+                hvgs_pos_end = int(pos) + len(ins)
+                hgvs_pos = str(hvgs_pos_start) + "_" + str(hvgs_pos_end)
+                # print(hgvs_pos)
+            # print(hgvs_pos)
+            hgvs = "m." + str(hgvs_pos) + "ins"
+            # print(hgvs)
+
+    else:
+        # this is a SNP
+        hgvs = "m." + str(pos) + str(ref) + ">" + str(alt)
+    return hgvs
+
+
 def split_header_variants(vcf):
     header = []
     variants = []
@@ -408,7 +413,14 @@ def find_index(string, pattern):
     return [i for i, ltr in enumerate(string) if ltr == pattern]
 
 
-def do_report(vcf, prefix, min_vaf=0.0):
+def do_report(vcf, prefix=None, min_vaf=0.0):
+    """
+    Create a mity report
+    :param vcf: the path to a vcf file
+    :param prefix: the optional prefix. This must be set if there is >1 vcf files
+    :param min_vaf: only include vairants with vaf > min_vaf in the report
+    :return:
+    """
     vcf = vcf[0]
     
     if len(vcf) == 0:

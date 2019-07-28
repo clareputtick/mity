@@ -51,7 +51,7 @@ def create_prefix(file_name, prefix=None):
     vcf_name, else return prefix
     :return: str prefix
     """
-    if ".vcf.gz" in file_name:
+    if ".vcf" in file_name:
         prefix = [os.path.basename(file_name).split(".vcf")[0], prefix][prefix is not None]
     elif ".bam" in file_name:
         prefix = [os.path.basename(file_name).split(".bam")[0], prefix][prefix is not None]
