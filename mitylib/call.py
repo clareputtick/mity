@@ -8,10 +8,23 @@ from .util import check_missing_file
 from .util import create_prefix
 from .normalise import do_normalise as vcfnorm
 
-# from . import normalise ## @TODO
-
-def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=20,
-            min_af=0.5, min_ac=4, ploidy=2, normalise=True):
+def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
+            min_vaf=0.005, min_ac=4, p=0.002, normalise=True):
+    """
+    Run mity call.
+    :param bam_files: a list of bam_files
+    :param reference: the path to the reference genome file (fasta format)
+    :param prefix: The result filename prefix. If None, then the first bam_file prefix
+    will be used
+    :param min_mq: minimum mapping quality threshold. default: 30
+    :param min_bq: minimum base quality threshold. default: 24
+    :param min_vaf: minimum heteroplasmy, aka the minimum fraction of alt reads vs total reads.
+    scale [0,1]; default 0.005
+    :param min_ac: minimum number of alternative reads to support a variant. default: 4
+    :param p: the noise threshold. default 0.002
+    :param normalise:
+    :return:
+    """
     bam_files = bam_files[0]  ## @TODO check this still works with >1 BAM file
     
     #####
@@ -49,8 +62,8 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=20,
                       '--min-base-quality {} '
                       '--min-alternate-fraction {} '
                       '--min-alternate-count {} '
-                      '--ploidy {} | bgzip > unnormalised.vcf.gz'
-                      ).format(reference, bam_str, region, min_mq, min_bq, min_af, min_ac, ploidy)
+                      '--ploidy 2 | bgzip > unnormalised.vcf.gz'
+                      ).format(reference, bam_str, region, min_mq, min_bq, min_vaf, min_ac)
     logging.info("Running FreeBayes in sensitive mode")
     print(freebayes_call)
     subprocess.run(freebayes_call, shell=True)
@@ -60,7 +73,7 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=20,
     if normalise:
         logging.info("Normalising and FILTERing variants")
         try:
-            vcfnorm('unnormalised.vcf.gz', output_file_name)
+            vcfnorm('unnormalised.vcf.gz', output_file_name, p)
         finally:
             os.remove('unnormalised.vcf.gz')
     else:

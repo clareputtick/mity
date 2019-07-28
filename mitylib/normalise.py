@@ -939,60 +939,45 @@ def combine_lines(variant_list):
   return(new_vcf)
 
 
-def add_filter(variant_list):
+def add_filter(variant_list, min_DP=15, SB_range = [0.2, 0.8], min_MQMR = 30, min_AQR = 20):
+  """
+  FILTER out poor quality variants in a VCF.
+  If one samples in the vcf passes, then they all pass in the FILTER column.
+
+  :param variant_list: the parsed VCF
+  :param min_DP: minimum total read depth of the variant
+  :param SB_range: min and max SB range, where SB is the strand bias of either the REF (SBR_FAIL), or ALT (SBA_FAIL) reads.
+  :param min_MQMR: minimum MQMR, where MQMR is the "Mean mapping quality of observed reference alleles"
+  :param min_AQR: minimum MQMR, where MQMR is the "Mean mapping quality of observed reference alleles"
+  :return: a
+  """
+  # @TODO: refactor this to use pyvcf
+
   # print(variant_list)
   # sys.exit()
+
+  #############################################
+  ##### HARD CODED FILTER VALUES
+  blacklist = list(range(302, 319))
+  blacklist = blacklist + [3105,3106,3107,3108]
+
   new_vcf = []
 
   for line in variant_list:
     # print(line)
-    # filters depend on RO, AO, MQMR, AQR, POS
-    # Some of these depend on samples
-    # if one sample passes, they all pass
-
-    # # set the filters to be PASS initially
-    # POS_fil = 1
-    # SBR_fil = 1
-    # SBA_fil = 1
-    # MQMR_fil = 1
-    # AQR_fil = 1
-
-    #############################################
-    ##### HARD CODED FILTER VALUES
-    min_DP = 15
-    SB_upper = 0.8
-    SB_lower = 0.2
-    blacklist = list(range(302, 319))
-    blacklist = blacklist + [3105,3106,3107,3108]
-    min_MQMR = 30
-    min_AQR = 20
 
     POS = float(line[1])
-    # print(POS)
 
-    info = line[7]
-    info = info.split(";")
+    info = line[7].split(";")
 
     info_names = [x.split("=")[0] for x in info]
     info_values = [x.split("=")[1] for x in info]
 
-    # SBR
-    SBR_idx = info_names.index("SBR")
-    SBR = float(info_values[SBR_idx])
-    # print(SBR)
+    SBR = float(info_values[info_names.index("SBR")])
+    SBA = float(info_values[info_names.index("SBA")])
+    MQMR = float(info_values[info_names.index("MQMR")])
 
-    # SBA
-    SBA_idx = info_names.index("SBA")
-    SBA = float(info_values[SBA_idx])
-    # print(SBA)
-
-    # MQMR
-    MQMR_idx = info_names.index("MQMR")
-    MQMR = float(info_values[MQMR_idx])
-    # print(MQMR)
-
-    FORMAT_names = line[8]
-    FORMAT_names = FORMAT_names.split(":")
+    FORMAT_names = line[8].split(":")
 
     FORMAT = line[9:]
 
@@ -1001,109 +986,64 @@ def add_filter(variant_list):
     samp_SBA_fil = []
     samp_MQMR_fil = []
     samp_AQR_fil = []
+    # @clare, why don't you just fail variants with depth < min_DP in one filter (samp_DP_fil)?
 
     for samp in FORMAT:
       samp_FORMAT = samp.split(":")
 
-      # AO
-      AO_idx = FORMAT_names.index("AO")
-      AO = float(samp_FORMAT[AO_idx])
-      # print(AO)
+      AO = float(samp_FORMAT[FORMAT_names.index("AO")])
+      RO = float(samp_FORMAT[FORMAT_names.index("RO")])
+      AQR = float(samp_FORMAT[FORMAT_names.index("AQR")])
 
-      # RO
-      RO_idx = FORMAT_names.index("RO")
-      RO = float(samp_FORMAT[RO_idx])
-      # print(RO)
-
-      # AQR
-      AQR_idx = FORMAT_names.index("AQR")
-      AQR = float(samp_FORMAT[AQR_idx])
-      # print(AQR)    
-
-  
-      if RO > min_DP and (SB_upper < SBR or SB_lower > SBR):
-        # fails
+      # @clare: why not (RO+AO) > min_DP?
+      # @clare: why not do `(RO+AO) > min_DP` once and capture in samp_DP_fil?
+      if RO > min_DP and (SB_range[1] < SBR or SB_range[0] > SBR):
         samp_SBR_fil.append(0)
 
-      if AO > min_DP and (SB_upper < SBA or SB_lower > SBA):
-        # fails
+      if AO > min_DP and (SB_range[1] < SBA or SB_range[0] > SBA):
         samp_SBA_fil.append(0)
 
       if RO > min_DP and MQMR < min_MQMR:
-        # fails
         samp_MQMR_fil.append(0)
 
       if RO > min_DP and AQR < min_AQR:
-        # fails
         samp_AQR_fil.append(0)
 
       if POS in blacklist:
-        # fails
-        # print(POS)
         samp_POS_fil.append(0)
 
-    # print(samp_POS_fil)
-    # if they arent all zero than at least one passed
+    # if they aren't all zero than at least one passed
     # only one sample has to pass
-    FILTER_INFO = []
     FILTER = []
     if len(samp_SBR_fil) < len(FORMAT):
-      # print(samp_SBR_fil)
       SBR_fil = 1
     else:
       SBR_fil = 0
-      # FILTER_INFO.append("SBR_FIL")
       FILTER.append("SBR_FIL")
 
     if len(samp_SBA_fil) < len(FORMAT):
-      # print(samp_SBA_fil)
       SBA_fil = 1
     else:
       SBA_fil = 0
-      # FILTER_INFO.append("SBA_FIL")
       FILTER.append("SBA_FIL")
 
     if len(samp_MQMR_fil) < len(FORMAT):
-      # print(samp_MQMR_fil)
       MQMR_fil = 1
     else:
       MQMR_fil = 0
-      # FILTER_INFO.append("MQMR_FIL")
       FILTER.append("MQMR_FIL")
 
     if len(samp_AQR_fil) < len(FORMAT):
-      # print(samp_AQR_fil)
-      AQR_fil = 1 
+      AQR_fil = 1
     else:
       AQR_fil = 0
-      # FILTER_INFO.append("AQR_FIL")
       FILTER.append("AQR_FIL")
 
     if len(samp_POS_fil) < len(FORMAT):
-      # print(samp_POS_fil)
-      # print(len(FORMAT))
-      POS_fil = 1 
+      POS_fil = 1
     else:
-      # print(POS)
       POS_fil = 0
-      # FILTER_INFO.append("POS_FIL")               
       FILTER.append("POS_FIL")
-
-    # FILTER_INFO = "POS_FIL="+str(POS_fil) + ";SBR_FIL=" + str(SBR_fil) + ";SBA_FIL=" + str(SBA_fil) + ";MQMR_FIL=" + str(MQMR_fil) + ";AQR_FIL=" + str(AQR_fil)
-    # FILTER_INFO = ";".join(FILTER_INFO)
-    # print(FILTER_INFO)
-    # if POS == 302:
-      # print(FILTER_INFO)
-    # add the filter info to the end of INFO
-    # print(FILTER_INFO)
-    # info = info.append(FILTER_INFO)
-    # print(info)
-    # info.append(FILTER_INFO)
-    # info = [x for x in info if x]
-    # info=";".join(info)
-    # print(info)
-
-    # line[7] = info
 
     # FILTER = "FAIL"
     if sum([SBR_fil, SBA_fil, MQMR_fil, AQR_fil, POS_fil]) == 5:
@@ -1122,7 +1062,7 @@ def add_filter(variant_list):
     #   print(line)
     new_vcf.append(line)
   # print(new_vcf)
-  return(new_vcf) 
+  return(new_vcf)
 
 
 def update_header(col_names, header_lines):
@@ -1248,15 +1188,14 @@ def update_header(col_names, header_lines):
   header_lines.append([col_names])
 
 
-def do_normalise(vcf, out_file=None, chromosome=None):
+def do_normalise(vcf, out_file=None, p=0.002, chromosome=None):
   """
   Normalise and FILTER a mity VCF file.
   
   This function splits multi-allelic variants and MNPs, whilst taking care to 
   split the
   VCF header properly. After normalising, it also updates the FILTER, 
-  to remove poor 
-  quality variants.
+  to remove poor quality variants.
   
   :param vcf: the path to a vcf.gz file. It can be single-sample, 
   or multi-sample, and
@@ -1264,7 +1203,10 @@ def do_normalise(vcf, out_file=None, chromosome=None):
   :type vcf: str
   :parm out_file: The name of the normalised vcf.gz file
   :type out_file: str
-  
+
+  :param p: The minimum noise threshold. CURRENTLY UNUSED
+  :type p: float
+
   :param chromosome: discard variants not on this chromosome. If None, 
   then all variants
       will be processed.
@@ -1314,7 +1256,7 @@ def do_normalise(vcf, out_file=None, chromosome=None):
     combined_variants = combine_lines(no_mnp)
     # debug_print_vcf_lines(combined_variants)
     logging.info('Adding filter variants\n')
-    filtered_variants = add_filter(combined_variants)
+    filtered_variants = add_filter(combined_variants, p)
     # debug_print_vcf_lines(filtered_variants)
     update_header(col_names, header_lines)
     # debug_print_vcf_lines(filtered_variants)
