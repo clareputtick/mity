@@ -44,14 +44,13 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=20,
     
     region = "MT:1-16569"  # @TODO parse chrom name & length from the BAM header
     region = "MT:1-500"  # @TODO delete this debugging sub-region analysis
-    freebayes_call = (f'freebayes -f {reference} {bam_str} -r {region} '
-                      f'--min-mapping-quality {min_mq} '
-                      f'--min-base-quality {min_bq} '
-                      f'--min-alternate-fraction {min_af} '
-                      f'--min-alternate-count {min_ac} '
-                      f'--ploidy {ploidy} | bgzip > unnormalised.vcf.gz'
-                      )
-    # run FreeBayes
+    freebayes_call = ('freebayes -f {} {} -r {} '
+                      '--min-mapping-quality {} '
+                      '--min-base-quality {} '
+                      '--min-alternate-fraction {} '
+                      '--min-alternate-count {} '
+                      '--ploidy {} | bgzip > unnormalised.vcf.gz'
+                      ).format(reference, bam_str, region, min_mq, min_bq, min_af, min_ac, ploidy)
     logging.info("Running FreeBayes in sensitive mode")
     print(freebayes_call)
     subprocess.run(freebayes_call, shell=True)

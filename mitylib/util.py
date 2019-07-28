@@ -1,10 +1,10 @@
+import configparser
 import logging
-import subprocess
 import os
+import subprocess
 import sys
 import tempfile
 import vcf
-import configparser
 
 def tabix(f):
     """
@@ -26,7 +26,7 @@ def check_missing_file(file_list, die=True):
         if not os.path.isfile(item):
             missing_files.append(item)
     if die and len(missing_files) > 0:
-        raise ValueError(f"Missing these files: {missing_files}")
+        raise ValueError("Missing these files: " + ",".join(missing_files))
     return missing_files
 
 def tmp_mity_file_name():
@@ -72,15 +72,21 @@ def write_vcf(new_vcf, out_file, genome_file='annot/b37d5.genome'):
     :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
     """
     f = tmp_mity_file_name()
-    logging.debug(f"Writing uncompressed vcf to {f}")
+    logging.debug("Writing uncompressed vcf to " + f)
     with open(f, mode='wt', encoding='utf-8') as myfile:
         for vcf_line in new_vcf:
             myfile.write('\t'.join([str(elem) for elem in vcf_line]) + '\n')
-    logging.debug(f"Sorting, bgzipping {f} -> {out_file}")
-    subprocess.run(f"gsort {f} {genome_file} | bgzip -cf > {out_file}", shell=True)
-    logging.debug(f"Tabix indexing {out_file}")
+    gsort_vcf(f, out_file, genome_file=genome_file)
+
+
+def gsort_vcf(f, out_file, genome_file='annot/b37d5.genome', remove_unsorted_vcf=True):
+    logging.debug("Sorting, bgzipping {} -> {}".format(f, out_file))
+    subprocess.run("gsort {} {} | bgzip -cf > {}".format(f, genome_file, out_file), shell=True)
+    logging.debug("Tabix indexing {}".format(out_file))
     tabix(out_file)
-    os.remove(f)
+    if remove_unsorted_vcf:
+        os.remove(f)
+
 
 def write_merged_vcf(new_vcf, out_file, genome_file='annot/b37d5.genome'):
     """
@@ -94,15 +100,11 @@ def write_merged_vcf(new_vcf, out_file, genome_file='annot/b37d5.genome'):
     :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
     """
     f = tmp_mity_file_name()
-    logging.debug(f"Writing uncompressed vcf to {f}")
+    logging.debug("Writing uncompressed vcf to " + f)
     with open(f, mode='wt', encoding='utf-8') as myfile:
         for vcf_line in new_vcf:
             myfile.write(vcf_line + '\n')
-    logging.debug(f"Sorting, bgzipping {f} -> {out_file}")
-    subprocess.run(f"gsort {f} {genome_file} | bgzip -cf > {out_file}", shell=True)
-    logging.debug(f"Tabix indexing {out_file}")
-    tabix(out_file)
-    os.remove(f)
+    gsort_vcf(f, out_file, genome_file=genome_file)
 
 def create_genome_file(vcf_file, genome_file):
     """
@@ -114,7 +116,7 @@ def create_genome_file(vcf_file, genome_file):
     :param genome_file: the resulting .genome file
     :return: None. this creates a '.genome' file
     """
-    
+
     vcf = vcf.Reader(filename=vcf_file)
     with open(genome_file, mode='wt', encoding='utf-8') as genome_file:
         for contig in vcf.contigs.keys():

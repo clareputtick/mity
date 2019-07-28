@@ -118,13 +118,13 @@ def _cmd_report(args):
 
 
 P_report = AP_subparsers.add_parser('report', help=_cmd_report.__doc__)
-P_report.add_argument('--vcf', action='append', nargs='+', required=True,
-                      help="mity vcf files to create a report from")
 P_report.add_argument('--prefix', action='store',
                       help='Output files will be named with PREFIX')
 P_report.add_argument('--min_vaf', action='store', type=float, default=0, help=
 'A variant must have at least this VAF to be included in the report. Default: '
 '0.')
+P_report.add_argument('vcf', action='append', nargs='+',
+                    help="mity vcf files to create a report from")
 P_report.set_defaults(func=_cmd_report)
 
 

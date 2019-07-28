@@ -103,4 +103,4 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     tar -xzvf hs37d5.fasta-index.tar.gz; mv genome.dict hs37d5.dict; mv genome.fa hs37d5.fa; mv genome.fa.fai hs37d5.fa.fai
     samtools faidx hs37d5.fa MT -o hs37d5.MT.fa
     samtools faidx hs37d5.MT.fa
-    dx upload hs37d5.MT.fa* -o 
+    dx upload hs37d5.MT.fa* --path kccg-freebayes-mity-resources:/assets/
