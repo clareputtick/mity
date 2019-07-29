@@ -81,6 +81,15 @@ def write_vcf(new_vcf, out_file, genome_file='reference/b37d5.genome'):
 
 
 def gsort_vcf(f, out_file, genome_file='reference/b37d5.genome', remove_unsorted_vcf=True):
+    """
+    use gsort to sort the records in a VCF file according to a .genome file.
+
+    :param f: the path to an unsorted vcf.gz file
+    :param out_file: the path to a resulting sorted vcf.gz file
+    :param genome_file: the .genome file corresponding to the reference genome. see https://github.com/brentp/gsort
+    :param remove_unsorted_vcf: if True, then the input file 'f' will be deleted.
+    :return: nothing
+    """
     logging.debug("Sorting, bgzipping {} -> {}".format(f, out_file))
     subprocess.run("gsort {} {} | bgzip -cf > {}".format(f, genome_file, out_file), shell=True)
     logging.debug("Tabix indexing {}".format(out_file))
@@ -227,14 +236,14 @@ def select_reference_fasta(reference, custom_genome=None):
         res = res[0]
     return res
 
-def select_reference_genome(reference, custom_genome=None):
+def select_reference_genome(reference, custom_fasta=None):
     """
     Allow the user to select one of the pre-loaded reference '.genome' files, via --reference,
     or supply their own via --custom_reference. This function will return the path to
     the reference '.genome' file.
 
     :param reference: one of the inbuilt reference genomes. hs37d5, hg19, hg38.
-    :param custom_genome: the path to a custom reference genome, or None. If this
+    :param custom_fasta: the path to a custom reference genome, or None. If this
     file exists, then it will override the option provided by 'reference'.
     :return the path to the reference genome as a str.
 
@@ -246,8 +255,8 @@ def select_reference_genome(reference, custom_genome=None):
     'reference/hg19.genome'
 
     """
-    if custom_genome is not None and os.path.exists(custom_genome):
-        res = custom_genome
+    if custom_fasta is not None and os.path.exists(custom_fasta):
+        res = custom_fasta
     else:
         ref_dir = os.path.join(get_mity_dir(), 'reference')
         res = glob('{}/{}.genome'.format(ref_dir, reference))
