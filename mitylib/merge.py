@@ -6,11 +6,25 @@ nuclear VCF are replaces with the mity variants, and the headers are merged
 import sys
 import gzip
 import logging
+import vcf as pyvcf
 from .util import write_merged_vcf
 from .util import create_prefix
+from .util import vcf_get_mt_contig
+
+def check_vcf_merge_compatibility(mity_vcf, hc_vcf):
+    """
+    Check that the MT sequence names and lengths match in both the mity and hc vcf's.
+    """
+    m = vcf_get_mt_contig(mity_vcf)
+    h = vcf_get_mt_contig(hc_vcf)
+    return m == h
 
 def do_merge(mity_vcf, hc_vcf, prefix=None, genome='reference/b37d5.genome'):
-    
+
+    if not check_vcf_merge_compatibility(mity_vcf, hc_vcf):
+        logging.error("The VCF files use mitochondrial contigs")
+        sys.exit()
+
     prefix = create_prefix(hc_vcf, prefix)
     outfile = prefix + ".mity.vcf.gz"
 

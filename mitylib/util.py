@@ -268,3 +268,20 @@ def select_reference_genome(reference, custom_fasta=None):
 def get_mity_dir():
     path = os.path.dirname(sys.modules['mitylib'].__file__)
     return path
+
+def vcf_get_mt_contig(vcf):
+    """
+    get the mitochondrial contig name and length from a VCF file
+    :param vcf: path to a vcf file
+    :return: a tuple of contig name as str and length as int
+
+    >>> vcf_get_mt_contig('./151016_FR07959656.dedup.realigned.recalibrated.chrMT.dedup.realigned.recalibrated.chrMT.mity.vcf.gz')
+    ('MT', 16569)
+    """
+    r = pyvcf.Reader(filename=vcf, compressed=True)
+    chroms = r.contigs.keys()
+    mito_contig = {'MT', 'chrM'}.intersection(chroms)
+    assert len(mito_contig) == 1
+    mito_contig = ''.join(mito_contig)
+
+    return r.contigs[mito_contig].id, r.contigs[mito_contig].length
