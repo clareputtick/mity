@@ -98,6 +98,7 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     dx make_download_url --duration 1y kccg-freebayes-mity-resources:/assets/hs37d5.fasta-index.tar.gz
 
 # make reference genome
+* https://documentation.dnanexus.com/science/scientific-guides/human-genome
 
     wget https://dl.dnanex.us/F/D/pVG7PjZy4qKBB6ZKbkkF0X6kB0kxf7ZzjpK7fXjY/hs37d5.fasta-index.tar.gz
     tar -xzvf hs37d5.fasta-index.tar.gz; mv genome.dict hs37d5.dict; mv genome.fa hs37d5.fa; mv genome.fa.fai hs37d5.fa.fai
@@ -112,3 +113,9 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
 
     samtools faidx Homo_sapiens_assembly38.fasta chrM -o hg38.chrM.fa
     samtools faidx hg38.chrM.fa 
+
+# debug via DNAnexus
+dx run cloud_workstation --ssh \
+-imax_session_length=1h \
+-ifids=file-BzF4G0j0QpzJP9931xpgKvv2 -ifids=file-BzF4G4Q0Qpz73J1BzVpJ41k4 --yes
+* see INSTALL.md

@@ -26,6 +26,8 @@ setuptools.setup(
         "Operating System :: MacOS",
         "Operating System :: POSIX",
         "Operating System :: Unix",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Bio-Informatics"
     ],
@@ -42,7 +44,7 @@ setuptools.setup(
         'xlsxwriter',
         'pyfastx'
     ],
-    python_requires='>=3',
+    python_requires='>=3.5.3',
     data_files=[
         (".", ['verchew.ini']),
         ('annot', [
