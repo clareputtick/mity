@@ -91,7 +91,7 @@ def _cmd_normalise(args):
     logging.info("mity %s", __version__)
     logging.info("Normalising and FILTERing mitochondrial vcf.gz file")
     
-    normalise.do_normalise(args.vcf, args.outfile)
+    normalise.do_normalise(args.vcf, args.outfile, args.p)
 
 
 P_normalise = AP_subparsers.add_parser('normalise', help=_cmd_normalise.__doc__)
@@ -99,6 +99,11 @@ P_normalise.add_argument('--vcf', action='store', required=True,
                          help="vcf.gz file from running mity")
 P_normalise.add_argument('--outfile', action='store', required=True,
                          help="output VCF file in bgzip compressed format")
+P_normalise.add_argument('--p', action='store', type=float,
+                         default=0.002,
+                         help='Minimum noise level. This is used to calculate QUAL score'
+                              'Default: 0.002, range = [0,1]',
+                         dest="p")
 P_normalise.set_defaults(func=_cmd_normalise)
 
 
