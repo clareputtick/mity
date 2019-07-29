@@ -220,7 +220,12 @@ def select_refgenome(reference, custom_genome=None):
     if custom_genome is not None and os.path.exists(custom_genome):
         res = custom_genome
     else:
-        res = glob('reference/{}.*.fa'.format(reference))
+        mity_dir = get_mity_dir()
+        res = glob('{}/reference/{}.*.fa'.format(mity_dir, reference))
+        print(",".join(res))
         assert len(res) == 1
         res = res[0]
     return res
+
+def get_mity_dir():
+    return os.path.abspath(os.path.dirname(sys.argv[0]))

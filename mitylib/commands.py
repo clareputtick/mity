@@ -34,10 +34,10 @@ do_call = public(call.do_call)
 
 def _cmd_call(args):
     """Call mitochondrial variants"""
-    logging.info("mity %s", __version__)
+    logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")
 
-    args.reference = select_refgenome(args)
+    args.reference = select_refgenome(args.reference, args.custom_reference)
 
     call.do_call(args.bam, args.reference, args.prefix, args.min_mq,
                  args.min_bq, args.min_af, args.min_ac, args.p, args.normalise)
