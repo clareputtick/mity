@@ -10,6 +10,7 @@ python-dateutil==2.8.0    # via pandas
 pytz==2019.1              # via pandas
 pyvcf==0.6.8
 six==1.12.0               # via python-dateutil
+xlsxwriter==1.1.8
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools==41.0.1        # via pyvcf

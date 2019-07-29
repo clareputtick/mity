@@ -2,8 +2,10 @@ import sys
 import logging
 import gzip
 import pandas
+import xlsxwriter
 from .util import check_missing_file
 from .util import create_prefix
+from .util import make_hgvs
 
 def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
     table = []
@@ -304,48 +306,6 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 table.append(new_line)
     
     return (table)
-
-
-def make_hgvs(pos, ref, alt):
-    # make HGVS syntax
-    if len(alt) > 1 or len(ref) > 1:
-        # this is an indel
-        if len(ref) > len(alt):
-            # this is a del
-            delet = ref[1:]
-            if len(delet) == 1:
-                hgvs_pos = int(pos) + 1
-                # print(hgvs_pos)
-            elif len(delet) > 1:
-                hvgs_pos_start = int(pos) + 1
-                hvgs_pos_end = int(pos) + len(delet)
-                hgvs_pos = str(hvgs_pos_start) + "_" + str(hvgs_pos_end)
-                # print(hgvs_pos)
-            # print(hgvs_pos)
-            hgvs = "m." + str(hgvs_pos) + "del"
-            # print(hgvs)
-
-        else:
-            # print("ins")
-            # this is an ins
-            ins = alt[1:]
-            if len(ins) == 1:
-                hgvs_pos = int(pos) + 1
-                # print(hgvs_pos)
-            elif len(ins) > 1:
-                hvgs_pos_start = int(pos) + 1
-                hvgs_pos_end = int(pos) + len(ins)
-                hgvs_pos = str(hvgs_pos_start) + "_" + str(hvgs_pos_end)
-                # print(hgvs_pos)
-            # print(hgvs_pos)
-            hgvs = "m." + str(hgvs_pos) + "ins"
-            # print(hgvs)
-
-    else:
-        # this is a SNP
-        hgvs = "m." + str(pos) + str(ref) + ">" + str(alt)
-    return hgvs
-
 
 def split_header_variants(vcf):
     header = []

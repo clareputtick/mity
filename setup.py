@@ -38,7 +38,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'pyvcf',
-        'pandas'
+        'pandas',
+        'xlsxwriter'
     ],
     python_requires='>=3',
     data_files=[

@@ -340,7 +340,7 @@ def combine_lines(variant_list):
   chromo = [x[0] for x in variant_list]
   unique_chromosomes_temp = list(set(chromo))
   
-  # trying to keep the varaints in a rough order (set doesnt preserve order)
+  # trying to keep the variants in a rough order (set doesnt preserve order)
   autosome =  [str(x) for x in list(range(1,23))]
   unique_chromosomes = [x for x in autosome if x in unique_chromosomes_temp]
   unique_chromosomes = unique_chromosomes + [x for x in ['X', 'Y', 'MT'] if x in unique_chromosomes_temp]
@@ -354,7 +354,7 @@ def combine_lines(variant_list):
   new_vcf = []
   # we loop over the chromsomes to fill new_vcf
   for uniq_chrom in unique_chromosomes:
-    logging.info('Doing chromosome ' + str(uniq_chrom))
+    logging.info('Processing chromosome ' + str(uniq_chrom))
     chromo_variant_list = [line for line in variant_list if line[0] == uniq_chrom]
     # print(chromo_variant_list)
     # sys.exit()
@@ -453,7 +453,7 @@ def combine_lines(variant_list):
 
         # to avoid dividing by zero:
         if SRF > 0 or SRR > 0:
-          SBR = SRF/(SRF+SRR)
+          SBR = round(SRF/(SRF+SRR), 3)
         else:
           SBR=0
 
@@ -470,7 +470,7 @@ def combine_lines(variant_list):
         SAR_idx = INFO_names.index('SAR')
         SAR = float(INFO_values[SAR_idx])
         # note SAF will always > 0, otherwise variant wouldn't be reported
-        SBA = SAF/(SAF+SAR)
+        SBA = round(SAF/(SAF+SAR), 3)
 
         INFO_values.append(SBA)
         INFO_names.append("SBA")
@@ -539,7 +539,7 @@ def combine_lines(variant_list):
 
           # DP = AO + RO can be zero if another sample cal
           if DP != 0:
-            samp_VAF = float(AO)/float(DP)
+            samp_VAF = round(float(AO)/float(DP),4)
           else:
             samp_VAF = 0
 
@@ -588,7 +588,7 @@ def combine_lines(variant_list):
           # print(AO_idx)
           QR = float(temp_format[QR_idx])
           if RO > 0:
-            AQR = str(QR/RO)
+            AQR = str(round(QR/RO, 3))
           else:
             # if there are no reference reads, set AQR high so you dont filter on it
             # AQR = 1000000
@@ -604,7 +604,7 @@ def combine_lines(variant_list):
           QA = float(temp_format[QA_idx])
           # here AO could be less than zero because it could be another sample that has this variant
           if AO > 0:
-            AQA = str(QA/AO)
+            AQA = str(round(QA/AO, 3))
           else:
             AQA = str(0)
           # add AQA to the FORMAT field
@@ -760,40 +760,29 @@ def combine_lines(variant_list):
           # print(new_DP)
 
           if new_DP != 0:
-            samp_VAF = float(new_AO)/float(new_DP)
+            samp_VAF = round(float(new_AO)/float(new_DP), 4)
           else:
-            samp_VAF = 0
-          # samp_VAF = float(new_AO)/float(new_DP)
+            samp_VAF = 0.0
+          logging.debug("Variant has samp_VAF: {}".format(str(samp_VAF)))
           VAF.append(str(samp_VAF))
           # print(VAF)
-          # print(VAF)
 
-          # add in the new genotype
+          # update GT
           if int(new_AO) < 4:
             new_genotype = "0/0"
-          elif int(new_AO) >= 4:
-            if samp_VAF == 1:
+          else:
+            if samp_VAF >= 0.95:
               new_genotype = "1/1"
-            elif samp_VAF < 1:
+            elif samp_VAF < 0.95:
               new_genotype = "0/1"
-
-          # if samp_VAF > 0.9:
-          #   new_genotype = "1/1"
-          # elif samp_VAF > 0:
-          #   new_genotype = "0/1"
-          # else:
-          #   new_genotype = "0/0"
+          samp_VAF = str(samp_VAF)
 
           # QR
-          QR_idx = FORMAT_names.index('QR')
-          QR_vector = [i[QR_idx] for i in temp_format]
+          QR_vector = [i[FORMAT_names.index('QR')] for i in temp_format]
           new_QR = unchanged(QR_vector)
           new_QR = str(new_QR)
 
           # calculate AQR
-          
-          # print(AO_idx)
-          
           if int(new_RO) > 0:
             AQR = str(float(new_QR)/float(new_RO))
           else:
@@ -819,8 +808,7 @@ def combine_lines(variant_list):
             # AQR = 1000000 will be confusing, so check in the filters function if RO = 0
             AQA = str(0)
 
-
-          new_FORMAT.append(":".join([new_genotype, new_DP, new_AD, new_RO, new_QR, AQR, new_AO, new_QA, AQR, str(samp_VAF)]))
+          new_FORMAT.append(":".join([new_genotype, new_DP, new_AD, new_RO, new_QR, AQR, new_AO, new_QA, AQR, samp_VAF]))
           # print(new_FORMAT)
           
         # print(new_FORMAT)
@@ -966,7 +954,7 @@ def add_filter(variant_list, min_DP=15, SB_range = [0.2, 0.8], min_MQMR = 30, mi
   for line in variant_list:
     # print(line)
 
-    POS = float(line[1])
+    POS = int(line[1])
 
     info = line[7].split(";")
 
@@ -991,23 +979,29 @@ def add_filter(variant_list, min_DP=15, SB_range = [0.2, 0.8], min_MQMR = 30, mi
     for samp in FORMAT:
       samp_FORMAT = samp.split(":")
 
-      AO = float(samp_FORMAT[FORMAT_names.index("AO")])
-      RO = float(samp_FORMAT[FORMAT_names.index("RO")])
+      AO = int(samp_FORMAT[FORMAT_names.index("AO")])
+      RO = int(samp_FORMAT[FORMAT_names.index("RO")])
       AQR = float(samp_FORMAT[FORMAT_names.index("AQR")])
 
-      # @clare: why not (RO+AO) > min_DP?
-      # @clare: why not do `(RO+AO) > min_DP` once and capture in samp_DP_fil?
-      if RO > min_DP and (SB_range[1] < SBR or SB_range[0] > SBR):
-        samp_SBR_fil.append(0)
+      from .util import make_hgvs
+      hgvs = make_hgvs(int(line[1]), line[3], line[4])
+      if RO > min_DP:
+        #logging.debug("Position {} pass min_DP filter, with RO {} > {}".format(hgvs, str(RO), str(min_DP)))
+        if not SB_range[0] <= SBR <= SB_range[1]:
+          logging.debug("Position {} failed SBR filter {}".format(hgvs, str(SBR)))
+          samp_SBR_fil.append(0)
 
-      if AO > min_DP and (SB_range[1] < SBA or SB_range[0] > SBA):
-        samp_SBA_fil.append(0)
+        if MQMR < min_MQMR:
+          samp_MQMR_fil.append(0)
 
-      if RO > min_DP and MQMR < min_MQMR:
-        samp_MQMR_fil.append(0)
+        if AQR < min_AQR:
+          samp_AQR_fil.append(0)
 
-      if RO > min_DP and AQR < min_AQR:
-        samp_AQR_fil.append(0)
+      if AO > min_DP:
+        #logging.debug("Position {} pass min_DP filter, with AO {} > {}".format(hgvs, str(AO), str(min_DP)))
+        if not SB_range[0] <= SBA <= SB_range[1]:
+          logging.debug("Position {} failed SBA filter {}".format(hgvs, str(round(SBA,3))))
+          samp_SBA_fil.append(0)
 
       if POS in blacklist:
         samp_POS_fil.append(0)
@@ -1137,7 +1131,7 @@ def update_header(col_names, header_lines):
                         '##FILTER=<ID=SBR_FIL,Description="For all alleles RO '
                         '> 15 and (SBR > 0.8 or SBR < 0.2)">'])
   header_lines.append([
-                        '##FILTER=<ID=SBA_FIL,Description="For all alleles RO '
+                        '##FILTER=<ID=SBA_FIL,Description="For all alleles AO '
                         '> 15 and (SBA > 0.8 or SBA < 0.2)">'])
   header_lines.append(
           ['##FILTER=<ID=MQMR_FIL,Description="For all alleles MQMR<30">'])
@@ -1171,9 +1165,8 @@ def update_header(col_names, header_lines):
                         'Description="Read depth, AO+RO">'])
   header_lines.append([
                         '##FORMAT=<ID=GT,Number=1,Type=String,'
-                        'Description="Genotype. If VAF>0.9 then genotype is '
-                        '1/1, if VAF>0 then genotype is 0/1, otherwise if VAF '
-                        '= 0 genotype is 0/0">'])
+                        'Description="Genotype. Variants with less than 4 alt reads are 0/0, '
+                        'then variants with VAF < 0.95 are 0/1, and variants with VAF >= 0.95 are 1/1">'])
   header_lines.append([
                         '##FORMAT=<ID=QA,Number=A,Type=Integer,Description="Alternate allele quality sum in phred">'])
   header_lines.append([
@@ -1256,7 +1249,7 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None):
     combined_variants = combine_lines(no_mnp)
     # debug_print_vcf_lines(combined_variants)
     logging.info('Adding filter variants\n')
-    filtered_variants = add_filter(combined_variants, p)
+    filtered_variants = add_filter(combined_variants)
     # debug_print_vcf_lines(filtered_variants)
     update_header(col_names, header_lines)
     # debug_print_vcf_lines(filtered_variants)
