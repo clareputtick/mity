@@ -1,18 +1,24 @@
 # call
+* makes an odd, very long filename
 * edit the VCF header to include the mity call command
 * edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata
 
 # normalise
+* mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * migrate to pyvcf where possible
-* i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. 
+* CRITICAL: i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. 
 
 # merge
 * migrate to pyvcf where possible (started in dev/merge2.py)
-* force the same reference genome in mity and HC?
 * force the same sample names in the same order in mity and HC?
 * are there any VCF format 4.1 vs 4.2 fields that clash. eg the type of the variable changes?
 
 # report
+* currently broken:
+    File "/usr/local/lib/python3.7/site-packages/mitylib/report.py", line 353, in split_header_variants
+        col_names = header[-1]
+    IndexError: list index out of range
+
 * L63-L104 is repetitive
 * VEP splitting should be in a function
 * L195-228 is repetitive
@@ -21,8 +27,10 @@
 * L903-906 is too repetitive: iterate over an array of fields for int64 vs float64
 
 # misc
-* there's no entrypoint to util.create_genome_file, thus gsort may fail
 * use logging.info, logging.debug, logging.warning, logging.error where possible
+* hg19 support: mity call and merge should be ok with hg19's chrM, but mity report 
+uses annotations with GRCh37 coordinates, and thus should fail. How much do we try 
+to support hg19 then? GRCh38 and GRCh37 are the same length.
 
 # installation (pre-submission)
 * use distutils to create a package, and register this with pip install
@@ -30,12 +38,12 @@
 
 # GitHub (pre-submission)
 * improve documentation
-* add INSTALL.md for those that want to install manually
-* include DNAnexus app code
+* update INSTALL.md
 * ensure there is example usage
 
 # DNAnexus
 * migrate app code to use the latest mity. either via an asset, or Docker image.
+* send app code to GitHub
 
 # Testing (pre-submission)
 * seek independent users to test this from scratch
