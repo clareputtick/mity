@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import vcf
+from glob import glob
 
 def tabix(f):
     """
@@ -196,3 +197,30 @@ def make_hgvs(pos, ref, alt):
         # this is a SNP
         hgvs = "m." + str(pos) + str(ref) + ">" + str(alt)
     return hgvs
+
+def select_refgenome(reference, custom_genome=None):
+    """
+    Allow the user to select one of the pre-loaded reference genomes, via --reference,
+    or supply their own via --custom_reference. This function will return the path to
+    the reference genome sequnece.
+
+    :param reference: one of the inbuilt reference genomes. hs37d5, hg19, hg38.
+    :param custom_genome: the path to a custom reference genome, or None. If this
+    file exists, then it will override the option provided by 'reference'.
+    :return the path to the reference genome as a str.
+
+    >>> select_refgenome('hg19', None)
+    'reference/hg19.chrM.fa'
+    >>> select_refgenome('hg19', 'reference/hs37d5.MT.fa')
+    'reference/hs37d5.MT.fa'
+    >>> select_refgenome('hg19', 'nonexistent.fa')
+    'reference/hg19.chrM.fa'
+
+    """
+    if custom_genome is not None and os.path.exists(custom_genome):
+        res = custom_genome
+    else:
+        res = glob('reference/{}.*.fa'.format(reference))
+        assert len(res) == 1
+        res = res[0]
+    return res

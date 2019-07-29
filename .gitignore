@@ -4,8 +4,13 @@
 *.bam
 *.bai
 *.R
-*.fa*
 venv
 *.iml
 .idea
 mitylib/__pycache__
+build/*
+dist/*
+gsort
+lib/*
+mity.egg-info/*
+pyvenv.cfg 

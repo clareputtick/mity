@@ -39,7 +39,8 @@ setuptools.setup(
     install_requires=[
         'pyvcf',
         'pandas',
-        'xlsxwriter'
+        'xlsxwriter',
+        'pyfastx'
     ],
     python_requires='>=3',
     data_files=[

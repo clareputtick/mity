@@ -104,3 +104,11 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     samtools faidx hs37d5.fa MT -o hs37d5.MT.fa
     samtools faidx hs37d5.MT.fa
     dx upload hs37d5.MT.fa* --path kccg-freebayes-mity-resources:/assets/
+
+    # hg38 from Broad: https://software.broadinstitute.org/gatk/download/bundle
+    wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dict
+    wget https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+    samtools faidx Homo_sapiens_assembly38.fasta 
+
+    samtools faidx Homo_sapiens_assembly38.fasta chrM -o hg38.chrM.fa
+    samtools faidx hg38.chrM.fa 
