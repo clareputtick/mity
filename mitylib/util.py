@@ -4,7 +4,8 @@ import os
 import subprocess
 import sys
 import tempfile
-import vcf
+import vcf as pyvcf
+
 from glob import glob
 
 def tabix(f):
@@ -127,7 +128,7 @@ def create_genome_file(vcf_file, genome_file):
     :return: None. this creates a '.genome' file
     """
 
-    vcf = vcf.Reader(filename=vcf_file)
+    vcf = pyvcf.Reader(filename=vcf_file)
     with open(genome_file, mode='wt', encoding='utf-8') as genome_file:
         for contig in vcf.contigs.keys():
             genome_file.write('\t'.join(vcf.contigs[contig]))
