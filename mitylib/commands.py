@@ -38,7 +38,7 @@ def _cmd_call(args):
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")
 
-    args.reference = select_reference_fasta(args.reference, args.custom_reference)
+    args.reference = select_reference_fasta(args.reference, None)
 
     call.do_call(args.bam, args.reference, args.prefix, args.min_mq,
                  args.min_bq, args.min_af, args.min_ac, args.p, args.normalise)
@@ -50,9 +50,9 @@ P_call.add_argument('bam', action='append', nargs='+',
 P_call.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
                     default="hs37d5", required=False,
                     help='reference genome version to use. default: hs37d5')
-P_call.add_argument('--custom_reference', action='store',
-                    default="", required=False,
-                    help='The path to a custom reference genome file in uncompressed fasta format')
+# P_call.add_argument('--custom_reference', action='store',
+#                     default="", required=False,
+#                     help='The path to a custom reference genome file in uncompressed fasta format')
 P_call.add_argument('--prefix', action='store',
                     help='Output files will be named with PREFIX')
 P_call.add_argument('--min-mapping-quality', action='store', type=int,
@@ -147,7 +147,7 @@ def _cmd_merge(args):
     logging.info("mity %s", __version__)
     logging.info("mity vcf merge")
 
-    genome = select_reference_genome(args.reference, args.custom_reference)
+    genome = select_reference_genome(args.reference, None)
 
     merge.do_merge(args.mity_vcf, args.nuclear_vcf, args.prefix, genome)
 
@@ -162,9 +162,9 @@ P_merge.add_argument('--prefix', action='store',
 P_merge.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
                      default="hs37d5", required=False,
                      help='reference genome version to use. default: hs37d5')
-P_merge.add_argument('--custom_reference', action='store',
-                     default="", required=False,
-                     help='The path to a custom reference genome file in uncompressed fasta format')
+# P_merge.add_argument('--custom_reference', action='store',
+#                      default="", required=False,
+#                      help='The path to a custom reference genome file in uncompressed fasta format')
 P_merge.set_defaults(func=_cmd_merge)
 
 

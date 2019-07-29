@@ -49,17 +49,17 @@ Either install mity globally:
     # fix a python version incompatibility bug in futures
     sudo perl -pi -e 's|raise exception_type, self._exception, self._traceback|raise Exception(self._exception).with_traceback(self._traceback)|' /usr/share/dnanexus/lib/python2.7/site-packages/concurrent/futures/_base.py
     
-    VERSION=0.0.1b7
+    VERSION=0.0.1b9
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
     
 Or install mity using a virtualenv
 
     sudo apt-get install python3-venv
     unset PYTHONPATH
-    VERSION=0.0.1a9
     python3 -m venv .
     source bin/activate
     ./bin/pip install wheel
+    VERSION=0.0.1b9
     ./bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
 
 # test
