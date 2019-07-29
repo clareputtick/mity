@@ -6,7 +6,6 @@ nuclear VCF are replaces with the mity variants, and the headers are merged
 import sys
 import gzip
 import logging
-import vcf as pyvcf
 from .util import write_merged_vcf
 from .util import create_prefix
 from .util import vcf_get_mt_contig
