@@ -3,12 +3,28 @@
 On a fresh Ubuntu 14.04 installation, install homebrew and python3.7
 
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+    
     export PATH=/home/linuxbrew/.linuxbrew/bin:$PATH
-    brew install python3
-    # TODO: if using a dnanexus cloud workstation, dx only uses python2.7, so need a better PYTHONPATH.
-    export PYTHONPATH=/home/linuxbrew/.linuxbrew/lib/python3.7/site-packages
+    
     python3 --version
-    # Python 3.7.4
+    # Python 3.5.2
+    # python3.5.2 is broken: https://stackoverflow.com/a/56010650/178297. 
+    # Need to upgrade to >=3.5.3
+    # pyenv is a convenient way to do this: https://github.com/pyenv/pyenv
+    sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+    xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+    brew install pyenv
+    eval "$(pyenv init -)"
+    source $(pyenv root)/completions/pyenv.bash
+    pyenv install 3.5.3
+    pyenv local 3.5.3
+    python --version
+    # Python 3.5.3
+
+    # merge DNAnexus' PYTHONPATH with this from PYTHON3
+    export PYTHONPATH=/home/linuxbrew/.linuxbrew/lib/python3.7/site-packages:/usr/share/dnanexus/lib/python2.7/site-packages
+
 
 Then install the system dependencies: freebayes (>=1.2.0), htslib (tabix+bgzip), gsort.        
     brew tap brewsci/bio
@@ -27,15 +43,28 @@ Then install the system dependencies: freebayes (>=1.2.0), htslib (tabix+bgzip),
 
 Either install mity globally:
 
-    VERSION=0.0.1a5
+    sudo apt-get install -y python3-pip
+    
+    export PYTHONPATH=/usr/share/dnanexus/lib/python2.7/site-packages
+    
+    sudo perl -pi -e 's|raise exception_type, self._exception, self._traceback|raise Exception(self._exception).with_traceback(self._traceback)|' /usr/share/dnanexus/lib/python2.7/site-packages/concurrent/futures/_base.py
+    export PYTHONPATH=/usr/local/lib/python3.5/dist-packages:/usr/lib/python3/dist-packages:/usr/share/dnanexus/lib/python2.7/site-packages
+    
+    # /usr/lib/python3.5
+    # /usr/lib/python3.5/plat-x86_64-linux-gnu
+    # /usr/lib/python3.5/lib-dynload
+    # /usr/local/lib/python3.5/dist-packages
+    # /usr/lib/python3/dist-packages
+    
     pip3 install wheel
+    VERSION=0.0.1a8
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
     
 Or install mity using a virtualenv
 
     sudo apt-get install python3-venv
     unset PYTHONPATH
-    VERSION=0.0.1a4
+    VERSION=0.0.1a9
     python3 -m venv .
     source bin/activate
     ./bin/pip install wheel
