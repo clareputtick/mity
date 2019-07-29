@@ -67,7 +67,7 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     mity report --vcf test1.2.0.dedup.realigned.recalibrated.chrMT.mity.norm.vcf.gz
     mity merge --nuclear_vcf test/15F00004.hc.vqsr.vcf.gz --mity_vcf test/15F00004.mity.vcf.gz
 
-# TODO setup python package on pip
+# setup python package on pip
 * https://packaging.python.org/tutorials/packaging-projects/
 * I made setup.py based on this tutorial, and it seemed to work locally.
 * use pip-compile from pip-tools to make requirements.txt: https://pypi.org/project/pip-tools/
@@ -85,7 +85,7 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
   
 * debugging
   
-  bump the version number in setup.py
+  bump the version number in _version.py
   ./build.sh
   # wait for test.pypi to index the new package
   # in your venv grab the new version. it'll uninstall the previous one
