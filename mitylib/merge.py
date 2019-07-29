@@ -9,7 +9,7 @@ import logging
 from .util import write_merged_vcf
 from .util import create_prefix
 
-def do_merge(mity_vcf, hc_vcf, prefix=None):
+def do_merge(mity_vcf, hc_vcf, prefix=None, genome='reference/b37d5.genome'):
     
     prefix = create_prefix(hc_vcf, prefix)
     outfile = prefix + ".mity.vcf.gz"
@@ -254,4 +254,4 @@ def do_merge(mity_vcf, hc_vcf, prefix=None):
         new_vcf = merged_header + [
             hc_col_names] + new_mity_variants + hc_variants
 
-        write_merged_vcf(new_vcf, outfile)
+        write_merged_vcf(new_vcf, outfile, genome)

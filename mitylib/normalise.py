@@ -1181,7 +1181,7 @@ def update_header(col_names, header_lines):
   header_lines.append([col_names])
 
 
-def do_normalise(vcf, out_file=None, p=0.002, chromosome=None):
+def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="reference/hs37d5.genome"):
   """
   Normalise and FILTER a mity VCF file.
   
@@ -1256,7 +1256,7 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None):
     logging.info('Writing normalised vcf\n')
     new_vcf = header_lines + filtered_variants
 
-    write_vcf(new_vcf, out_file)
+    write_vcf(new_vcf, out_file, genome)
 
 def debug_print_vcf_lines(x):
   for line in x:
