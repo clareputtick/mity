@@ -47,5 +47,6 @@ setuptools.setup(
     ],
     python_requires='>=3.5.3',
     package_data={'mity': ['verchew.ini', 'annot/*', 'reference/*fa']},
+    include_package_data=True,
     scripts=["mity"]
 )
