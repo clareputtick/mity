@@ -57,7 +57,7 @@ Either install mity globally:
     # /usr/lib/python3/dist-packages
     
     pip3 install wheel
-    VERSION=0.0.1a8
+    VERSION=0.0.1b1
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
     
 Or install mity using a virtualenv
