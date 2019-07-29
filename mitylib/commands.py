@@ -13,7 +13,8 @@ import logging
 
 from . import (call, normalise, report, merge)
 from ._version import __version__
-from .util import select_refgenome
+from .util import select_reference_fasta
+from .util import select_reference_genome
 
 __all__ = []
 
@@ -37,7 +38,7 @@ def _cmd_call(args):
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")
 
-    args.reference = select_refgenome(args.reference, args.custom_reference)
+    args.reference = select_reference_fasta(args.reference, args.custom_reference)
 
     call.do_call(args.bam, args.reference, args.prefix, args.min_mq,
                  args.min_bq, args.min_af, args.min_ac, args.p, args.normalise)
@@ -102,7 +103,7 @@ def _cmd_normalise(args):
 
 
 P_normalise = AP_subparsers.add_parser('normalise', help=_cmd_normalise.__doc__)
-P_normalise.add_argument('--vcf', action='store', required=True,
+P_normalise.add_argument('vcf', action='store',
                          help="vcf.gz file from running mity")
 P_normalise.add_argument('--outfile', action='store', required=True,
                          help="output VCF file in bgzip compressed format")
@@ -145,7 +146,10 @@ def _cmd_merge(args):
     """Merging mity VCF with nuclear VCF"""
     logging.info("mity %s", __version__)
     logging.info("mity vcf merge")
-    merge.do_merge(args.mity_vcf, args.nuclear_vcf, args.prefix)
+
+    genome = select_reference_genome(args.reference, args.custom_reference)
+
+    merge.do_merge(args.mity_vcf, args.nuclear_vcf, args.prefix, genome)
 
 P_merge = AP_subparsers.add_parser('merge', help=_cmd_merge.__doc__)
 P_merge.add_argument('--mity_vcf', action='store', required=True,
@@ -153,8 +157,14 @@ P_merge.add_argument('--mity_vcf', action='store', required=True,
 P_merge.add_argument('--nuclear_vcf', action='store', required=True,
                      help="nuclear vcf file")
 P_merge.add_argument('--prefix', action='store',
-                      help='Output files will be named with PREFIX. '
+                     help='Output files will be named with PREFIX. '
                      'The default is to use the nuclear vcf name')
+P_merge.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
+                     default="hs37d5", required=False,
+                     help='reference genome version to use. default: hs37d5')
+P_merge.add_argument('--custom_reference', action='store',
+                     default="", required=False,
+                     help='The path to a custom reference genome file in uncompressed fasta format')
 P_merge.set_defaults(func=_cmd_merge)
 
 

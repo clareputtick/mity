@@ -16,11 +16,11 @@ On a fresh Ubuntu 14.04 installation, install homebrew and python3.7
     xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
     brew install pyenv
     eval "$(pyenv init -)"
-    source $(pyenv root)/completions/pyenv.bash
     pyenv install 3.5.3
     pyenv local 3.5.3
     python --version
     # Python 3.5.3
+    pip install --upgrade pip
 
     # merge DNAnexus' PYTHONPATH with this from PYTHON3
     export PYTHONPATH=/home/linuxbrew/.linuxbrew/lib/python3.7/site-packages:/usr/share/dnanexus/lib/python2.7/site-packages
@@ -43,21 +43,13 @@ Then install the system dependencies: freebayes (>=1.2.0), htslib (tabix+bgzip),
 
 Either install mity globally:
 
-    sudo apt-get install -y python3-pip
-    
     export PYTHONPATH=/usr/share/dnanexus/lib/python2.7/site-packages
-    
-    sudo perl -pi -e 's|raise exception_type, self._exception, self._traceback|raise Exception(self._exception).with_traceback(self._traceback)|' /usr/share/dnanexus/lib/python2.7/site-packages/concurrent/futures/_base.py
     export PYTHONPATH=/usr/local/lib/python3.5/dist-packages:/usr/lib/python3/dist-packages:/usr/share/dnanexus/lib/python2.7/site-packages
     
-    # /usr/lib/python3.5
-    # /usr/lib/python3.5/plat-x86_64-linux-gnu
-    # /usr/lib/python3.5/lib-dynload
-    # /usr/local/lib/python3.5/dist-packages
-    # /usr/lib/python3/dist-packages
+    # fix a python version incompatibility bug in futures
+    sudo perl -pi -e 's|raise exception_type, self._exception, self._traceback|raise Exception(self._exception).with_traceback(self._traceback)|' /usr/share/dnanexus/lib/python2.7/site-packages/concurrent/futures/_base.py
     
-    pip3 install wheel
-    VERSION=0.0.1b1
+    VERSION=0.0.1b7
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
     
 Or install mity using a virtualenv
