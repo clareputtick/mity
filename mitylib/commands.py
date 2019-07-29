@@ -48,7 +48,7 @@ P_call.add_argument('bam', action='append', nargs='+',
                     help='BAM files to run the analysis on.')
 P_call.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
                     default="hs37d5", required=False,
-                    help='reference genome version to use')
+                    help='reference genome version to use. default: hs37d5')
 P_call.add_argument('--custom_reference', action='store',
                     default="", required=False,
                     help='The path to a custom reference genome file in uncompressed fasta format')
