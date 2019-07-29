@@ -13,6 +13,7 @@ import logging
 
 from . import (call, normalise, report, merge)
 from ._version import __version__
+from .util import select_refgenome
 
 __all__ = []
 
@@ -31,12 +32,13 @@ AP_subparsers = AP.add_subparsers(
 
 do_call = public(call.do_call)
 
-
 def _cmd_call(args):
     """Call mitochondrial variants"""
     logging.info("mity %s", __version__)
     logging.info("Calling mitochondrial variants")
-    
+
+    args.reference = select_refgenome(args)
+
     call.do_call(args.bam, args.reference, args.prefix, args.min_mq,
                  args.min_bq, args.min_af, args.min_ac, args.p, args.normalise)
 
@@ -44,7 +46,12 @@ def _cmd_call(args):
 P_call = AP_subparsers.add_parser('call', help=_cmd_call.__doc__)
 P_call.add_argument('bam', action='append', nargs='+',
                     help='BAM files to run the analysis on.')
-P_call.add_argument('--reference', action='store', required=True)
+P_call.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
+                    default="hs37d5", required=False,
+                    help='reference genome version to use')
+P_call.add_argument('--custom_reference', action='store',
+                    default="", required=False,
+                    help='The path to a custom reference genome file in uncompressed fasta format')
 P_call.add_argument('--prefix', action='store',
                     help='Output files will be named with PREFIX')
 P_call.add_argument('--min-mapping-quality', action='store', type=int,
