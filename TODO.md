@@ -1,7 +1,7 @@
 # call
-* makes an odd, very long filename
-* edit the VCF header to include the mity call command
-* edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata
+* CRITICAL: makes an odd, very long filename
+* CRITICAL: edit the VCF header to include the mity call command
+* CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata
 
 # normalise
 * mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
@@ -14,7 +14,7 @@
 * are there any VCF format 4.1 vs 4.2 fields that clash. eg the type of the variable changes?
 
 # report
-* currently broken:
+* CRITICAL: currently broken:
     File "/usr/local/lib/python3.7/site-packages/mitylib/report.py", line 353, in split_header_variants
         col_names = header[-1]
     IndexError: list index out of range
@@ -37,9 +37,9 @@ to support hg19 then? GRCh38 and GRCh37 are the same length.
 * create a docker image
 
 # GitHub (pre-submission)
-* improve documentation
-* update INSTALL.md
-* ensure there is example usage
+* CRITICAL: improve documentation
+* CRITICAL: update INSTALL.md
+* CRITICAL: ensure there is example usage
 
 # DNAnexus
 * migrate app code to use the latest mity. either via an asset, or Docker image.
