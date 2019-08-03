@@ -26,7 +26,6 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     :return:
     """
     bam_files = bam_files[0] 
-    print(bam_files)
     #####
     # Checks
     #####
@@ -40,21 +39,11 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     check_missing_file(bam_files, die=True)
     prefix = create_prefix(bam_files[0], prefix)
     
-    # make outfile string
-    file_string = []
-    for b in bam_files:
-        f_string = ".".join(b.split('.')[1:-1]) + '.mity.vcf.gz'
-        file_string.append(f_string)
-    
-    # check all the bam files have the same file_string
-    if len(set(file_string)) > 1:
-        sys.exit("Don't know what to do here")
-    file_string = file_string[0]
-    
-    output_file_name = out_folder_path + "/" + prefix + "." + file_string
+    if prefix is None:
+        prefix=os.path.basename(bam_files[0]).replace(".bam", "") # @TODO need to check that the bam ends in .bam?
 
-    print("out_folder_path")
-    print(out_folder_path)
+
+    output_file_name = out_folder_path + "/" + prefix + ".mity.vcf.gz"
     
     bam_str = " ".join(['-b ' + bam_file for bam_file in bam_files])
     
