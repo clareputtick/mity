@@ -82,11 +82,16 @@ P_call.add_argument('--min-alternate-count', action='store', type=int,
                     dest="min_ac")
 P_call.add_argument('--p', action='store', type=float,
                     default=0.002,
-                    help='Minimum noise level. This is used to calculate QUAL score'
+                    help='Minimum noise level. This is used to calculate QUAL score. '
                          'Default: 0.002, range = [0,1]',
                     dest="p")
 P_call.add_argument('--normalise', action='store_true',
                     help='Normalise the resulting VCF?')
+P_call.add_argument('--out-folder-path', action='store', type=str,
+                    default='.',
+                    help='Output files will be saved in OUT_FOLDER_PATH. '
+                         "Default: '.' ",
+                    dest="out_folder_path")
 P_call.set_defaults(func=_cmd_call)
 
 # normalise --------------------------------------------------------------------

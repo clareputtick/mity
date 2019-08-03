@@ -9,7 +9,7 @@ from .util import create_prefix
 from .normalise import do_normalise as vcfnorm
 
 def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
-            min_vaf=0.005, min_ac=4, p=0.002, normalise=True):
+            min_vaf=0.005, min_ac=4, p=0.002, normalise=True, out_folder_path="."):
     """
     Run mity call.
     :param bam_files: a list of bam_files
@@ -51,7 +51,7 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
         sys.exit("Don't know what to do here")
     file_string = file_string[0]
     
-    output_file_name = prefix + "." + file_string
+    output_file_name = out_folder_path + "/" + prefix + "." + file_string
     
     bam_str = " ".join(['-b ' + bam_file for bam_file in bam_files])
     
