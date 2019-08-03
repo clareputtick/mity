@@ -9,7 +9,7 @@ from .util import create_prefix
 from .normalise import do_normalise as vcfnorm
 
 def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
-            min_vaf=0.005, min_ac=4, p=0.002, normalise=True, out_folder_path="/Users/putticc/Projects/mity/test_out"):
+            min_vaf=0.005, min_ac=4, p=0.002, normalise=True, out_folder_path="."):
     """
     Run mity call.
     :param bam_files: a list of bam_files
@@ -39,6 +39,9 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     check_missing_file(bam_files, die=True)
     prefix = create_prefix(bam_files[0], prefix)
     
+    if not os.path.exists(out_folder_path):
+        os.makedirs(out_folder_path)
+
     if prefix is None:
         prefix=os.path.basename(bam_files[0]).replace(".bam", "") # @TODO need to check that the bam ends in .bam?
 
@@ -50,6 +53,7 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
 
     region = "MT:1-16569"  # @TODO parse chrom name & length from the BAM header
     region = "MT:1-500"  # @TODO delete this debugging sub-region analysis
+
     freebayes_call = ('freebayes -f {} {} -r {} '
                       '--min-mapping-quality {} '
                       '--min-base-quality {} '
