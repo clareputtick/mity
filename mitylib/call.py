@@ -46,7 +46,8 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     output_file_name = out_folder_path + "/" + prefix + ".mity.vcf.gz"
     
     bam_str = " ".join(['-b ' + bam_file for bam_file in bam_files])
-    
+    unnormalised_vcf_path = out_folder_path + "/" + prefix + ".unnormalised.vcf.gz"
+
     region = "MT:1-16569"  # @TODO parse chrom name & length from the BAM header
     region = "MT:1-500"  # @TODO delete this debugging sub-region analysis
     freebayes_call = ('freebayes -f {} {} -r {} '
@@ -54,22 +55,23 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
                       '--min-base-quality {} '
                       '--min-alternate-fraction {} '
                       '--min-alternate-count {} '
-                      '--ploidy 2 | bgzip > unnormalised.vcf.gz'
-                      ).format(reference, bam_str, region, min_mq, min_bq, min_vaf, min_ac)
+                      '--ploidy 2 | bgzip > {} '
+                      ).format(reference, bam_str, region, min_mq, min_bq, min_vaf, min_ac, unnormalised_vcf_path)
+
     logging.info("Running FreeBayes in sensitive mode")
     print(freebayes_call)
     subprocess.run(freebayes_call, shell=True)
-    if os.path.isfile('unnormalised.vcf.gz'):
+    if os.path.isfile(unnormalised_vcf_path):
         logging.info("Finished running FreeBayes")
     
     if normalise:
         logging.info("Normalising and FILTERing variants")
         try:
-            vcfnorm('unnormalised.vcf.gz', output_file_name, p)
+            vcfnorm(unnormalised_vcf_path, output_file_name, p)
         finally:
-            os.remove('unnormalised.vcf.gz')
+            os.remove(unnormalised_vcf_path)
     else:
-        os.rename("unnormalised.vcf.gz", output_file_name)
+        os.rename(unnormalised_vcf_path, output_file_name)
         tabix(output_file_name)
 
 
