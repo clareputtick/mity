@@ -41,7 +41,8 @@ def _cmd_call(args):
     args.reference = select_reference_fasta(args.reference, None)
 
     call.do_call(args.bam, args.reference, args.prefix, args.min_mq,
-                 args.min_bq, args.min_af, args.min_ac, args.p, args.normalise)
+                 args.min_bq, args.min_af, args.min_ac, args.p, args.normalise,
+                 args.out_folder_path, args.region)
 
 
 P_call = AP_subparsers.add_parser('call', help=_cmd_call.__doc__)
@@ -67,11 +68,11 @@ P_call.add_argument('--min-base-quality', action='store', type=int, default=20,
                          'Default: 20',
                     dest="min_bq")
 P_call.add_argument('--min-alternate-fraction', action='store', type=float,
-                    default=0.5,
+                    default=0.1,
                     help='Require at least MIN_ALTERNATE_FRACTION '
                          'observations supporting an alternate allele within '
                          'a single individual in the in order to evaluate the '
-                         'position. Default: 0.0001, range = [0,1]',
+                         'position. Default: 0.01, range = [0,1]',
                     dest="min_af")
 P_call.add_argument('--min-alternate-count', action='store', type=int,
                     default=4,
@@ -88,10 +89,16 @@ P_call.add_argument('--p', action='store', type=float,
 P_call.add_argument('--normalise', action='store_true',
                     help='Normalise the resulting VCF?')
 P_call.add_argument('--out-folder-path', action='store', type=str,
-                    default='.',
+                    default='/Users/putticc/Projects/mity/test_out',
                     help='Output files will be saved in OUT_FOLDER_PATH. '
                          "Default: '.' ",
                     dest="out_folder_path")
+P_call.add_argument('--region', action='store', type=str,
+                    default=None,
+                    help='Region of MT genome to call variants in. '
+                         'If unset will call variants in entire MT genome as specified in BAM header. '
+                         "Default: Entire MT genome. ",
+                    dest="region")
 P_call.set_defaults(func=_cmd_call)
 
 # normalise --------------------------------------------------------------------

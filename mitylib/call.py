@@ -9,7 +9,8 @@ from .util import create_prefix
 from .normalise import do_normalise as vcfnorm
 
 def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
-            min_vaf=0.005, min_ac=4, p=0.002, normalise=True, out_folder_path="."):
+            min_af=0.01, min_ac=4, p=0.002, normalise=True, 
+            out_folder_path=".", region="MT:1-500"):
     """
     Run mity call.
     :param bam_files: a list of bam_files
@@ -18,7 +19,7 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     will be used
     :param min_mq: minimum mapping quality threshold. default: 30
     :param min_bq: minimum base quality threshold. default: 24
-    :param min_vaf: minimum heteroplasmy, aka the minimum fraction of alt reads vs total reads.
+    :param min_af: minimum heteroplasmy, aka the minimum fraction of alt reads vs total reads.
     scale [0,1]; default 0.005
     :param min_ac: minimum number of alternative reads to support a variant. default: 4
     :param p: the noise threshold. default 0.002
@@ -51,16 +52,18 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     bam_str = " ".join(['-b ' + bam_file for bam_file in bam_files])
     unnormalised_vcf_path = out_folder_path + "/" + prefix + ".unnormalised.vcf.gz"
 
-    region = "MT:1-16569"  # @TODO parse chrom name & length from the BAM header
-    region = "MT:1-500"  # @TODO delete this debugging sub-region analysis
-
-    freebayes_call = ('freebayes -f {} {} -r {} '
+    freebayes_call = ('freebayes -f {} {} '
                       '--min-mapping-quality {} '
                       '--min-base-quality {} '
                       '--min-alternate-fraction {} '
                       '--min-alternate-count {} '
-                      '--ploidy 2 | bgzip > {} '
-                      ).format(reference, bam_str, region, min_mq, min_bq, min_vaf, min_ac, unnormalised_vcf_path)
+                      '--ploidy 2 '
+                      ).format(reference, bam_str, min_mq, min_bq, min_af, min_ac)
+
+    if region is not None:
+        freebayes_call = freebayes_call + ('-r {} ').format(region)
+
+    freebayes_call = freebayes_call + ('| bgzip > {} ').format(unnormalised_vcf_path)
 
     logging.info("Running FreeBayes in sensitive mode")
     print(freebayes_call)
