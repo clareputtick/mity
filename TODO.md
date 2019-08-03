@@ -1,7 +1,8 @@
 # call
-* CRITICAL: makes an odd, very long filename
+* CRITICAL: makes an odd, very long filename - DONE
 * CRITICAL: edit the VCF header to include the mity call command
 * CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata
+* CRITICAL: If the freebayes command (or any other subprocess.run commands) fail, mity should fail
 
 # normalise
 * mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
