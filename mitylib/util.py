@@ -62,7 +62,7 @@ def create_prefix(file_name, prefix=None):
     return prefix
 
 
-def write_vcf(new_vcf, out_file, genome_file='reference/b37d5.genome'):
+def write_vcf(new_vcf, out_file, genome_file='mitylib/reference/b37d5.genome'):
     """
     write a vcf object to vcf.gz file with tbi index.
     
@@ -81,7 +81,7 @@ def write_vcf(new_vcf, out_file, genome_file='reference/b37d5.genome'):
     gsort_vcf(f, out_file, genome_file=genome_file)
 
 
-def gsort_vcf(f, out_file, genome_file='reference/b37d5.genome', remove_unsorted_vcf=True):
+def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_unsorted_vcf=True):
     """
     use gsort to sort the records in a VCF file according to a .genome file.
 
@@ -99,7 +99,7 @@ def gsort_vcf(f, out_file, genome_file='reference/b37d5.genome', remove_unsorted
         os.remove(f)
 
 
-def write_merged_vcf(new_vcf, out_file, genome_file='reference/b37d5.genome'):
+def write_merged_vcf(new_vcf, out_file, genome_file='mitylib/reference/b37d5.genome'):
     """
     write a vcf object to vcf.gz file with tbi index.
     
