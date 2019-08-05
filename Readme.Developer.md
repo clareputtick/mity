@@ -119,3 +119,34 @@ dx run cloud_workstation --ssh \
 -imax_session_length=1h \
 -ifids=file-BzF4G0j0QpzJP9931xpgKvv2 -ifids=file-BzF4G4Q0Qpz73J1BzVpJ41k4 --yes
 * see INSTALL.md
+
+# Get testing data
+
+Using the Ashkenazim Trio data.
+
+Getting BAMs:
+
+Links from ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/
+
+```bash
+wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/NIST_Illumina_2x250bps/novoalign_bams/HG002.hs37d5.2x250.bam
+wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/NIST_Illumina_2x250bps/novoalign_bams/HG002.hs37d5.2x250.bam.bai
+
+wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG003_NA24149_father/NIST_Illumina_2x250bps/novoalign_bams/HG003.hs37d5.2x250.bam
+wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG003_NA24149_father/NIST_Illumina_2x250bps/novoalign_bams/HG003.hs37d5.2x250.bam.bai
+
+wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG004_NA24143_mother/NIST_Illumina_2x250bps/novoalign_bams/HG004.hs37d5.2x250.bam
+wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG004_NA24143_mother/NIST_Illumina_2x250bps/novoalign_bams/HG004.hs37d5.2x250.bam.bai
+
+samtools view -bh -o HG002.hs37d5.2x250.small.MT.bam HG002.hs37d5.2x250.bam MT:1-700
+samtools view -bh -o HG003.hs37d5.2x250.small.MT.bam HG003.hs37d5.2x250.bam MT:1-700
+samtools view -bh -o HG004.hs37d5.2x250.small.MT.bam HG004.hs37d5.2x250.bam MT:1-700
+
+samtools index HG002.hs37d5.2x250.small.MT.bam
+samtools index HG003.hs37d5.2x250.small.MT.bam
+samtools index HG004.hs37d5.2x250.small.MT.bam
+
+```
+
+
+
