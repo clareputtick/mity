@@ -18,6 +18,7 @@ def tabix(f):
     :returns: Nothing
     :rtype: None
     """
+
     tabix_call = "tabix -f " + f
     logging.debug(tabix_call)
     subprocess.run(tabix_call, shell=True)
@@ -78,10 +79,11 @@ def write_vcf(new_vcf, out_file, genome_file='mitylib/reference/b37d5.genome'):
     with open(f, mode='wt', encoding='utf-8') as myfile:
         for vcf_line in new_vcf:
             myfile.write('\t'.join([str(elem) for elem in vcf_line]) + '\n')
-    gsort_vcf(f, out_file, genome_file=genome_file)
+    # gsort_vcf(f, out_file, genome_file=genome_file)
+    bcftools_sort_vcf(f, out_file)
 
 
-def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_unsorted_vcf=True):
+def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_unsorted_vcf=False):
     """
     use gsort to sort the records in a VCF file according to a .genome file.
 
@@ -92,12 +94,36 @@ def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_
     :return: nothing
     """
     logging.debug("Sorting, bgzipping {} -> {}".format(f, out_file))
-    subprocess.run("gsort {} {} | bgzip -cf > {}".format(f, genome_file, out_file), shell=True)
+    gsort_cmd = "gsort {} {} | bgzip -cf > {}".format(f, genome_file, out_file)
+
+    print(gsort_cmd)
+
+    subprocess.run(gsort_cmd, shell=True)
     logging.debug("Tabix indexing {}".format(out_file))
     tabix(out_file)
     if remove_unsorted_vcf:
         os.remove(f)
 
+def bcftools_sort_vcf(f, out_file, remove_unsorted_vcf=False):
+    """
+    use gsort to sort the records in a VCF file according to a .genome file.
+
+    :param f: the path to an unsorted vcf.gz file
+    :param out_file: the path to a resulting sorted vcf.gz file
+    :param genome_file: the .genome file corresponding to the reference genome. see https://github.com/brentp/gsort
+    :param remove_unsorted_vcf: if True, then the input file 'f' will be deleted.
+    :return: nothing
+    """
+    logging.debug("Sorting, bgzipping {} -> {}".format(f, out_file))
+    bcftools_sort_cmd = "bcftools sort {} -O z -o {}".format(f, out_file)
+
+    print(bcftools_sort_cmd)
+
+    subprocess.run(bcftools_sort_cmd, shell=True)
+    logging.debug("Tabix indexing {}".format(out_file))
+    tabix(out_file)
+    if remove_unsorted_vcf:
+        os.remove(f)
 
 def write_merged_vcf(new_vcf, out_file, genome_file='mitylib/reference/b37d5.genome'):
     """
