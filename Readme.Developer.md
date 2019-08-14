@@ -148,7 +148,7 @@ samtools index HG003.hs37d5.2x250.small.MT.bam
 samtools index HG004.hs37d5.2x250.small.MT.bam
 
 ```
-And need to add read group (RG) for freebayes to get the sample name
+And need to add read group (RG) for freebayes to get the sample name. See https://www.biostars.org/p/349213/
 ```bash
 cd test_in
 samtools addreplacerg -r ID:HG002 -r SM:HG002 HG002.hs37d5.2x250.small.MT.bam -o HG002.hs37d5.2x250.small.MT.RG.bam
@@ -157,7 +157,7 @@ samtools addreplacerg -r ID:HG004 -r SM:HG004 HG004.hs37d5.2x250.small.MT.bam -o
 
 samtools index HG002.hs37d5.2x250.small.MT.RG.bam
 samtools index HG003.hs37d5.2x250.small.MT.RG.bam
-samtools index HG003.hs37d5.2x250.small.MT.RG.bam
+samtools index HG004.hs37d5.2x250.small.MT.RG.bam
 ```
 
 
