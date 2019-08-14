@@ -75,9 +75,9 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
         logging.info("Finished running FreeBayes")
     
     if normalise:
-        logging.info("Normalising and FILTERing variants")
+        logging.info("Normalising and Filtering variants")
         try:
-            vcfnorm(unnormalised_vcf_path, output_file_name, p)
+            vcfnorm(vcf = unnormalised_vcf_path, out_file = output_file_name,  p = p)
         finally:
             os.remove(unnormalised_vcf_path)
     else:

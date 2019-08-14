@@ -129,6 +129,7 @@ Getting BAMs:
 Links from ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/
 
 ```bash
+cd test_in
 wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/NIST_Illumina_2x250bps/novoalign_bams/HG002.hs37d5.2x250.bam
 wget ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/NIST_Illumina_2x250bps/novoalign_bams/HG002.hs37d5.2x250.bam.bai
 
@@ -147,6 +148,16 @@ samtools index HG003.hs37d5.2x250.small.MT.bam
 samtools index HG004.hs37d5.2x250.small.MT.bam
 
 ```
+And need to add read group (RG) for freebayes to get the sample name. See https://www.biostars.org/p/349213/
+```bash
+cd test_in
+samtools addreplacerg -r ID:HG002 -r SM:HG002 HG002.hs37d5.2x250.small.MT.bam -o HG002.hs37d5.2x250.small.MT.RG.bam
+samtools addreplacerg -r ID:HG003 -r SM:HG003 HG003.hs37d5.2x250.small.MT.bam -o HG003.hs37d5.2x250.small.MT.RG.bam
+samtools addreplacerg -r ID:HG004 -r SM:HG004 HG004.hs37d5.2x250.small.MT.bam -o HG004.hs37d5.2x250.small.MT.RG.bam
 
+samtools index HG002.hs37d5.2x250.small.MT.RG.bam
+samtools index HG003.hs37d5.2x250.small.MT.RG.bam
+samtools index HG004.hs37d5.2x250.small.MT.RG.bam
+```
 
 
