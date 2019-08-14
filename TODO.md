@@ -3,11 +3,15 @@
 * CRITICAL: edit the VCF header to include the mity call command
 * CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata
 * CRITICAL: If the freebayes command (or any other subprocess.run commands) fail, mity should fail
+* At the moment we use gsort or bcftools tools to sort the normalised vcf. Given that it is always chromosome MT, this should be able to be done with python in the normalise script, meaning one less tool to download.
+* Check that the different references work
+* Freebayes assumes that the BAMs have a RG, which is where it gets the sample name from. If there is no @RG line, freebayes just outputs a single "unknown" sample, even if you input more than one sample. We should add a check to mity, to check that the BAM header has a read group line. This could just check that there is a line in the BAM header starting with @RG.
 
 # normalise
 * mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * migrate to pyvcf where possible
 * CRITICAL: i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. 
+* CRITICAL: When there is more than one sample I dont think the sample names are coming out properly
 
 # merge
 * migrate to pyvcf where possible (started in dev/merge2.py)
