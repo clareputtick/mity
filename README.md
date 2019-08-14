@@ -33,9 +33,9 @@ mity call \
 --min-alternate-fraction 0.5 \
 --region MT:1-500 \
 --normalise \
-test_in/HG002.hs37d5.2x250.small.MT.bam \
-test_in/HG003.hs37d5.2x250.small.MT.bam \
-test_in/HG004.hs37d5.2x250.small.MT.bam 
+test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
 ```
 
 This should create test_out/ashkenazim.mity.vcf.gz and test_out/ashkenazim.mity.vcf.gz.tbi
