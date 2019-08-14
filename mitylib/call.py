@@ -10,7 +10,7 @@ from .normalise import do_normalise as vcfnorm
 
 def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
             min_af=0.01, min_ac=4, p=0.002, normalise=True, 
-            out_folder_path=".", region="MT:1-500"):
+            out_folder_path=".", region=None):
     """
     Run mity call.
     :param bam_files: a list of bam_files
@@ -24,6 +24,8 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     :param min_ac: minimum number of alternative reads to support a variant. default: 4
     :param p: the noise threshold. default 0.002
     :param normalise:
+    :param out_folder_path: the folder to store the results within. default: .
+    :param region: Which region to analyse? If None, then the whole MT will be analysed.
     :return:
     """
     bam_files = bam_files[0] 
@@ -60,8 +62,9 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
                       '--ploidy 2 '
                       ).format(reference, bam_str, min_mq, min_bq, min_af, min_ac)
 
-    if region is not None:
-        freebayes_call = freebayes_call + ('-r {} ').format(region)
+    if region is None:
+        region = "MT:1-16569"
+    freebayes_call = freebayes_call + ('-r {} ').format(region)
 
     freebayes_call = freebayes_call + ('| bgzip > {} ').format(unnormalised_vcf_path)
 
