@@ -64,10 +64,10 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     print(freebayes_call)
     subprocess.run(freebayes_call, shell=True)
     if os.path.isfile(unnormalised_vcf_path):
-        logging.info("Finished running FreeBayes")
+        logging.debug("Finished running FreeBayes")
     
     if normalise:
-        logging.info("Normalising and Filtering variants")
+        logging.debug("Normalising and Filtering variants")
         try:
             vcfnorm(vcf=unnormalised_vcf_path, out_file=output_file_name, p=p)
         finally:
