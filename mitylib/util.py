@@ -99,7 +99,7 @@ def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_
     logging.debug("Sorting, bgzipping {} -> {}".format(f, out_file))
     gsort_cmd = "gsort {} {} | bgzip -cf > {}".format(f, genome_file, out_file)
 
-    print(gsort_cmd)
+    logging.debug(gsort_cmd)
 
     subprocess.run(gsort_cmd, shell=True)
     logging.debug("Tabix indexing {}".format(out_file))
@@ -118,9 +118,9 @@ def bcftools_sort_vcf(f, out_file, remove_unsorted_vcf=False):
     :return: nothing
     """
     logging.debug("Sorting, bgzipping {} -> {}".format(f, out_file))
-    bcftools_sort_cmd = "bcftools sort {} -O z -o {}".format(f, out_file)
+    bcftools_sort_cmd = "bcftools sort {} -O z -o {} 2>&1 >/dev/null".format(f, out_file)
 
-    print(bcftools_sort_cmd)
+    logging.debug(bcftools_sort_cmd)
 
     subprocess.run(bcftools_sort_cmd, shell=True)
     logging.debug("Tabix indexing {}".format(out_file))
@@ -271,7 +271,7 @@ def select_reference_fasta(reference, custom_genome=None):
     else:
         ref_dir = os.path.join(get_mity_dir(), 'reference')
         res = glob('{}/{}.*.fa'.format(ref_dir, reference))
-        print(",".join(res))
+        logging.debug(",".join(res))
         assert len(res) == 1
         res = res[0]
     return res
@@ -300,7 +300,7 @@ def select_reference_genome(reference, custom_fasta=None):
     else:
         ref_dir = os.path.join(get_mity_dir(), 'reference')
         res = glob('{}/{}.genome'.format(ref_dir, reference))
-        print(",".join(res))
+        logging.debug(",".join(res))
         assert len(res) == 1
         res = res[0]
     return res
