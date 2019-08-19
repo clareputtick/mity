@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import vcf as pyvcf
+import pysam
 import inspect
 from glob import glob
 
@@ -314,6 +315,31 @@ def vcf_get_mt_contig(vcf):
     mito_contig = ''.join(mito_contig)
 
     return r.contigs[mito_contig].id, r.contigs[mito_contig].length
+
+
+def bam_get_mt_contig(bam, as_string=False):
+    """
+    get the mitochondrial contig name and length from a BAM file
+    :param bam: path to a bam file
+    :return: a tuple of contig name as str and length as int
+
+    >>> bam_get_mt_contig('NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.bam', False)
+    ('chrM', 16569)
+    >>> bam_get_mt_contig('NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.bam', True)
+    'chrM:1-16569'
+    """
+    r = pysam.AlignmentFile(bam, "rb")
+    chroms = [str(record.get("SN")) for record in r.header['SQ']]
+    mito_contig = {'MT', 'chrM'}.intersection(chroms)
+    assert len(mito_contig) == 1
+    mito_contig = ''.join(mito_contig)
+    res = None
+    for record in r.header['SQ']:
+        if mito_contig == record['SN']:
+            res = record['SN'], record['LN']
+    if res is not None and as_string:
+        res = res[0] + ":1-" + str(res[1])
+    return res
 
 def get_annot_file(f):
     #mitylibdir = os.path.dirname(inspect.getfile(mitylib))
