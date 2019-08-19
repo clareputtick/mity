@@ -354,7 +354,7 @@ def combine_lines(variant_list):
   new_vcf = []
   # we loop over the chromsomes to fill new_vcf
   for uniq_chrom in unique_chromosomes:
-    logging.info('Processing chromosome ' + str(uniq_chrom))
+    logging.debug('Processing chromosome ' + str(uniq_chrom))
     chromo_variant_list = [line for line in variant_list if line[0] == uniq_chrom]
     # print(chromo_variant_list)
     # sys.exit()
@@ -1216,7 +1216,7 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/r
   
   # split the header and the variants into two seperate lists
   # @TODO: refactor this to use pyvcf
-  logging.info('Splitting header and variants\n')
+  logging.debug('Splitting header and variants')
   col_names = None
   header_lines = []
   variants = []
@@ -1237,27 +1237,27 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/r
         variants.append(line)
 
   if len(variants) == 0:
-    logging.warning('No variants in VCF with specified chromosome/s\n')
-  else:
-    logging.info('Splitting multiallelic\n')
-    single_allele = split_multi_allelic(variants)
-  
-    logging.info('Splitting MNPs\n')
-    no_mnp = split_MNP(single_allele)
-    # debug_print_vcf_lines(no_mnp)
-    logging.info('Combining duplicated variants\n')
-    combined_variants = combine_lines(no_mnp)
-    # debug_print_vcf_lines(combined_variants)
-    logging.info('Adding filter variants\n')
-    filtered_variants = add_filter(combined_variants)
-    # debug_print_vcf_lines(filtered_variants)
-    update_header(col_names, header_lines)
-    # debug_print_vcf_lines(filtered_variants)
-    logging.info('Writing normalised vcf\n')
-  
-    new_vcf = header_lines + filtered_variants
+    logging.warning('No variants in VCF with specified chromosome/s')
 
-    write_vcf(new_vcf, out_file, genome)
+  logging.debug('Splitting multiallelic')
+  single_allele = split_multi_allelic(variants)
+
+  logging.debug('Splitting MNPs')
+  no_mnp = split_MNP(single_allele)
+  # debug_print_vcf_lines(no_mnp)
+  logging.debug('Combining duplicated variants')
+  combined_variants = combine_lines(no_mnp)
+  # debug_print_vcf_lines(combined_variants)
+  logging.debug('Adding filter variants')
+  filtered_variants = add_filter(combined_variants)
+  # debug_print_vcf_lines(filtered_variants)
+  update_header(col_names, header_lines)
+  # debug_print_vcf_lines(filtered_variants)
+  logging.info('Writing normalised vcf')
+
+  new_vcf = header_lines + filtered_variants
+
+  write_vcf(new_vcf, out_file, genome)
 
 def debug_print_vcf_lines(x):
   for line in x:

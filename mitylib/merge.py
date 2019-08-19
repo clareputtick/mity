@@ -27,7 +27,7 @@ def do_merge(mity_vcf, hc_vcf, prefix=None, genome='mitylib/reference/b37d5.geno
     prefix = create_prefix(hc_vcf, prefix)
     outfile = prefix + ".mity.vcf.gz"
 
-    logging.info("importing hc_vcf: " + hc_vcf)
+    logging.debug("importing hc_vcf: " + hc_vcf)
     hc_file = gzip.open(hc_vcf, 'rt')
     
     # split the header and the variants into two separate lists
@@ -45,7 +45,7 @@ def do_merge(mity_vcf, hc_vcf, prefix=None, genome='mitylib/reference/b37d5.geno
     hc_col_names = hc_header[-1]
     del hc_header[-1]
 
-    logging.info("importing mity_vcf: " + mity_vcf)
+    logging.debug("importing mity_vcf: " + mity_vcf)
     mity_file = gzip.open(mity_vcf, 'rt')
     
     # split the header and the variants into two separate lists
