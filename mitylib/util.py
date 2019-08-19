@@ -166,8 +166,13 @@ def check_dependency(dep, exit=True):
     """
     Check if a dependency exists.
 
+    Special cases:
+    * gsort: this utility from brentp has the same name as GNU sort on some linux
+      systems. This function will check that brentp's gsort is found.
+
     >>> check_dependency("ls")
     >>> check_dependency("freebayes")
+    >>> check_dependency("gsort")
     :param dep: name of the dependency
     :param exit: If True, then if the dependency isn't found, the session will exit.
     :return: True/False if dependency was found.
@@ -177,6 +182,11 @@ def check_dependency(dep, exit=True):
         res = subprocess.run(['which', dep], capture_output=True, check=True, encoding="UTF8")
         found = True
         logging.info("Found dependency: " + str(res.stdout).strip())
+        if dep == "gsort":
+            # There is a potential name clash with gnu sort on linux
+            res = subprocess.run('gsort --help | grep -c GENOME')
+            if res != "2":
+                logging.error("Adjust your PATH to ensure that brentp's gsort is found before GNU sort" + dep)
     except subprocess.CalledProcessError:
         logging.error("Missing dependency: " + dep)
         if exit:
