@@ -3,9 +3,7 @@ import sys
 import subprocess
 import logging
 import os.path
-from .util import tabix
-from .util import check_missing_file
-from .util import create_prefix
+from .util import tabix, check_missing_file, create_prefix, bam_get_mt_contig
 from .normalise import do_normalise as vcfnorm
 
 def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
@@ -32,8 +30,6 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     #####
     # Checks
     #####
-    # TODO: need to check what the mitochondria is called in the bam header? 
-    
 
     if len(bam_files) > 1 and prefix is None:
         raise ValueError(
@@ -51,7 +47,7 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     bam_str = " ".join(['-b ' + bam_file for bam_file in bam_files])
 
     if region is None:
-        region = "MT:1-16569"
+        region = bam_get_mt_contig(bam_files[0], as_string=True)
 
     freebayes_call = ('freebayes -f {} {} '
                       '--min-mapping-quality {} '
