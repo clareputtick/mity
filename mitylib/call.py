@@ -45,14 +45,13 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     if not os.path.exists(out_folder_path):
         os.makedirs(out_folder_path)
 
-    if prefix is None:
-        prefix=os.path.basename(bam_files[0]).replace(".bam", "") # @TODO need to check that the bam ends in .bam?
+    output_file_name = os.path.join(out_folder_path, prefix + ".mity.vcf.gz")
+    unnormalised_vcf_path = os.path.join(out_folder_path, prefix + ".unnormalised.vcf.gz")
 
-
-    output_file_name = out_folder_path + "/" + prefix + ".mity.vcf.gz"
-    
     bam_str = " ".join(['-b ' + bam_file for bam_file in bam_files])
-    unnormalised_vcf_path = out_folder_path + "/" + prefix + ".unnormalised.vcf.gz"
+
+    if region is None:
+        region = "MT:1-16569"
 
     freebayes_call = ('freebayes -f {} {} '
                       '--min-mapping-quality {} '
@@ -60,11 +59,8 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
                       '--min-alternate-fraction {} '
                       '--min-alternate-count {} '
                       '--ploidy 2 '
-                      ).format(reference, bam_str, min_mq, min_bq, min_af, min_ac)
-
-    if region is None:
-        region = "MT:1-16569"
-    freebayes_call = freebayes_call + ('-r {} ').format(region)
+                      '--region {} '
+                      ).format(reference, bam_str, min_mq, min_bq, min_af, min_ac, region)
 
     freebayes_call = freebayes_call + ('| bgzip > {} ').format(unnormalised_vcf_path)
 
@@ -77,11 +73,9 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     if normalise:
         logging.info("Normalising and Filtering variants")
         try:
-            vcfnorm(vcf = unnormalised_vcf_path, out_file = output_file_name,  p = p)
+            vcfnorm(vcf=unnormalised_vcf_path, out_file=output_file_name, p=p)
         finally:
             os.remove(unnormalised_vcf_path)
     else:
         os.rename(unnormalised_vcf_path, output_file_name)
         tabix(output_file_name)
-
-

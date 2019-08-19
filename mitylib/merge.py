@@ -18,7 +18,7 @@ def check_vcf_merge_compatibility(mity_vcf, hc_vcf):
     h = vcf_get_mt_contig(hc_vcf)
     return m == h
 
-def do_merge(mity_vcf, hc_vcf, prefix=None, genome='reference/b37d5.genome'):
+def do_merge(mity_vcf, hc_vcf, prefix=None, genome='mitylib/reference/b37d5.genome'):
 
     if not check_vcf_merge_compatibility(mity_vcf, hc_vcf):
         logging.error("The VCF files use mitochondrial contigs")

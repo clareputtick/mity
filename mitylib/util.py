@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 import vcf as pyvcf
-
+import inspect
 from glob import glob
 
 def tabix(f):
@@ -36,7 +36,7 @@ def tmp_mity_file_name():
     """
     Create a tmp mity vcf file
     
-    #TODO There must be more pythonic ways of doing this.
+    #TODO There must be a more pythonic way of doing this.
     """
     f = tempfile.NamedTemporaryFile(mode="wt", prefix='mity', suffix=".vcf",
                                     delete=False)
@@ -50,11 +50,13 @@ def create_prefix(file_name, prefix=None):
     Most mity functions have an optional prefix. If a prefix is not specified,
     then use the  file name (minus the .vcf.gz or .bam suffix) as the prefix.
     :param file_name: The vcf, bam, bed filename
-    :param prefix: The optional prefix. If None, then craete a prefix from 
-    vcf_name, else return prefix
+    :param prefix: The optional prefix. If None, then create a prefix from
+    file_name, else return prefix
     :return: str prefix
     """
-    if ".vcf" in file_name:
+    if prefix is not None:
+        pass
+    elif ".vcf" in file_name:
         prefix = [os.path.basename(file_name).split(".vcf")[0], prefix][prefix is not None]
     elif ".bam" in file_name:
         prefix = [os.path.basename(file_name).split(".bam")[0], prefix][prefix is not None]
@@ -312,3 +314,11 @@ def vcf_get_mt_contig(vcf):
     mito_contig = ''.join(mito_contig)
 
     return r.contigs[mito_contig].id, r.contigs[mito_contig].length
+
+def get_annot_file(f):
+    #mitylibdir = os.path.dirname(inspect.getfile(mitylib))
+    #mitylibdir = os.path.dirname(mitylib.__file__)
+    mitylibdir = get_mity_dir()
+    p = os.path.join(mitylibdir, "annot", f)
+    assert os.path.exists(p)
+    return p

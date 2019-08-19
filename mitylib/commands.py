@@ -89,7 +89,7 @@ P_call.add_argument('--p', action='store', type=float,
 P_call.add_argument('--normalise', action='store_true',
                     help='Normalise the resulting VCF?')
 P_call.add_argument('--out-folder-path', action='store', type=str,
-                    default='/Users/putticc/Projects/mity/test_out',
+                    default='.',
                     help='Output files will be saved in OUT_FOLDER_PATH. '
                          "Default: '.' ",
                     dest="out_folder_path")
