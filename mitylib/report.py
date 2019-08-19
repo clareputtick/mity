@@ -3,9 +3,7 @@ import logging
 import gzip
 import pandas
 import xlsxwriter
-from .util import check_missing_file
-from .util import create_prefix
-from .util import make_hgvs
+from .util import check_missing_file, create_prefix, make_hgvs, get_annot_file
 
 def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
     table = []
@@ -257,7 +255,7 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 FORMAT_AQA = geno[AQA_idx]
                 # print(FORMAT_AQA)                                          
                 
-                
+                # @TODO - move to `mity normalise` as INFO:TIER
                 if float(FORMAT_VAF) >= 0.01:
                     tier = 1
                 elif float(FORMAT_VAF) < 0.01 and float(FORMAT_AO) > 10:
@@ -565,10 +563,8 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     
     ########## Merge with mitomap and panel annotation table
     # this depends on chrom, pos, ref, alt
-    mitomap_panel_annotations = pandas.read_csv(
-        "annot/mitomap_panel_annotations.csv")
-    mitomap_panel_annotations['POS'] = mitomap_panel_annotations['POS'].astype(
-        'str')
+    mitomap_panel_annotations = pandas.read_csv(get_annot_file("mitomap_panel_annotations.csv"))
+    mitomap_panel_annotations['POS'] = mitomap_panel_annotations['POS'].astype('str')
     # print(mitomap_panel_annotations.dtypes)
     # print(variant_df.dtypes)
     mitomap_panel_annotated_variants = pandas.merge(left=variant_df,
@@ -579,7 +575,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     
     ########## Merge with gene names and biotype
     # this depends on chrom, pos
-    gtf_annotations = pandas.read_csv("annot/gtf_annotations.csv")
+    gtf_annotations = pandas.read_csv(get_annot_file("gtf_annotations.csv"))
     gtf_annotations['POS'] = gtf_annotations['POS'].astype('str')
     # print(gtf_annotations.dtypes)
     
@@ -590,7 +586,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     
     ########## Merge with Mitomap Locations
     # this depends on chrom, pos
-    mito_locus_annotations = pandas.read_csv("annot/mito_dna_func_loc.csv")
+    mito_locus_annotations = pandas.read_csv(get_annot_file("mito_dna_func_loc.csv"))
     mito_locus_annotations['POS'] = mito_locus_annotations['POS'].astype('str')
     # print(gtf_annotations.dtypes)
     
@@ -603,7 +599,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     
     ########## Merge with trna anticodon positions
     # this depends on chrom pos 
-    trna_annotations = pandas.read_csv("annot/anticodon_positions.csv")
+    trna_annotations = pandas.read_csv(get_annot_file("anticodon_positions.csv"))
     trna_annotations['POS'] = trna_annotations['POS'].astype('str')
     trna_annotations['anticodon'] = trna_annotations['anticodon'].astype('str')
     trna_mito_locus_gtf_mitomap_panel_annotated_variants = pandas.merge(
@@ -615,7 +611,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     
     ########## Merge with mitotip score and prediction
     # this depends on chrom pos ref alt
-    mitotip_annotations = pandas.read_csv("annot/mitotip_score_fixed_del.csv")
+    mitotip_annotations = pandas.read_csv(get_annot_file("mitotip_score_fixed_del.csv"))
     mitotip_annotations['POS'] = mitotip_annotations['POS'].astype('str')
     mitotip_annotations['MitoTip_score'] = mitotip_annotations[
         'MitoTip_score'].astype('str')
@@ -630,7 +626,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     
     ########## Merge with mgrb variants
     # this depends on chrom pos ref alt
-    mgrb_annotations = pandas.read_csv("annot/mgrb_variants.csv")
+    mgrb_annotations = pandas.read_csv(get_annot_file("mgrb_variants.csv"))
     mgrb_annotations['POS'] = mgrb_annotations['POS'].astype('str')
     mgrb_mitotip_trna_mito_locus_gtf_mitomap_panel_annotated_variants = \
         pandas.merge(
@@ -643,7 +639,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     ########## Merge with haplotype data
     # this depends on chrom pos ref alt
     # TODO: why does this add two lines for some variants?
-    haplotype_annotations = pandas.read_csv("annot/haplotype_data.csv")
+    haplotype_annotations = pandas.read_csv(get_annot_file("haplotype_data.csv"))
     haplotype_annotations['POS'] = haplotype_annotations['POS'].astype('str')
     haplotype_mgrb_mitotip_trna_mito_locus_gtf_mitomap_panel_annotated_variants = pandas.merge(
         left=mgrb_mitotip_trna_mito_locus_gtf_mitomap_panel_annotated_variants,
