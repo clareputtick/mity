@@ -1,5 +1,10 @@
 # mity
-@TODO
+mity is a bioinformatic analysis pipeline designed to call mitochondrial SNV and INDEL variants from Whole Genome Sequencing (WGS) data. mity can:
+* identify very low-heteroplasmy variants, even <1% heteroplasmy when there is sufficient read-depth (eg >1000x)
+* filter out common artefacts that arise from high-depth sequencing
+* easily integrate with existing nuclear DNA analysis pipelines (mity merge)
+* provide an annotated report, designed for clinicians and researchers to interrogate
+
 
 # Usage
     mity -h
@@ -8,7 +13,7 @@
 * freebayes >= 1.2.0
 * bgzip + tabix
 * gsort (https://github.com/brentp/gsort)
-* python3 (tested on 3.7.3)
+* python3 (tested on 3.7.4)
 * pyvcf
 * xlsxwriter
 * pandas

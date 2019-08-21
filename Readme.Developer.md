@@ -168,3 +168,15 @@ wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_proj
 wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/data/CEU/NA12878/alignment/NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.bam.bas
 wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa
 samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.bam *cram chrM:1-16569
+
+# Docker
+* created a Dockerfile and this seemed to work really well
+
+    docker build --tag=mity .
+    docker login
+    docker tag 070c31168c06 drmjc/mity:0.0.1b13
+    docker push drmjc/mity:0.0.1b13
+
+    # test mity
+    docker run mity call -h
+    docker run drmjc/mity:0.0.1b13 -h
