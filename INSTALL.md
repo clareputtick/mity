@@ -87,3 +87,10 @@ Or install mity using a virtualenv
     wget https://dl.dnanex.us/F/D/pVG7PjZy4qKBB6ZKbkkF0X6kB0kxf7ZzjpK7fXjY/hs37d5.fasta-index.tar.gz
     tar -xzvf hs37d5.fasta-index.tar.gz; mv genome.dict hs37d5.dict; mv genome.fa hs37d5.fa; mv genome.fa.fai hs37d5.fa.fai
 
+# test post-docker
+
+    wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
+    wget https://dl.dnanex.us/F/D/qyV40Qgfj6Jgy3zZfJ07vkgXqZvJ6Fb2kXb24fyv/A1.dedup.realigned.recalibrated.chrMT.bam.bai
+    docker run --rm -it -v $(pwd):/home drmjc/mity:0.0.1b13 call --prefix A1 /home/A1.dedup.realigned.recalibrated.chrMT.bam
+    docker run --rm -it -v $(pwd):/home drmjc/mity:0.0.1b13 normalise --outfile /home/A1.mity.norm.vcf.gz /data/A1.mity.vcf.gz
+    docker run --rm -it -v $(pwd):/home drmjc/mity:0.0.1b13 report /home/A1.mity.norm.vcf.gz
