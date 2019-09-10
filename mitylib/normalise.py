@@ -5,6 +5,8 @@ import gzip
 import re
 import logging
 from .util import write_vcf
+from scipy.stats import binom
+from numpy import log10
 
 def unchanged(List):
   # check that all numbers in the list are the same
@@ -325,7 +327,7 @@ def split_MNP(variant_list):
 # variant_list is a list of sublists, each sublist is  line in the vcf
 # variant_list is a list, with no multiallelic variants
 # Eg variant_list = [['MT', 73.0, '.', 'A', 'G', '148165', '.', 'DP=5912...], ['MT', 146.0, '.', 'T', 'C', '198193', '.', 'DP=7697;...], ['MT', '182', '.', 'C', 'T', '6.00899e-14', '.', 'DP=7955;...]]
-def combine_lines(variant_list):
+def combine_lines(variant_list, p=0.0001):
 
   # make dictinary with keys chromosome, position and alternate
 
@@ -425,6 +427,7 @@ def combine_lines(variant_list):
       # should probably make the same so its easier to follow
       if len(matching_lines) == 1:
         # print("not repeated position")
+        # print(matching_lines)
         # then this isnt a repeated position
         # we just need to update and add values to the info/format field.
 
@@ -501,8 +504,12 @@ def combine_lines(variant_list):
 
         # add VAF to the format
         FORMAT_names.append('VAF')
+        # add q to the formal
+        FORMAT_names.append('q')
         # print(FORMAT_names)
         # add dummy VAF placeholder
+        [x.extend(['-1']) for x in FORMAT_values]
+        # add dummy q placeholder
         [x.extend(['-1']) for x in FORMAT_values]
         # print(FORMAT_values)
 
@@ -547,7 +554,24 @@ def combine_lines(variant_list):
           # VAF.append(str(samp_VAF))
           VAF_idx = FORMAT_names.index('VAF')
           temp_format[VAF_idx] = str(samp_VAF)
+          # add in q
+          # print(float(DP))
+          # print(binom.cdf(float(AO), float(DP), p))
+          # print(log10(1 - binom.cdf(float(AO), float(DP), p)))
 
+          if DP != 0:
+            q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
+          else:
+            q = 0
+
+          q_idx = FORMAT_names.index('q')
+          temp_format[q_idx] = str(q)
+
+          # print(p)
+          # print(float(DP))
+          # print(float(AO))
+          # print(q)
+          # exit()
           # add in the new genotype
           if AO < 4:
             new_genotype = "0/0"
@@ -705,6 +729,8 @@ def combine_lines(variant_list):
 
         # add VAF to the format
         FORMAT_names.append('VAF')
+        # add q to the format
+        FORMAT_names.append('q')
         # print(FORMAT_names)
         # add dummy VAF placeholder
         # [x.extend(['-1']) for x in FORMAT_values]
@@ -767,6 +793,15 @@ def combine_lines(variant_list):
           VAF.append(str(samp_VAF))
           # print(VAF)
 
+          if new_DP != 0:
+            samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
+          else:
+            samp_q = 0.0
+          samp_q = str(samp_q)  
+          # q.append(str(samp_q))
+
+          # print(VAF)
+
           # update GT
           if int(new_AO) < 4:
             new_genotype = "0/0"
@@ -796,7 +831,7 @@ def combine_lines(variant_list):
           QA_idx = FORMAT_names.index('QA')
           QA_vector = [i[QA_idx] for i in temp_format]
           new_QA = Sum(QA_vector)
-          new_QA = str(new_QA)
+          new_QA = str(int(new_QA))
 
           # calculate AQA
           # here AO could be less than zero because it could be another sample that has this variant
@@ -808,7 +843,7 @@ def combine_lines(variant_list):
             # AQR = 1000000 will be confusing, so check in the filters function if RO = 0
             AQA = str(0)
 
-          new_FORMAT.append(":".join([new_genotype, new_DP, new_AD, new_RO, new_QR, AQR, new_AO, new_QA, AQR, samp_VAF]))
+          new_FORMAT.append(":".join([new_genotype, new_DP, new_AD, new_RO, new_QR, AQR, new_AO, new_QA, AQR, samp_VAF, samp_q]))
           # print(new_FORMAT)
           
         # print(new_FORMAT)
@@ -1059,7 +1094,7 @@ def add_filter(variant_list, min_DP=15, SB_range = [0.2, 0.8], min_MQMR = 30, mi
   return(new_vcf)
 
 
-def update_header(col_names, header_lines):
+def update_header(col_names, header_lines, p):
   ##############################
   ####### Process Header lines
   header_lines.append([
@@ -1175,6 +1210,8 @@ def update_header(col_names, header_lines):
                         '##FORMAT=<ID=RO,Number=1,Type=String,Description="Reference observations">'])
   header_lines.append([
                         '##FORMAT=<ID=VAF,Number=A,Type=Float,Description="Allele frequency in the range (0,1] - the ratio of the number of alternate reads to reference reads">'])
+  header_lines.append([
+                        '##FORMAT=<ID=q,Number=A,Type=Float,Description="Phred scaled binomial probability of seeing AO reads from DP, assuming a noise floor of p=' + str(p) + '. ">'])
   
   ##############################
   ######## Add col names back in
@@ -1208,7 +1245,7 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/r
   :returns: Nothing. This creates a vcf.gz named out_file
   :rtype: None
   """
-  
+  print(p)
   if out_file is None:
     out_file = vcf.replace(".vcf.gz", ".norm.vcf.gz")
 
@@ -1246,12 +1283,12 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/r
   no_mnp = split_MNP(single_allele)
   # debug_print_vcf_lines(no_mnp)
   logging.debug('Combining duplicated variants')
-  combined_variants = combine_lines(no_mnp)
+  combined_variants = combine_lines(no_mnp, p = p)
   # debug_print_vcf_lines(combined_variants)
   logging.debug('Adding filter variants')
   filtered_variants = add_filter(combined_variants)
   # debug_print_vcf_lines(filtered_variants)
-  update_header(col_names, header_lines)
+  update_header(col_names, header_lines, p = p)
   # debug_print_vcf_lines(filtered_variants)
   logging.info('Writing normalised vcf')
 
