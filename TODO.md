@@ -6,12 +6,18 @@
 * At the moment we use gsort or bcftools tools to sort the normalised vcf. Given that it is always chromosome MT, this should be able to be done with python in the normalise script, meaning one less tool to download.
 * Check that the different references work
 * Freebayes assumes that the BAMs have a RG, which is where it gets the sample name from. If there is no @RG line, freebayes just outputs a single "unknown" sample, even if you input more than one sample. We should add a check to mity, to check that the BAM header has a read group line. This could just check that there is a line in the BAM header starting with @RG.
+* I dont think the error for if the bams dont exist is working:
+```bash
+mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fraction 0.5 --normalise bam_that_doesnt_exist.bam
+```
 
 # normalise
 * mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * migrate to pyvcf where possible
-* CRITICAL: i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. 
-* CRITICAL: When there is more than one sample I dont think the sample names are coming out properly
+* CRITICAL: i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. - Done
+* CRITICAL: When there is more than one sample I dont think the sample names are coming out properly - Done
+* Make the test bams contain lines that have "repeated positions". To do this fun fb on entire bams and see which regions would give a repeated position. - Done
+* Should probably detail how we combine variants
 
 # merge
 * migrate to pyvcf where possible (started in dev/merge2.py)
