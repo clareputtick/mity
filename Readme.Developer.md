@@ -149,6 +149,7 @@ samtools index HG004.hs37d5.2x250.small.MT.bam
 
 ```
 And need to add read group (RG) for freebayes to get the sample name. See https://www.biostars.org/p/349213/
+
 ```bash
 cd test_in
 samtools addreplacerg -r ID:HG002 -r SM:HG002 HG002.hs37d5.2x250.small.MT.bam -o HG002.hs37d5.2x250.small.MT.RG.bam
@@ -159,6 +160,17 @@ samtools index HG002.hs37d5.2x250.small.MT.RG.bam
 samtools index HG003.hs37d5.2x250.small.MT.RG.bam
 samtools index HG004.hs37d5.2x250.small.MT.RG.bam
 ```
+# Testing the combine variants function in mity normalise
+To test the entire function, you need to run mity in a sensitive mode so that there is at least one variant that is repeated.
+```bash
+mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fraction 0.001 --region MT:300-500 --normalise test_in/HG002.hs37d5.2x250.small.MT.RG.bam test_in/HG003.hs37d5.2x250.small.MT.RG.bam test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
+```
+
+mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fraction 0.001 --region MT:300-500 --normalise test_in/HG002.hs37d5.2x250.MT.bam
+
+Gives the warning
+/Users/putticc/Projects/mity/mitylib/normalise.py:563: RuntimeWarning: divide by zero encountered in log10
+  q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
 
 
 # Test GRCh38 from 1000 genomes
