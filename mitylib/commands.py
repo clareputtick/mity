@@ -136,7 +136,7 @@ def _cmd_report(args):
     """Generate mity report"""
     logging.info("mity %s", __version__)
     logging.info("Generating mity report")
-    report.do_report(args.vcf, args.prefix, args.min_vaf)
+    report.do_report(args.vcf, args.prefix, args.min_vaf, args.out_folder_path)
 
 
 P_report = AP_subparsers.add_parser('report', help=_cmd_report.__doc__)
@@ -145,6 +145,11 @@ P_report.add_argument('--prefix', action='store',
 P_report.add_argument('--min_vaf', action='store', type=float, default=0, help=
 'A variant must have at least this VAF to be included in the report. Default: '
 '0.')
+P_report.add_argument('--out-folder-path', action='store', type=str,
+                    default='.',
+                    help='Output files will be saved in OUT_FOLDER_PATH. '
+                         "Default: '.' ",
+                    dest="out_folder_path")
 P_report.add_argument('vcf', action='append', nargs='+',
                     help="mity vcf files to create a report from")
 P_report.set_defaults(func=_cmd_report)
