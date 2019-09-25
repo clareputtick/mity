@@ -1,8 +1,8 @@
 # call
 * CRITICAL: makes an odd, very long filename - DONE
-* CRITICAL: edit the VCF header to include the mity call command
-* CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata
-* CRITICAL: If the freebayes command (or any other subprocess.run commands) fail, mity should fail
+* CRITICAL: edit the VCF header to include the mity call command - TODO
+* CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata - TODO
+* CRITICAL: If the freebayes command (or any other subprocess.run commands) fail, mity should fail - TODO
 * At the moment we use gsort or bcftools tools to sort the normalised vcf. Given that it is always chromosome MT, this should be able to be done with python in the normalise script, meaning one less tool to download.
 * Check that the different references work
 * Freebayes assumes that the BAMs have a RG, which is where it gets the sample name from. If there is no @RG line, freebayes just outputs a single "unknown" sample, even if you input more than one sample. We should add a check to mity, to check that the BAM header has a read group line. This could just check that there is a line in the BAM header starting with @RG.
@@ -18,8 +18,8 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 * CRITICAL: When there is more than one sample I dont think the sample names are coming out properly - Done
 * Make the test bams contain lines that have "repeated positions". To do this fun fb on entire bams and see which regions would give a repeated position. - Done
 * Should probably detail how we combine variants
-* If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number?
-* Check the log10 function that I am using - it seems to want to give 159.55 alot. I think this is when the binomial function is close to 1.
+* CRITICAL: If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number?
+* CRITICAL: Check the log10 function that I am using - it seems to want to give 159.55 a lot. I think this is when the binomial function is close to 1.
 
 # merge
 * migrate to pyvcf where possible (started in dev/merge2.py)
