@@ -38,7 +38,7 @@ def split_multi_allelic(variants):
   for line in variants:
 
     lineparts = line.split('\t')
-    # print(lineparts)q
+    # print(lineparts)
     # lineparts = ['MT', '3103', '.', 'CTACN', 'CTAC,CTACT', '68191.9', '.', 'AB=0,0;ABP=0,0;AC=2,4;AF=0.333333,0.666667;AN=6;...]
     
     # The position of these fields should never change in a vcf:
