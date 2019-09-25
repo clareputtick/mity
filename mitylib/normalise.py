@@ -794,7 +794,7 @@ def combine_lines(variant_list, p=0.0001):
           # print(VAF)
 
           if new_DP != 0:
-            samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
+            samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(new_DP), p))), 2)
           else:
             samp_q = 0.0
           samp_q = str(samp_q)  
