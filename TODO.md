@@ -31,6 +31,7 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
     File "/usr/local/lib/python3.7/site-packages/mitylib/report.py", line 353, in split_header_variants
         col_names = header[-1]
     IndexError: list index out of range
+This is because the mity-report code assumes certain fields are in the VCF, which aren't there if mity-normalise hasnt been run. I think the best way to fix this is to rewrite the code so that it doesn't assume fields in the VCF. This could then be a more useful script as it would work with all VCFs. But I'm going to leave it for now, and we can say that mity-report only works with normalised VCFs.
 
 * L63-L104 is repetitive
 * VEP splitting should be in a function
