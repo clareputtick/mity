@@ -19,6 +19,7 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 * Make the test bams contain lines that have "repeated positions". To do this fun fb on entire bams and see which regions would give a repeated position. - Done
 * Should probably detail how we combine variants
 * If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number?
+* Check the log10 function that I am using - it seems to want to give 159.55 alot. I think this is when the binomial function is close to 1.
 
 # merge
 * migrate to pyvcf where possible (started in dev/merge2.py)
@@ -37,6 +38,8 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 * some more examples in here that could be streamlined and processed over a list of keys
 * L823-891 could just be saved in a text file and loaded in as a one-liner
 * L903-906 is too repetitive: iterate over an array of fields for int64 vs float64
+* Check if report works with multiple VCFs
+* need to add output folder - currently saves in current directory
 
 # misc
 * use logging.info, logging.debug, logging.warning, logging.error where possible
