@@ -39,7 +39,7 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 * L823-891 could just be saved in a text file and loaded in as a one-liner
 * L903-906 is too repetitive: iterate over an array of fields for int64 vs float64
 * Check if report works with multiple VCFs
-* need to add output folder - currently saves in current directory
+* need to add output folder - currently saves in current directory - Done
 
 # misc
 * use logging.info, logging.debug, logging.warning, logging.error where possible
