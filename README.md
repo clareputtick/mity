@@ -31,19 +31,45 @@ export PATH
 ## mity-call
 First run mity-call on three MT BAMs provided in mity/test_in
 
+We run it in normalised mode
 ```bash
 mity call \
 --prefix ashkenazim \
---out-folder-path test_out \
+--out-folder-path test_out/normalised \
 --min-alternate-fraction 0.5 \
 --region MT:1-500 \
 --normalise \
+--p 0.001 \
+test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
+```
+And in non normalised mode
+
+```bash
+mity call \
+--prefix ashkenazim \
+--out-folder-path test_out/unnormalised \
+--min-alternate-fraction 0.5 \
+--region MT:1-500 \
+--p 0.001 \
 test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
 test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
 test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
 ```
 
 This should create test_out/ashkenazim.mity.vcf.gz and test_out/ashkenazim.mity.vcf.gz.tbi
+
+## mity-report
+On the normalised VCF
+```bash
+mity report \
+--prefix ashkenazim \
+--min_vaf 0.1 \
+--out-folder-path /Users/putticc/Projects/mity/test_out/normalised \
+test_out/normalised/ashkenazim.mity.vcf.gz
+```
+
 
 
 # Acknowledgements
