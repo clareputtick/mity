@@ -70,7 +70,14 @@ mity report \
 test_out/normalised/ashkenazim.mity.vcf.gz
 ```
 
-
+On the unnormalised VCF - this doesn't work.
+```bash
+mity report \
+--prefix ashkenazim \
+--min_vaf 0.1 \
+--out-folder-path /Users/putticc/Projects/mity/test_out/unnormalised \
+test_out/unnormalised/ashkenazim.mity.vcf.gz
+```
 
 # Acknowledgements
 We thank the Kinghorn Centre for Clinical Genomics and collaborators, who helped
