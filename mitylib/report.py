@@ -2,6 +2,7 @@ import sys
 import logging
 import gzip
 import pandas
+import os.path
 import xlsxwriter
 from .util import check_missing_file, create_prefix, make_hgvs, get_annot_file
 
@@ -371,7 +372,7 @@ def find_index(string, pattern):
     return [i for i, ltr in enumerate(string) if ltr == pattern]
 
 
-def do_report(vcf, prefix=None, min_vaf=0.0):
+def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     """
     Create a mity report
     :param vcf: the path to a vcf file
@@ -903,8 +904,11 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     annotated_variants1['SBA_INFO'] = annotated_variants1['SBA_INFO'].astype(
         'float64')
 
+    if not os.path.exists(out_folder_path):
+        os.makedirs(out_folder_path)
+
     logging.info("saving xlsx report")
-    xlsx_name = prefix + '.annotated_variants.xlsx'
+    xlsx_name = os.path.join(out_folder_path, prefix + ".annotated_variants.xlsx")
     writer = pandas.ExcelWriter(xlsx_name, engine='xlsxwriter')
     documentation_df.to_excel(writer, sheet_name='Documentation', index=False,
                               header=False)
@@ -912,7 +916,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0):
     writer.save()
     
     logging.info("saving csv report")
-    csv_name = prefix + '.annotated_variants.csv'
+    csv_name = os.path.join(out_folder_path, prefix + ".annotated_variants.csv")
     annotated_variants1.to_csv(csv_name, index=False, )
     # numpy.savetxt('data.csv', delimiter=',', X = annotated_variants1)
     # with open("test.csv", "w", newline='') as csv_file:
