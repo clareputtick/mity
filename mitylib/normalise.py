@@ -560,7 +560,10 @@ def combine_lines(variant_list, p=0.0001):
           # print(log10(1 - binom.cdf(float(AO), float(DP), p)))
 
           if DP != 0:
-            q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
+            if AO == DP:
+              q = 10000
+            else:
+              q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
           else:
             q = 0
 
@@ -794,7 +797,10 @@ def combine_lines(variant_list, p=0.0001):
           # print(VAF)
 
           if new_DP != 0:
-            samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(new_DP), p))), 2)
+            if new_DP == AO:
+              samp_q = 10000
+            else:
+              samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(new_DP), p))), 2)
           else:
             samp_q = 0.0
           samp_q = str(samp_q)  
