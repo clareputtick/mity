@@ -18,7 +18,7 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 * CRITICAL: When there is more than one sample I dont think the sample names are coming out properly - Done
 * Make the test bams contain lines that have "repeated positions". To do this fun fb on entire bams and see which regions would give a repeated position. - Done
 * Should probably detail how we combine variants
-* CRITICAL: If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number?
+* CRITICAL: If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number? - Done
 * CRITICAL: Check the log10 function that I am using - it seems to want to give 159.55 a lot. I think this is when the binomial function is close to 1.
 
 # merge
