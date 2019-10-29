@@ -12,7 +12,6 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 ```
 
 # normalise
-* mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * migrate to pyvcf where possible
 * CRITICAL: i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. - Done
 * CRITICAL: When there is more than one sample I dont think the sample names are coming out properly - Done
@@ -27,6 +26,7 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 * are there any VCF format 4.1 vs 4.2 fields that clash. eg the type of the variable changes?
 
 # report
+* mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * CRITICAL: currently broken:
     File "/usr/local/lib/python3.7/site-packages/mitylib/report.py", line 353, in split_header_variants
         col_names = header[-1]
