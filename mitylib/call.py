@@ -49,6 +49,27 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     if region is None:
         region = bam_get_mt_contig(bam_files[0], as_string=True)
 
+    # this is the mity command that will be printed in the VCF header
+    # I'm not sure how to get the exact line from the terminal, so I remake it here
+    mity_cmd = '##commandline="mity call --reference ' + str(reference) + ' --prefix ' + prefix + ' --min-mapping-quality ' + str(min_mq) + ' --min-base-quality ' + str(min_bq) + ' --min-alternate-fraction ' + str(min_af) + ' --min-alternate-count ' + str(min_ac)  + ' --out-folder-path ' + str(out_folder_path)
+
+    if region is not None:
+        mity_cmd = mity_cmd + ' --region ' + region
+
+    if normalise:
+        mity_cmd = mity_cmd + ' --normalise --p ' + str(p)
+
+    mity_cmd = mity_cmd + '"'
+    # print(mity_cmd)
+
+    mity_cmd = mity_cmd.replace("/", "\/")
+
+    # print(mity_cmd)
+
+    # replace the freebayes command line with the mity command
+    sed_cmd = "sed 's/^##commandline=.*/" + mity_cmd + "/'"
+    # print(sed_cmd)
+
     freebayes_call = ('freebayes -f {} {} '
                       '--min-mapping-quality {} '
                       '--min-base-quality {} '
@@ -58,10 +79,11 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
                       '--region {} '
                       ).format(reference, bam_str, min_mq, min_bq, min_af, min_ac, region)
 
-    freebayes_call = freebayes_call + ('| bgzip > {} ').format(unnormalised_vcf_path)
+    freebayes_call = freebayes_call + ('| {} | bgzip > {} ').format(sed_cmd, unnormalised_vcf_path)
 
     logging.info("Running FreeBayes in sensitive mode")
-    print(freebayes_call)
+    # print(freebayes_call)
+    
     subprocess.run(freebayes_call, shell=True)
     if os.path.isfile(unnormalised_vcf_path):
         logging.debug("Finished running FreeBayes")

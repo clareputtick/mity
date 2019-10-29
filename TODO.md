@@ -1,6 +1,6 @@
 # call
 * CRITICAL: makes an odd, very long filename - DONE
-* CRITICAL: edit the VCF header to include the mity call command - TODO
+* CRITICAL: edit the VCF header to include the mity call command - Done
 * CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata - TODO
 * CRITICAL: If the freebayes command (or any other subprocess.run commands) fail, mity should fail - TODO
 * At the moment we use gsort or bcftools tools to sort the normalised vcf. Given that it is always chromosome MT, this should be able to be done with python in the normalise script, meaning one less tool to download.
