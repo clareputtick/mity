@@ -31,7 +31,7 @@ export PATH
 ## mity-call
 First run mity-call on three MT BAMs provided in mity/test_in
 
-We run it in normalised mode
+We can run it in normalised mode:
 ```bash
 mity call \
 --prefix ashkenazim \
@@ -44,7 +44,9 @@ test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
 test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
 test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
 ```
-And in non normalised mode
+This should create test_out/normalised/ashkenazim.mity.vcf.gz and test_out/normalised/ashkenazim.mity.vcf.gz.tbi
+
+We can run it without the normalisation:
 
 ```bash
 mity call \
@@ -58,10 +60,11 @@ test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
 test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
 ```
 
-This should create test_out/ashkenazim.mity.vcf.gz and test_out/ashkenazim.mity.vcf.gz.tbi
+This should create test_out/unnormalised/ashkenazim.mity.vcf.gz and test_out/unnormalised/ashkenazim.mity.vcf.gz.tbi
 
 ## mity-report
-On the normalised VCF
+
+We can create a mity report on the normalised VCF:
 ```bash
 mity report \
 --prefix ashkenazim \
@@ -69,6 +72,8 @@ mity report \
 --out-folder-path /Users/putticc/Projects/mity/test_out/normalised \
 test_out/normalised/ashkenazim.mity.vcf.gz
 ```
+
+This should create: test_out/normalised/ashkenazim.annotated_variants.csv and test_out/normalised/ashkenazim.annotated_variants.xlsx
 
 On the unnormalised VCF - this doesn't work.
 ```bash
@@ -78,6 +83,7 @@ mity report \
 --out-folder-path /Users/putticc/Projects/mity/test_out/unnormalised \
 test_out/unnormalised/ashkenazim.mity.vcf.gz
 ```
+## mity-merge
 
 # Acknowledgements
 We thank the Kinghorn Centre for Clinical Genomics and collaborators, who helped
