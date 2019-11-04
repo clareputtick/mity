@@ -1,6 +1,6 @@
 # call
 * CRITICAL: makes an odd, very long filename - DONE
-* CRITICAL: edit the VCF header to include the mity call command - TODO
+* CRITICAL: edit the VCF header to include the mity call command - Done
 * CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata - TODO
 * CRITICAL: If the freebayes command (or any other subprocess.run commands) fail, mity should fail - TODO
 * At the moment we use gsort or bcftools tools to sort the normalised vcf. Given that it is always chromosome MT, this should be able to be done with python in the normalise script, meaning one less tool to download.
@@ -12,13 +12,12 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 ```
 
 # normalise
-* mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * migrate to pyvcf where possible
 * CRITICAL: i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. - Done
 * CRITICAL: When there is more than one sample I dont think the sample names are coming out properly - Done
 * Make the test bams contain lines that have "repeated positions". To do this fun fb on entire bams and see which regions would give a repeated position. - Done
 * Should probably detail how we combine variants
-* CRITICAL: If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number?
+* CRITICAL: If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number? - Done
 * CRITICAL: Check the log10 function that I am using - it seems to want to give 159.55 a lot. I think this is when the binomial function is close to 1.
 
 # merge
@@ -27,6 +26,7 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 * are there any VCF format 4.1 vs 4.2 fields that clash. eg the type of the variable changes?
 
 # report
+* mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * CRITICAL: currently broken:
     File "/usr/local/lib/python3.7/site-packages/mitylib/report.py", line 353, in split_header_variants
         col_names = header[-1]
