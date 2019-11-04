@@ -76,7 +76,7 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
 
     keyring set https://test.pypi.org/legacy/ drmjc
     keyring set https://upload.pypi.org/legacy/ drmjc
-
+VTuKVFCHwDxd8k7
 * test installation on a fresh osx box
 
   python -m venv .
