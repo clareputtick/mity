@@ -1,11 +1,8 @@
 # call
-* CRITICAL: makes an odd, very long filename - DONE
-* CRITICAL: edit the VCF header to include the mity call command - Done
-* CRITICAL: edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata - TODO
-* CRITICAL: If the freebayes command (or any other subprocess.run commands) fail, mity should fail - TODO
-* At the moment we use gsort or bcftools tools to sort the normalised vcf. Given that it is always chromosome MT, this should be able to be done with python in the normalise script, meaning one less tool to download.
+* edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata - TODO
+* If the freebayes command (or any other subprocess.run commands) fail, mity should fail - TODO
 * Check that the different references work
-* Freebayes assumes that the BAMs have a RG, which is where it gets the sample name from. If there is no @RG line, freebayes just outputs a single "unknown" sample, even if you input more than one sample. We should add a check to mity, to check that the BAM header has a read group line. This could just check that there is a line in the BAM header starting with @RG.
+* Freebayes assumes that the BAMs have a `RG`, which is where it gets the sample name from. If there is no `@RG` line, Freebayes just outputs a single "unknown" sample, even if you input more than one sample. We should add a check to `mity`, to check that the BAM header has a read group line. This could just check that there is a line in the BAM header starting with `@RG`.
 * I dont think the error for if the bams dont exist is working:
 ```bash
 mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fraction 0.5 --normalise bam_that_doesnt_exist.bam
@@ -13,15 +10,11 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
 
 # normalise
 * migrate to pyvcf where possible
-* CRITICAL: i've added the 'p' noise floor threshold, but can't see where the new QUAL is calculated. - Done
-* CRITICAL: When there is more than one sample I dont think the sample names are coming out properly - Done
-* Make the test bams contain lines that have "repeated positions". To do this fun fb on entire bams and see which regions would give a repeated position. - Done
 * Should probably detail how we combine variants
-* CRITICAL: If the number of reads supporting the variant and the depth are the same, we get a divide by zero error, because the binomial cdf gives 1, and we end up with log10(1-1). We need to decide what q should be in this case - Inf or a large number? - Done
 * CRITICAL: Check the log10 function that I am using - it seems to want to give 159.55 a lot. I think this is when the binomial function is close to 1.
 
 # merge
-* migrate to pyvcf where possible (started in dev/merge2.py)
+* migrate to `pyvcf` where possible (started in `dev/merge2.py`)
 * force the same sample names in the same order in mity and HC?
 * are there any VCF format 4.1 vs 4.2 fields that clash. eg the type of the variable changes?
 
@@ -31,7 +24,7 @@ mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fractio
     File "/usr/local/lib/python3.7/site-packages/mitylib/report.py", line 353, in split_header_variants
         col_names = header[-1]
     IndexError: list index out of range
-This is because the mity-report code assumes certain fields are in the VCF, which aren't there if mity-normalise hasnt been run. I think the best way to fix this is to rewrite the code so that it doesn't assume fields in the VCF. This could then be a more useful script as it would work with all VCFs. But I'm going to leave it for now, and we can say that mity-report only works with normalised VCFs.
+>> This is because the mity-report code assumes certain fields are in the VCF, which aren't there if mity-normalise hasnt been run. I think the best way to fix this is to rewrite the code so that it doesn't assume fields in the VCF. This could then be a more useful script as it would work with all VCFs. But I'm going to leave it for now, and we can say that mity-report only works with normalised VCFs.
 
 * L63-L104 is repetitive
 * VEP splitting should be in a function
@@ -49,8 +42,8 @@ uses annotations with GRCh37 coordinates, and thus should fail. How much do we t
 to support hg19 then? GRCh38 and GRCh37 are the same length.
 
 # installation (pre-submission)
-* use distutils to create a package, and register this with pip install
-* create a docker image
+* use distutils to create a package, and register this with pip install - to finalise
+* create a docker image - DONE
 
 # GitHub (pre-submission)
 * CRITICAL: improve documentation

@@ -82,8 +82,8 @@ def write_vcf(new_vcf, out_file, genome_file='mitylib/reference/b37d5.genome'):
     with open(f, mode='wt', encoding='utf-8') as myfile:
         for vcf_line in new_vcf:
             myfile.write('\t'.join([str(elem) for elem in vcf_line]) + '\n')
-    # gsort_vcf(f, out_file, genome_file=genome_file)
-    bcftools_sort_vcf(f, out_file)
+    gsort_vcf(f, out_file, genome_file=genome_file)
+    # bcftools_sort_vcf(f, out_file)
 
 
 def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_unsorted_vcf=False):
@@ -109,7 +109,7 @@ def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_
 
 def bcftools_sort_vcf(f, out_file, remove_unsorted_vcf=False):
     """
-    use gsort to sort the records in a VCF file according to a .genome file.
+    use bcftools sort to sort the records in a VCF file.
 
     :param f: the path to an unsorted vcf.gz file
     :param out_file: the path to a resulting sorted vcf.gz file
