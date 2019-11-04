@@ -76,12 +76,11 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
 
     keyring set https://test.pypi.org/legacy/ drmjc
     keyring set https://upload.pypi.org/legacy/ drmjc
-VTuKVFCHwDxd8k7
 * test installation on a fresh osx box
 
   python -m venv .
   source bin/activate
-  bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1a1
+  bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1b16
   
 * debugging
   
@@ -89,7 +88,8 @@ VTuKVFCHwDxd8k7
   ./build.sh
   # wait for test.pypi to index the new package
   # in your venv grab the new version. it'll uninstall the previous one
-  bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1a3
+  source bin/activate
+  bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1b16
   
 # test data
 
@@ -192,3 +192,31 @@ samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.b
     # test mity
     docker run mity call -h
     docker run drmjc/mity:0.0.1b13 -h
+
+# Triple check that joint-calling agrees with single calling
+* all agree
+
+    mity call --prefix ashkenazim002 --out-folder-path test_out --min-alternate-fraction 0.001 --region MT:300-320 --normalise test_in/HG002.hs37d5.2x250.small.MT.RG.bam 
+    mity call --prefix ashkenazim003 --out-folder-path test_out --min-alternate-fraction 0.001 --region MT:300-320 --normalise test_in/HG003.hs37d5.2x250.small.MT.RG.bam 
+    mity call --prefix ashkenazim004 --out-folder-path test_out --min-alternate-fraction 0.001 --region MT:300-320 --normalise test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
+
+
+    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG004   HG003   HG002
+    MT      301     .       A       C       1.51592e-12     SBA_FIL DP=51100;MQM=70;MQMR=70;QA=3595;QR=1718745;SAF=18;SAR=137;SRF=24151;SRR=26794;SBR=0.474;SBA=0.116       GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/1:13343:13299,44:13299:442379:33.264:44:1035:23.523:0.0033:31.28      0/1:20895:20851,44:20851:717140:34.394:44:1043:23.705:0.0021:4.82       0/1:16862:16795,67:16795:559226:33.297:67:1517:22.642:0.004:68.7
+    MT      302     .       ACCCCCCCTCCCCCGCTTCTGGCCA       CCCCCCCCCTCCCCCCGCTTCTGGCCA     5.09327e+06     POS_FIL DP=107;MQM=70;MQMR=70;QA=2148;QR=509;SAF=0;SAR=93;SRF=3;SRR=11;TYPE=complex;SBR=0.214;SBA=0.0   GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      1/1:47:0,47:0:0:0:47:1064:22.638:1.0:10000      0/0:15:14,1:14:509:36.357:1:21:21.0:0.0667:33.84        1/1:45:0,45:0:0:0:45:1063:23.622:1.0:10000
+    MT      302     .       ACCCCCCCTCCCCCGCTTCTGGCCA       CCCCCCCCTCCCCCCGCTTCTGGCCA      5.09327e+06     POS_FIL DP=31;MQM=70;MQMR=70;QA=430;QR=509;SAF=0;SAR=17;SRF=3;SRR=11;TYPE=complex;SBR=0.214;SBA=0.0     GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/0:1:0,1:0:0:0:1:27:27.0:1.0:10000     0/1:27:14,13:14:509:36.357:13:319:24.538:0.4815:159.55  0/0:3:0,3:0:0:0:3:84:28.0:1.0:10000
+    
+    
+    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG002
+    MT      301     .       A       C       6.07527e-13     SBA_FIL DP=16862;MQM=70;MQMR=70;QA=1517;QR=559226;SAF=9;SAR=58;SRF=7094;SRR=9701;SBR=0.422;SBA=0.134    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/1:16862:16795,67:16795:559226:33.297:67:1517:22.642:0.004:68.7
+    MT      302     .       ACCCCCCCTCCCCCGCTTCTG   CCCCCCCCCTCCCCCCGCTTCTG 1.23996e+06     SBA_FIL;POS_FIL DP=45;MQM=70;MQMR=0;QA=1063;QR=0;SAF=0;SAR=45;SRF=0;SRR=0;TYPE=complex;SBR=0;SBA=0.0    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      1/1:45:0,45:0:0:0:45:1063:23.622:1.0:10000
+    
+    
+    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG003
+    MT      301     .       A       C       0       SBA_FIL DP=20895;MQM=70;MQMR=70;QA=1043;QR=717140;SAF=5;SAR=39;SRF=11228;SRR=9623;SBR=0.538;SBA=0.114   GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/1:20895:20851,44:20851:717140:34.394:44:1043:23.705:0.0021:4.82
+    MT      302     .       ACCCCCCCTCCCCCGCTTCTGGCCA       CCCCCCCCTCCCCCCGCTTCTGGCCA      525055  POS_FIL DP=27;MQM=70;MQMR=70;QA=319;QR=509;SAF=0;SAR=13;SRF=3;SRR=11;TYPE=complex;SBR=0.214;SBA=0.0     GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/1:27:14,13:14:509:36.357:13:319:24.538:0.4815:159.55
+    
+    
+    #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG004
+    MT      301     .       A       C       0       SBA_FIL DP=13343;MQM=70;MQMR=70;QA=1035;QR=442379;SAF=4;SAR=40;SRF=5829;SRR=7470;SBR=0.438;SBA=0.091    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/1:13343:13299,44:13299:442379:33.264:44:1035:23.523:0.0033:31.28
+    MT      302     .       ACCCCCCCTCCCCCGCTTCTG   CCCCCCCCCTCCCCCCGCTTCTG 1.10729e+06     SBA_FIL;POS_FIL DP=47;MQM=70;MQMR=0;QA=1064;QR=0;SAF=0;SAR=47;SRF=0;SRR=0;TYPE=complex;SBR=0;SBA=0.0    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      1/1:47:0,47:0:0:0:47:1064:22.638:1.0:10000

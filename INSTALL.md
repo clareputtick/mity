@@ -1,12 +1,12 @@
 # Docker
 The simplest way to run mity is via docker:
 
-    docker run drmjc/mity:0.0.1b13 -h
+    docker run drmjc/mity:0.0.1b15 -h
 
 # pip
 If you have freebayes >=1.2 and gsort installed, then pip should work well
 
-    VERSION=0.0.1b13
+    VERSION=0.0.1b15
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
 
 # manual installation 
@@ -23,12 +23,11 @@ are a number of alternatives. YMMV.
     export PATH=/home/linuxbrew/.linuxbrew/bin:$PATH
     
     python3 --version
-    # Python 3.5.2
     # python 3.5.2 is broken: https://stackoverflow.com/a/56010650/178297. 
     # python 3.5.3 is broken: https://github.com/python/typing/issues/266 
     # My development has been on 3.7.4. mity will likely work in other distro's, 
     # but push ahead with 3.7.4 for now.
-    # pyenv is a convenient way to manage multiple python distros: https://github.com/pyenv/pyenv
+    # `pyenv` is a convenient way to manage multiple python distros: https://github.com/pyenv/pyenv
     sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
       libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
       xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
@@ -67,7 +66,7 @@ Either install mity globally:
     # fix a python version incompatibility bug in futures
     sudo perl -pi -e 's|raise exception_type, self._exception, self._traceback|raise Exception(self._exception).with_traceback(self._traceback)|' /usr/share/dnanexus/lib/python2.7/site-packages/concurrent/futures/_base.py
     
-    VERSION=0.0.1b13
+    VERSION=0.0.1b15
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
     
 Or install mity using a virtualenv
@@ -77,7 +76,7 @@ Or install mity using a virtualenv
     python3 -m venv .
     source bin/activate
     ./bin/pip install wheel
-    VERSION=0.0.1b13
+    VERSION=0.0.1b15
     ./bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
 
 # test
