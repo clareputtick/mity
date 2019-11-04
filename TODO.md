@@ -1,12 +1,5 @@
 # call
-* edit the VCF header to add freebayes_ prefix to any of the important freebayes metadata - TODO
-* If the freebayes command (or any other subprocess.run commands) fail, mity should fail - TODO
-* Check that the different references work
-* Freebayes assumes that the BAMs have a `RG`, which is where it gets the sample name from. If there is no `@RG` line, Freebayes just outputs a single "unknown" sample, even if you input more than one sample. We should add a check to `mity`, to check that the BAM header has a read group line. This could just check that there is a line in the BAM header starting with `@RG`.
-* I dont think the error for if the bams dont exist is working:
-```bash
-mity call --prefix ashkenazim --out-folder-path test_out --min-alternate-fraction 0.5 --normalise bam_that_doesnt_exist.bam
-```
+* Check that hg19 reference works
 
 # normalise
 * migrate to pyvcf where possible

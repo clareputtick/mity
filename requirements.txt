@@ -15,4 +15,4 @@ six==1.12.0               # via python-dateutil
 xlsxwriter==1.1.8
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.2.0        # via pyvcf
+# setuptools==41.6.0        # via pyvcf

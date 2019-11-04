@@ -184,8 +184,8 @@ def check_dependency(dep, exit=True):
         logging.info("Found dependency: " + str(res.stdout).strip())
         if dep == "gsort":
             # There is a potential name clash with gnu sort on linux
-            res = subprocess.run('gsort --help | grep -c GENOME')
-            if res != "2":
+            res = subprocess.check_output('gsort --help | grep -c GENOME', shell=True)
+            if res != b'2\n':
                 logging.error("Adjust your PATH to ensure that brentp's gsort is found before GNU sort" + dep)
     except subprocess.CalledProcessError:
         logging.error("Missing dependency: " + dep)
@@ -350,6 +350,17 @@ def bam_get_mt_contig(bam, as_string=False):
     if res is not None and as_string:
         res = res[0] + ":1-" + str(res[1])
     return res
+
+def bam_has_RG(bam):
+    """
+    Does the BAM File have an @RG header? This is critical for mity to correctly call variants.
+
+    :param bam: str: path to bam file
+    :return: True/False
+    >>> bam_has_RG('NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.bam')
+    """
+    r = pysam.AlignmentFile(bam, "rb")
+    return len(r.header['RG']) > 0
 
 def get_annot_file(f):
     #mitylibdir = os.path.dirname(inspect.getfile(mitylib))
