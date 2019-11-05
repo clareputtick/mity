@@ -3,8 +3,7 @@
 
 # normalise
 * migrate to pyvcf where possible
-* Should probably detail how we combine variants
-* CRITICAL: Check the log10 function that I am using - it seems to want to give 159.55 a lot. I think this is when the binomial function is close to 1.
+* Should document how we combine variants
 
 # merge
 * migrate to `pyvcf` where possible (started in `dev/merge2.py`)
