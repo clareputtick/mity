@@ -429,7 +429,7 @@ def combine_lines(variant_list, p=0.0001):
             if len(matching_lines) == 1:
                 # print("not repeated position")
                 # print(matching_lines)
-                # then this isnt a repeated position
+                # This is a unique record for this genomic position.
                 # we just need to update and add values to the info/format field.
 
                 # pick out the line from chromo_variant_list:
@@ -463,7 +463,7 @@ def combine_lines(variant_list, p=0.0001):
                 INFO_values.append(SBR)
                 INFO_names.append("SBR")
 
-                # we want to caclulate SBA and add to INFO
+                # we want to calculate SBA and add to INFO
                 # SBA = strand bias of alternate
                 # i.e. SBA = SAF/(SAF+SAR)
 
@@ -517,7 +517,6 @@ def combine_lines(variant_list, p=0.0001):
                 # VAF = []
                 DP_vector = []
                 # new_genotype = []
-                new_QUAL = math.inf
                 for samp in range(0, n_samples):
                     # print("")
                     temp_format = FORMAT_values[samp]
@@ -568,7 +567,6 @@ def combine_lines(variant_list, p=0.0001):
 
                     q_idx = FORMAT_names.index('q')
                     temp_format[q_idx] = str(q)
-                    new_QUAL = min(new_QUAL, q)
 
                     # print(p)
                     # print(float(DP))
@@ -627,6 +625,7 @@ def combine_lines(variant_list, p=0.0001):
 
                     # calculate AQA
                     QA_idx = FORMAT_names.index('QA')
+                    QA_idx = FORMAT_names.index('QA')
                     # print(AO_idx)
                     QA = float(temp_format[QA_idx])
                     # here AO could be less than zero because it could be another sample that has this variant
@@ -643,7 +642,15 @@ def combine_lines(variant_list, p=0.0001):
                     new_line[samp + 9] = temp_format
 
                 # update QUAL
-                new_line[5] = str(new_QUAL)
+                cohort_AO = sum(AO_vector)
+                cohort_DP = sum(DP_vector)
+                cohort_QUAL = 0.0
+                if cohort_DP != 0:
+                    if cohort_DP == cohort_AO:
+                        cohort_QUAL = 10000
+                    else:
+                        cohort_QUAL = round(abs(-10 * log10(1 - binom.cdf(float(cohort_AO), float(cohort_DP), p))), 2)
+                new_line[5] = str(round(cohort_QUAL, 1))
 
                 # add the new FORMAT names
                 FORMAT_names = ":".join(FORMAT_names)
@@ -802,11 +809,8 @@ def combine_lines(variant_list, p=0.0001):
                             samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(new_DP), p))), 2)
                     else:
                         samp_q = 0.0
-                    new_QUAL = min(new_QUAL, samp_q)
                     samp_q = str(samp_q)
                     # q.append(str(samp_q))
-
-                    # print(VAF)
 
                     # update GT
                     if int(new_AO) < 4:
@@ -958,7 +962,15 @@ def combine_lines(variant_list, p=0.0001):
                 # new_info.append(VAF)
                 new_info = ";".join(new_info)
 
-                replacement_line[5] = str(new_QUAL)
+                cohort_AO = sum(new_AO_vector)
+                cohort_DP = sum(new_DP_vector)
+                cohort_QUAL = 0.0
+                if cohort_DP != 0:
+                    if cohort_DP == cohort_AO:
+                        cohort_QUAL = 10000
+                    else:
+                        cohort_QUAL = round(abs(-10 * log10(1 - binom.cdf(float(cohort_AO), float(cohort_DP), p))), 2)
+                replacement_line[5] = str(round(cohort_QUAL, 1))
                 replacement_line[7] = new_info
                 replacement_line[9:] = new_FORMAT
                 FORMAT_names = ":".join(FORMAT_names)
