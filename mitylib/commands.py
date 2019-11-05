@@ -34,6 +34,8 @@ AP_subparsers = AP.add_subparsers(
 do_call = public(call.do_call)
 
 def _cmd_call(args):
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG, format="%(message)s")
     """Call mitochondrial variants"""
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")
@@ -62,13 +64,13 @@ P_call.add_argument('--min-mapping-quality', action='store', type=int,
                          'mapping quality less than MIN_MAPPING_QUALITY. '
                          'Default: 30',
                     dest="min_mq")
-P_call.add_argument('--min-base-quality', action='store', type=int, default=20,
+P_call.add_argument('--min-base-quality', action='store', type=int, default=24,
                     help='Exclude alleles from analysis if their supporting '
                          'base quality is less than MIN_BASE_QUALITY. '
-                         'Default: 20',
+                         'Default: 24',
                     dest="min_bq")
 P_call.add_argument('--min-alternate-fraction', action='store', type=float,
-                    default=0.1,
+                    default=0.01,
                     help='Require at least MIN_ALTERNATE_FRACTION '
                          'observations supporting an alternate allele within '
                          'a single individual in the in order to evaluate the '
@@ -99,6 +101,8 @@ P_call.add_argument('--region', action='store', type=str,
                          'If unset will call variants in entire MT genome as specified in BAM header. '
                          "Default: Entire MT genome. ",
                     dest="region")
+P_call.add_argument('--debug', action='store_true',
+                    help='Verbose output for debugging?')
 P_call.set_defaults(func=_cmd_call)
 
 # normalise --------------------------------------------------------------------
