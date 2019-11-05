@@ -256,6 +256,7 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 FORMAT_AQA = geno[AQA_idx]
                 # print(FORMAT_AQA)                                          
 
+                # referred to as variant_quality in the final table
                 QUAL_idx = geno_names.index('q')
                 FORMAT_QUAL = geno[QUAL_idx]
                 # print(FORMAT_QUAL)
@@ -552,7 +553,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                    "MQMR_FIL", "AQR_FIL",
                    "GT_FORMAT", "total_sample_depth", "ref_depth", "QR_FORMAT",
                    "AQR_FORMAT", "alt_depth",
-                   "QA_FORMAT", "AQA_FORMAT", "QUAL_FORMAT", "tier", "INFO", "FORMAT"]
+                   "QA_FORMAT", "AQA_FORMAT", "variant_quality", "tier", "INFO", "FORMAT"]
     
     if vep_header != "":
         table_vep_headers = [x + "_VEP" for x in vep_header]
@@ -713,7 +714,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     # otherwise dont
     if is_vepped:
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
-                'variant_heteroplasmy', 'QUAL_FORMAT',
+                'variant_heteroplasmy', 'variant_quality',
                 'ref_depth', 'alt_depth', 'total_sample_depth',
                 'total_locus_depth', 'COHORT_COUNT', 'tier',
                 'baylor_panel', 'common_22_panel', 'common_58_panel',
@@ -747,7 +748,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'INFO', 'FORMAT']
     else:
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
-                'variant_heteroplasmy', 'QUAL_FORMAT',
+                'variant_heteroplasmy', 'variant_quality',
                 'ref_depth', 'alt_depth', 'total_sample_depth',
                 'total_locus_depth', 'COHORT_COUNT', 'tier',
                 'baylor_panel', 'common_22_panel', 'common_58_panel',
@@ -802,7 +803,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     documentation.append(
         "variant_heteroplasmy: alt_depth/(ref_depth+alt_depth)")
     documentation.append(
-        "QUAL_FORMAT: phred-scaled variant quality")
+        "variant_quality: phred-scaled variant quality")
     documentation.append(
         "total_sample_depth: alt_depth + ref_depth for the particular sample")
     documentation.append(
@@ -876,8 +877,8 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     ## change the columns that are numerical data types to numerical
     annotated_variants1['variant_heteroplasmy'] = annotated_variants1[
         'variant_heteroplasmy'].astype('float64')
-    annotated_variants1['QUAL_FORMAT'] = annotated_variants1[
-        'QUAL_FORMAT'].astype('float64')
+    annotated_variants1['variant_quality'] = annotated_variants1[
+        'variant_quality'].astype('float64')
     annotated_variants1['ref_depth'] = annotated_variants1['ref_depth'].astype(
         'int64')
     annotated_variants1['alt_depth'] = annotated_variants1['alt_depth'].astype(
