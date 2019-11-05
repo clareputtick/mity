@@ -6,7 +6,7 @@ import re
 import logging
 from .util import write_vcf
 from scipy.stats import binom
-from numpy import log10
+from numpy import log10, math
 
 
 def unchanged(List):
@@ -517,6 +517,7 @@ def combine_lines(variant_list, p=0.0001):
                 # VAF = []
                 DP_vector = []
                 # new_genotype = []
+                new_QUAL = math.inf
                 for samp in range(0, n_samples):
                     # print("")
                     temp_format = FORMAT_values[samp]
@@ -567,6 +568,7 @@ def combine_lines(variant_list, p=0.0001):
 
                     q_idx = FORMAT_names.index('q')
                     temp_format[q_idx] = str(q)
+                    new_QUAL = min(new_QUAL, q)
 
                     # print(p)
                     # print(float(DP))
@@ -576,7 +578,7 @@ def combine_lines(variant_list, p=0.0001):
                     # add in the new genotype
                     if AO < 4:
                         new_genotype = "0/0"
-                    elif AO >= 4:
+                    else:
                         if samp_VAF == 1:
                             new_genotype = "1/1"
                         elif samp_VAF < 1:
@@ -640,6 +642,9 @@ def combine_lines(variant_list, p=0.0001):
                     temp_format = ":".join(temp_format)
                     new_line[samp + 9] = temp_format
 
+                # update QUAL
+                new_line[5] = str(new_QUAL)
+                
                 # add the new FORMAT names
                 FORMAT_names = ":".join(FORMAT_names)
                 new_line[8] = FORMAT_names
@@ -671,17 +676,17 @@ def combine_lines(variant_list, p=0.0001):
                 new_info = [x + next(si, '') for x in si]
                 new_info = ";".join(new_info)
                 # print(new_info)
-                # add the new INFO to the new_line
+                # update INFO
                 new_line[7] = new_info
                 # print(new_line)
                 new_vcf.append(new_line)
 
 
-            elif len(matching_lines) > 1:
+            else:
+                # then this is a repeated position
+                # we need to update and add values to the info/format field, as well as combine the matching lines
                 # print("repeated position")
                 # print(matching_lines)
-                # then this is a repeated position
-                # we need to update and add values to the info/format field, as well as combine the matchign lines
 
                 new_line = [chromo_variant_list[i] for i in matching_lines]
                 replacement_line = new_line[0]
@@ -691,7 +696,7 @@ def combine_lines(variant_list, p=0.0001):
                 ##### FORMAT field
                 new_FORMAT = []
 
-                # loop over samples, and update each sample seperately and then add to new format
+                # loop over samples, and update each sample separately and then add to new format
                 # each line should have same number of samples
                 # TODO could move the calculation of the number of samples to the start of the function
                 first_FORMAT_values = new_line[0][9:]
@@ -797,6 +802,7 @@ def combine_lines(variant_list, p=0.0001):
                             samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(new_DP), p))), 2)
                     else:
                         samp_q = 0.0
+                    new_QUAL = min(new_QUAL, samp_q)
                     samp_q = str(samp_q)
                     # q.append(str(samp_q))
 
@@ -952,6 +958,7 @@ def combine_lines(variant_list, p=0.0001):
                 # new_info.append(VAF)
                 new_info = ";".join(new_info)
 
+                replacement_line[5] = str(new_QUAL)
                 replacement_line[7] = new_info
                 replacement_line[9:] = new_FORMAT
                 FORMAT_names = ":".join(FORMAT_names)
@@ -1153,7 +1160,7 @@ def update_header(col_names, header_lines, p):
         'reverse strand">'])
     header_lines.append([
         '##INFO=<ID=TYPE,Number=1,Type=String,'
-        'Description="normalised := TODO, complex := TODO">'])
+        'Description="normalised := when the variant has been normalised, complex := when the new reference and alternate length are still > 1 after normalising">'])
     # vaf - will be one for each allele. it is very useful so its good to be in
     # the INFO field
     ##############################
@@ -1291,7 +1298,7 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/r
     # debug_print_vcf_lines(filtered_variants)
     update_header(col_names, header_lines, p=p)
     # debug_print_vcf_lines(filtered_variants)
-    logging.info('Writing normalised vcf')
+    logging.info('Writing normalised vcf: {}'.format(out_file))
 
     new_vcf = header_lines + filtered_variants
 
