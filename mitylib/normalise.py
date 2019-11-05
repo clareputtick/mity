@@ -644,7 +644,7 @@ def combine_lines(variant_list, p=0.0001):
 
                 # update QUAL
                 new_line[5] = str(new_QUAL)
-                
+
                 # add the new FORMAT names
                 FORMAT_names = ":".join(FORMAT_names)
                 new_line[8] = FORMAT_names
