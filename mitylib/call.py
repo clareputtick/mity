@@ -63,6 +63,8 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     if normalise:
         mity_cmd = mity_cmd + ' --normalise --p ' + str(p)
 
+    mity_cmd = mity_cmd + ' ' + ' '.join(bam_files)
+
     mity_cmd = mity_cmd + '"'
     mity_cmd = mity_cmd.replace("/", "\/")
     logging.debug(mity_cmd)
