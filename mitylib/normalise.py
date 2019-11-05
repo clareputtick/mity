@@ -651,6 +651,7 @@ def combine_lines(variant_list, p=0.0001):
                     else:
                         cohort_QUAL = round(abs(-10 * log10(1 - binom.cdf(float(cohort_AO), float(cohort_DP), p))), 2)
                 new_line[5] = str(round(cohort_QUAL, 1))
+                logging.debug("Cohort QUAL score: {} := {} vs {}".format(new_line[5], ",".join(str(x) for x in AO_vector), ",".join(str(x) for x in DP_vector)))
 
                 # add the new FORMAT names
                 FORMAT_names = ":".join(FORMAT_names)
@@ -970,6 +971,7 @@ def combine_lines(variant_list, p=0.0001):
                         cohort_QUAL = 10000
                     else:
                         cohort_QUAL = round(abs(-10 * log10(1 - binom.cdf(float(cohort_AO), float(cohort_DP), p))), 2)
+                logging.debug("Cohort QUAL score: {} := {} vs {}".format(new_line[5], ",".join(str(x) for x in new_AO_vector), ",".join(str(x) for x in new_DP_vector)))
                 replacement_line[5] = str(round(cohort_QUAL, 1))
                 replacement_line[7] = new_info
                 replacement_line[9:] = new_FORMAT

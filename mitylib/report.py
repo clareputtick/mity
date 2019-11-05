@@ -255,7 +255,11 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 AQA_idx = geno_names.index('AQA')
                 FORMAT_AQA = geno[AQA_idx]
                 # print(FORMAT_AQA)                                          
-                
+
+                QUAL_idx = geno_names.index('q')
+                FORMAT_QUAL = geno[QUAL_idx]
+                # print(FORMAT_QUAL)
+
                 # @TODO - move to `mity normalise` as INFO:TIER
                 if float(FORMAT_VAF) >= 0.01:
                     tier = 1
@@ -264,15 +268,15 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 else:
                     tier = 3
                     
-                    # table = [["SAMPLE", "CHR", "POS", "REF", "ALT", "QUAL",
-                    # "FILTER", "INFO_DP", "INFO_MQM", "INFO_MQMR", 
-                    #       "INFO_QA", "INFO_QR", "INFO_SAF", "INFO_SAR", 
-                    #       "INFO_SRF", "INFO_SRR", "INFO_SBR", "INFO_SBA", 
-                    #       "INFO_VAF", "INFO_POS_FIL", "INFO_SBR_FIL", 
-                    #       "INFO_SBA_FIL", "INFO_MQMR_FIL", "INFO_AQR_FIL",
-                    #       "FORMAT_GT", "FORMAT_DP", "FORMAT_RO", 
-                    #       "FORMAT_QR", "FORMAT_AQR", "FORMAT_AO", 
-                    #       "FORMAT_QA", "FORMAT_AQA", "INFO", "FORMAT"]]
+                # table = [["SAMPLE", "CHR", "POS", "REF", "ALT", "QUAL",
+                # "FILTER", "INFO_DP", "INFO_MQM", "INFO_MQMR",
+                #       "INFO_QA", "INFO_QR", "INFO_SAF", "INFO_SAR",
+                #       "INFO_SRF", "INFO_SRR", "INFO_SBR", "INFO_SBA",
+                #       "INFO_VAF", "INFO_POS_FIL", "INFO_SBR_FIL",
+                #       "INFO_SBA_FIL", "INFO_MQMR_FIL", "INFO_AQR_FIL",
+                #       "FORMAT_GT", "FORMAT_DP", "FORMAT_RO",
+                #       "FORMAT_QR", "FORMAT_AQR", "FORMAT_AO",
+                #       "FORMAT_QA", "FORMAT_AQA", "INFO", "FORMAT"]]
                 # print(lineparts[7])
                 # print(lineparts[9+samp])
                 
@@ -290,7 +294,7 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                             AQR_FIL,
                             FORMAT_GT, FORMAT_DP, FORMAT_RO, FORMAT_QR,
                             FORMAT_AQR, FORMAT_AO,
-                            FORMAT_QA, FORMAT_AQA, tier, no_comma_info,
+                            FORMAT_QA, FORMAT_AQA, FORMAT_QUAL, tier, no_comma_info,
                             no_comma_format]
                 
                 if vep_headers != "":
@@ -548,7 +552,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                    "MQMR_FIL", "AQR_FIL",
                    "GT_FORMAT", "total_sample_depth", "ref_depth", "QR_FORMAT",
                    "AQR_FORMAT", "alt_depth",
-                   "QA_FORMAT", "AQA_FORMAT", "tier", "INFO", "FORMAT"]
+                   "QA_FORMAT", "AQA_FORMAT", "QUAL_FORMAT", "tier", "INFO", "FORMAT"]
     
     if vep_header != "":
         table_vep_headers = [x + "_VEP" for x in vep_header]
@@ -571,8 +575,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     mitomap_panel_annotated_variants = pandas.merge(left=variant_df,
                                                     right=mitomap_panel_annotations,
                                                     how='left',
-                                                    on=['CHR', 'POS', 'REF',
-                                                        'ALT'])
+                                                    on=['CHR', 'POS', 'REF', 'ALT'])
     
     ########## Merge with gene names and biotype
     # this depends on chrom, pos
@@ -638,7 +641,6 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     # sys.exit()
     
     ########## Merge with haplotype data
-    # this depends on chrom pos ref alt
     # TODO: why does this add two lines for some variants?
     haplotype_annotations = pandas.read_csv(get_annot_file("haplotype_data.csv"))
     haplotype_annotations['POS'] = haplotype_annotations['POS'].astype('str')
@@ -680,8 +682,8 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     annotated_variants['gene/locus'] = general_locus
     annotated_variants['gene/locus description'] = general_biotype
     
-    cohort_count_table = pandas.DataFrame({'count': annotated_variants.groupby(
-            ["POS", "ALT"]).size()}).reset_index()
+    cohort_count_table = pandas.DataFrame(
+        {'count': annotated_variants.groupby(["POS", "ALT"]).size()}).reset_index()
     cohort_count_table.columns = ['POS', 'ALT', 'COHORT_COUNT']
     
     annotated_variants1 = pandas.merge(left=annotated_variants,
@@ -711,7 +713,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     # otherwise dont
     if is_vepped:
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
-                'variant_heteroplasmy',
+                'variant_heteroplasmy', 'QUAL_FORMAT',
                 'ref_depth', 'alt_depth', 'total_sample_depth',
                 'total_locus_depth', 'COHORT_COUNT', 'tier',
                 'baylor_panel', 'common_22_panel', 'common_58_panel',
@@ -745,7 +747,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'INFO', 'FORMAT']
     else:
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
-                'variant_heteroplasmy',
+                'variant_heteroplasmy', 'QUAL_FORMAT',
                 'ref_depth', 'alt_depth', 'total_sample_depth',
                 'total_locus_depth', 'COHORT_COUNT', 'tier',
                 'baylor_panel', 'common_22_panel', 'common_58_panel',
@@ -799,6 +801,8 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
         "gene then the mitomap entry, if it exists.")
     documentation.append(
         "variant_heteroplasmy: alt_depth/(ref_depth+alt_depth)")
+    documentation.append(
+        "QUAL_FORMAT: phred-scaled variant quality")
     documentation.append(
         "total_sample_depth: alt_depth + ref_depth for the particular sample")
     documentation.append(
@@ -872,6 +876,8 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     ## change the columns that are numerical data types to numerical
     annotated_variants1['variant_heteroplasmy'] = annotated_variants1[
         'variant_heteroplasmy'].astype('float64')
+    annotated_variants1['QUAL_FORMAT'] = annotated_variants1[
+        'QUAL_FORMAT'].astype('float64')
     annotated_variants1['ref_depth'] = annotated_variants1['ref_depth'].astype(
         'int64')
     annotated_variants1['alt_depth'] = annotated_variants1['alt_depth'].astype(
