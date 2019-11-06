@@ -40,9 +40,10 @@ def _cmd_call(args):
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")
 
+    genome = select_reference_genome(args.reference, None)
     args.reference = select_reference_fasta(args.reference, None)
 
-    call.do_call(args.bam, args.reference, args.prefix, args.min_mq,
+    call.do_call(args.bam, args.reference, genome, args.prefix, args.min_mq,
                  args.min_bq, args.min_af, args.min_ac, args.p, args.normalise,
                  args.out_folder_path, args.region)
 
@@ -114,8 +115,10 @@ def _cmd_normalise(args):
     """Normalise & FILTER mitochondrial variants"""
     logging.info("mity %s", __version__)
     logging.info("Normalising and FILTERing mitochondrial vcf.gz file")
-    
-    normalise.do_normalise(args.vcf, args.outfile, args.p)
+
+    genome = select_reference_genome(args.reference, None)
+
+    normalise.do_normalise(args.vcf, args.outfile, args.p, genome)
 
 
 P_normalise = AP_subparsers.add_parser('normalise', help=_cmd_normalise.__doc__)
@@ -128,6 +131,9 @@ P_normalise.add_argument('--p', action='store', type=float,
                          help='Minimum noise level. This is used to calculate QUAL score'
                               'Default: 0.002, range = [0,1]',
                          dest="p")
+P_normalise.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
+                    default="hs37d5", required=False,
+                    help='reference genome version to use. default: hs37d5')
 P_normalise.set_defaults(func=_cmd_normalise)
 
 
