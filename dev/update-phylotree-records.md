@@ -193,3 +193,7 @@ less dev/haplotype_data.csv
     G16319A,G,A,16319,"A,B2c2a,B5b1a2,C1c3,D4b1,D4d,D4o1,G2a4,H13a2c,I1a1a3,I1c,J1c8a,J2b1c1,K1b1a,L0a4,L3d1a1'2,M12b1a2,M2a'b,M32,M35a1a,M3c1b1a,M40a1,M47,M55,M60a,M6a2,M79,M7c1a3,M7c1c1,M8a,N2a,N5a,S4,N1a3a1,P4a,R7,U5b1f1a,X2a1a1",MT
     G1442A,G,A,1442,"A1,A2aj,B4f,K1c1d,L2b'c,L3e1g,M7a1a2,R7a'b",MT
 
+** overwrite and test
+
+    cp mitylib/annot/haplotype_data.csv dev/haplotype_data.original.csv
+    cp dev/haplotype_data.csv mitylib/annot/

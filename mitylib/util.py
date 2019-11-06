@@ -12,10 +12,10 @@ from glob import glob
 def tabix(f):
     """
     Generate a tabix index for a bgzipped file
-    
+
     :param f: path to a bgzip compressed file
     :type f: str
-    
+
     :returns: Nothing
     :rtype: None
     """
@@ -36,7 +36,7 @@ def check_missing_file(file_list, die=True):
 def tmp_mity_file_name():
     """
     Create a tmp mity vcf file
-    
+
     #TODO There must be a more pythonic way of doing this.
     """
     f = tempfile.NamedTemporaryFile(mode="wt", prefix='mity', suffix=".vcf",
@@ -69,10 +69,10 @@ def create_prefix(file_name, prefix=None):
 def write_vcf(new_vcf, out_file, genome_file='mitylib/reference/b37d5.genome'):
     """
     write a vcf object to vcf.gz file with tbi index.
-    
-    This differs from write_merged_vcf, as mity merge doesn't split each VCF 
+
+    This differs from write_merged_vcf, as mity merge doesn't split each VCF
     line on tabs, whereas mity normalise does
-    
+
     :param new_vcf: new_vcf is a list of lists, created by normalise
     :param out_file: the resulting filename. this should end in vcf.gz
     :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
@@ -97,6 +97,7 @@ def gsort_vcf(f, out_file, genome_file='mitylib/reference/b37d5.genome', remove_
     :return: nothing
     """
     logging.debug("Sorting, bgzipping {} -> {}".format(f, out_file))
+    logging.debug("gsort is using genome file " + genome_file)
     gsort_cmd = "gsort {} {} | bgzip -cf > {}".format(f, genome_file, out_file)
 
     logging.debug(gsort_cmd)
@@ -113,7 +114,6 @@ def bcftools_sort_vcf(f, out_file, remove_unsorted_vcf=False):
 
     :param f: the path to an unsorted vcf.gz file
     :param out_file: the path to a resulting sorted vcf.gz file
-    :param genome_file: the .genome file corresponding to the reference genome. see https://github.com/brentp/gsort
     :param remove_unsorted_vcf: if True, then the input file 'f' will be deleted.
     :return: nothing
     """
@@ -131,10 +131,10 @@ def bcftools_sort_vcf(f, out_file, remove_unsorted_vcf=False):
 def write_merged_vcf(new_vcf, out_file, genome_file='mitylib/reference/b37d5.genome'):
     """
     write a vcf object to vcf.gz file with tbi index.
-    
-    This differs from write_vcf, as mity merge doesn't split each VCF line on 
+
+    This differs from write_vcf, as mity merge doesn't split each VCF line on
     tabs, whereas mity normalise does
-    
+
     :param new_vcf: new_vcf is a list of strings, created by merge
     :param out_file: the resulting filename. this should end in vcf.gz
     :return: None. This function writes a vcf.gz and vcf.gz.tbi file.
