@@ -1058,31 +1058,31 @@ def add_filter(variant_list, min_DP=15, SB_range=[0.2, 0.8], min_MQMR=30, min_AQ
             SBR_fil = 1
         else:
             SBR_fil = 0
-            FILTER.append("SBR_FIL")
+            FILTER.append("SBR")
 
         if len(samp_SBA_fil) < len(FORMAT):
             SBA_fil = 1
         else:
             SBA_fil = 0
-            FILTER.append("SBA_FIL")
+            FILTER.append("SBA")
 
         if len(samp_MQMR_fil) < len(FORMAT):
             MQMR_fil = 1
         else:
             MQMR_fil = 0
-            FILTER.append("MQMR_FIL")
+            FILTER.append("MQMR")
 
         if len(samp_AQR_fil) < len(FORMAT):
             AQR_fil = 1
         else:
             AQR_fil = 0
-            FILTER.append("AQR_FIL")
+            FILTER.append("AQR")
 
         if len(samp_POS_fil) < len(FORMAT):
             POS_fil = 1
         else:
             POS_fil = 0
-            FILTER.append("POS_FIL")
+            FILTER.append("POS")
 
         # FILTER = "FAIL"
         if sum([SBR_fil, SBA_fil, MQMR_fil, AQR_fil, POS_fil]) == 5:
@@ -1167,21 +1167,21 @@ def update_header(col_names, header_lines, p):
     # vaf - will be one for each allele. it is very useful so its good to be in
     # the INFO field
     ##############################
-    ######## FILTER lines: @TODO, remove the _FIL suffix
+    ######## FILTER lines: @TODO, remove the  suffix
     header_lines.append([
-        '##FILTER=<ID=POS_FIL,Description="Variant falls in '
+        '##FILTER=<ID=POS,Description="Variant falls in '
         'the blacklist of positions: MT:302-319, '
         'MT:3105-3108">'])
     header_lines.append([
-        '##FILTER=<ID=SBR_FIL,Description="For all alleles RO '
+        '##FILTER=<ID=SBR,Description="For all alleles RO '
         '> 15 and (SBR > 0.8 or SBR < 0.2)">'])
     header_lines.append([
-        '##FILTER=<ID=SBA_FIL,Description="For all alleles AO '
+        '##FILTER=<ID=SBA,Description="For all alleles AO '
         '> 15 and (SBA > 0.8 or SBA < 0.2)">'])
     header_lines.append(
-        ['##FILTER=<ID=MQMR_FIL,Description="For all alleles MQMR<30">'])
+        ['##FILTER=<ID=MQMR,Description="For all alleles MQMR<30">'])
     header_lines.append(
-        ['##FILTER=<ID=AQR_FIL,Description="For all alleles AQR<20">'])
+        ['##FILTER=<ID=AQR,Description="For all alleles AQR<20">'])
     # header_lines.append(['##FILTER=<ID=VAF,Number=A,Type=Float,
     # Description="Allele frequency in the range (0,1] - the ratio of the
     # number of alternate reads to reference reads">'])
