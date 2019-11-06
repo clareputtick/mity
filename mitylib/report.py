@@ -27,50 +27,14 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
         
         ## get the filters
         
-        POS_FIL = "PASS"
-        if 'POS_FIL' in FILTER:
-            # print(info)
-            POS_FIL = "FAIL"
-            # POS_FIL_idx = info.index('POS_FIL')
-            # del info[POS_FIL_idx]
-        
-        SBR_FIL = "PASS"
-        if 'SBR_FIL' in FILTER:
-            # print(info)
-            SBR_FIL = "FAIL"
-            # SBR_FIL_idx = info.index('SBR_FIL')
-            # del info[SBR_FIL_idx]             
-        
-        # INFO_names = [x.split("=")[0] for x in info]
-        # INFO_values = [i.split("=")[1] for i in info]
-        
-        SBA_FIL = "PASS"
-        if 'SBA_FIL' in FILTER:
-            # print(info)
-            SBA_FIL = "FAIL"
-            # SBA_FIL_idx = info.index('SBA_FIL')
-            # del info[SBA_FIL_idx]             
-        
-        # INFO_names = [x.split("=")[0] for x in info]
-        # INFO_values = [i.split("=")[1] for i in info]         
-        
-        MQMR_FIL = "PASS"
-        if 'MQMR_FIL' in FILTER:
-            # print(info)
-            MQMR_FIL = "FAIL"
-            # MQMR_FIL_idx = info.index('MQMR_FIL')
-            # del info[MQMR_FIL_idx]                
-        
-        AQR_FIL = "PASS"
-        if 'AQR_FIL' in FILTER:
-            # print(info)
-            AQR_FIL = "FAIL"
-            # AQR_FIL_idx = info.index('AQR_FIL')
-            # del info[AQR_FIL_idx]
-        
+        POS_FILTER = "FAIL" if 'POS' in FILTER else "PASS"
+        SBR_FILTER = "FAIL" if 'SBR' in FILTER else "PASS"
+        SBA_FILTER = "FAIL" if 'SBA' in FILTER else "PASS"
+        MQMR_FILTER = "FAIL" if 'MQMR' in FILTER else "PASS"
+        AQR_FILTER = "FAIL" if 'AQR' in FILTER else "PASS"
+
         INFO_names = [x.split("=")[0] for x in info]
         INFO_values = [i.split("=")[1] for i in info]
-        
         # print(INFO_names)
         # print(INFO_values)
         
@@ -273,8 +237,8 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 # "FILTER", "INFO_DP", "INFO_MQM", "INFO_MQMR",
                 #       "INFO_QA", "INFO_QR", "INFO_SAF", "INFO_SAR",
                 #       "INFO_SRF", "INFO_SRR", "INFO_SBR", "INFO_SBA",
-                #       "INFO_VAF", "INFO_POS_FIL", "INFO_SBR_FIL",
-                #       "INFO_SBA_FIL", "INFO_MQMR_FIL", "INFO_AQR_FIL",
+                #       "INFO_VAF", "INFO_POS_FILTER", "INFO_SBR_FILTER",
+                #       "INFO_SBA_FILTER", "INFO_MQMR_FILTER", "INFO_AQR_FILTER",
                 #       "FORMAT_GT", "FORMAT_DP", "FORMAT_RO",
                 #       "FORMAT_QR", "FORMAT_AQR", "FORMAT_AO",
                 #       "FORMAT_QA", "FORMAT_AQA", "INFO", "FORMAT"]]
@@ -290,9 +254,8 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 new_line = [samples[samp], chromosome, pos, ref, alt, hgvs,
                             QUAL, FILTER, INFO_DP, INFO_MQM, INFO_MQMR,
                             INFO_QA, INFO_QR, INFO_SAF, INFO_SAR, INFO_SRF,
-                            INFO_SRR, INFO_SBR, INFO_SBA,
-                            FORMAT_VAF, POS_FIL, SBR_FIL, SBA_FIL, MQMR_FIL,
-                            AQR_FIL,
+                            INFO_SRR, INFO_SBR, INFO_SBA, FORMAT_VAF,
+                            POS_FILTER, SBR_FILTER, SBA_FILTER, MQMR_FILTER, AQR_FILTER,
                             FORMAT_GT, FORMAT_DP, FORMAT_RO, FORMAT_QR,
                             FORMAT_AQR, FORMAT_AO,
                             FORMAT_QA, FORMAT_AQA, FORMAT_QUAL, tier, no_comma_info,
@@ -549,8 +512,8 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                    "FILTER", "total_locus_depth", "MQM_INFO", "MQMR_INFO",
                    "QA_INFO", "QR_INFO", "SAF_INFO", "SAR_INFO", "SRF_INFO",
                    "SRR_INFO", "SBR_INFO", "SBA_INFO",
-                   "variant_heteroplasmy", "POS_FIL", "SBR_FIL", "SBA_FIL",
-                   "MQMR_FIL", "AQR_FIL",
+                   "variant_heteroplasmy", "POS_FILTER", "SBR_FILTER", "SBA_FILTER",
+                   "MQMR_FILTER", "AQR_FILTER",
                    "GT_FORMAT", "total_sample_depth", "ref_depth", "QR_FORMAT",
                    "AQR_FORMAT", "alt_depth",
                    "QA_FORMAT", "AQA_FORMAT", "variant_quality", "tier", "INFO", "FORMAT"]
@@ -742,7 +705,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'CHR', 'POS', 'REF', 'ALT', 'QUAL', 'FILTER',
                 'MQM_INFO', 'MQMR_INFO', 'QA_INFO', 'QR_INFO', 'SAF_INFO',
                 'SAR_INFO', 'SRF_INFO', 'SRR_INFO', 'SBR_INFO', 'SBA_INFO',
-                'POS_FIL', 'SBR_FIL', 'SBA_FIL', 'MQMR_FIL', 'AQR_FIL',
+                'POS_FILTER', 'SBR_FILTER', 'SBA_FILTER', 'MQMR_FILTER', 'AQR_FILTER',
                 'GT_FORMAT', 'QR_FORMAT', 'AQR_FORMAT', 'QA_FORMAT',
                 'AQA_FORMAT',
                 'INFO', 'FORMAT']
@@ -766,7 +729,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'CHR', 'POS', 'REF', 'ALT', 'QUAL', 'FILTER',
                 'MQM_INFO', 'MQMR_INFO', 'QA_INFO', 'QR_INFO', 'SAF_INFO',
                 'SAR_INFO', 'SRF_INFO', 'SRR_INFO', 'SBR_INFO', 'SBA_INFO',
-                'POS_FIL', 'SBR_FIL', 'SBA_FIL', 'MQMR_FIL', 'AQR_FIL',
+                'POS_FILTER', 'SBR_FILTER', 'SBA_FILTER', 'MQMR_FILTER', 'AQR_FILTER',
                 'GT_FORMAT', 'QR_FORMAT', 'AQR_FORMAT', 'QA_FORMAT',
                 'AQA_FORMAT',
                 'INFO', 'FORMAT']
