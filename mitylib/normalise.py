@@ -632,8 +632,8 @@ def combine_lines(variant_list, p=0.002):
                     new_line[samp + 9] = temp_format
 
                 # update QUAL
-                cohort_AO = sum(AO_vector)
-                cohort_DP = sum(DP_vector)
+                cohort_AO = sum(int(x) for x in AO_vector)
+                cohort_DP = sum(int(x) for x in DP_vector)
                 cohort_QUAL = mity_qual(cohort_AO, cohort_DP, p=p)
                 new_line[5] = str(round(cohort_QUAL, 1))
                 logging.debug("Cohort QUAL score: {} := {} vs {}".format(new_line[5], ",".join(str(x) for x in AO_vector), ",".join(str(x) for x in DP_vector)))
@@ -788,7 +788,7 @@ def combine_lines(variant_list, p=0.002):
                     VAF.append(str(samp_VAF))
                     # print(VAF)
 
-                    samp_q = mity_qual(AO, new_DP, p=p)
+                    samp_q = mity_qual(new_AO, new_DP, p=p)
                     samp_q = str(samp_q)
 
                     # update GT
@@ -941,10 +941,10 @@ def combine_lines(variant_list, p=0.002):
                 # new_info.append(VAF)
                 new_info = ";".join(new_info)
 
-                cohort_AO = sum(new_AO_vector)
-                cohort_DP = sum(new_DP_vector)
+                cohort_AO = sum(int(x) for x in new_AO_vector)
+                cohort_DP = sum(int(x) for x in new_DP_vector)
                 cohort_QUAL = mity_qual(cohort_AO, cohort_DP, p=p)
-                logging.debug("Cohort QUAL score: {} := {} vs {}".format(new_line[5], ",".join(str(x) for x in new_AO_vector), ",".join(str(x) for x in new_DP_vector)))
+                logging.debug("Cohort QUAL score: {} := {} vs {}".format(replacement_line[5], ",".join(str(x) for x in new_AO_vector), ",".join(str(x) for x in new_DP_vector)))
                 replacement_line[5] = str(round(cohort_QUAL, 1))
                 replacement_line[7] = new_info
                 replacement_line[9:] = new_FORMAT
@@ -965,6 +965,8 @@ def mity_qual(AO, DP, p=0.002):
     :return: (float) phred-scaled quality score
     """
     q = 0.0
+    AO = int(AO)
+    DP = int(DP)
     if AO > 0 and DP > 0:
         if DP == AO:
             DP = DP + 1

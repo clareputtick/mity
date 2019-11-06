@@ -228,7 +228,7 @@ def do_merge(mity_vcf, hc_vcf, prefix=None, genome='mitylib/reference/b37d5.geno
         for line in new_vcf:
             print(line)
     else:
-        # check that they have the same sampels
+        # check that they have the same samples
         if set(hc_samples) != set(mity_samples):
             sys.exit("VCFs have different sample names")
         mity_variants_no_sample = [x[:9] for x in mity_variants]
