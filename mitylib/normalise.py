@@ -330,12 +330,12 @@ def split_MNP(variant_list):
 # variant_list is a list of sublists, each sublist is  line in the vcf
 # variant_list is a list, with no multiallelic variants
 # Eg variant_list = [['MT', 73.0, '.', 'A', 'G', '148165', '.', 'DP=5912...], ['MT', 146.0, '.', 'T', 'C', '198193', '.', 'DP=7697;...], ['MT', '182', '.', 'C', 'T', '6.00899e-14', '.', 'DP=7955;...]]
-def combine_lines(variant_list, p=0.0001):
-    # make dictinary with keys chromosome, position and alternate
+def combine_lines(variant_list, p=0.002):
+    # make dictionary with keys chromosome, position and alternate
 
     # print(variant_list)
     # we are interested in the lines that have the same chromosome position and alternate -
-    # to idenitify these lines, create an "id" for each line that is position_alternate
+    # to identify these lines, create an "id" for each line that is position_alternate
     # if any lines have matching ids then they should be combined.
 
     # get the chromosome positions and alternates
@@ -552,19 +552,9 @@ def combine_lines(variant_list, p=0.0001):
                     # VAF.append(str(samp_VAF))
                     VAF_idx = FORMAT_names.index('VAF')
                     temp_format[VAF_idx] = str(samp_VAF)
+
                     # add in q
-                    # print(float(DP))
-                    # print(binom.cdf(float(AO), float(DP), p))
-                    # print(log10(1 - binom.cdf(float(AO), float(DP), p)))
-
-                    if DP != 0:
-                        if AO == DP:
-                            q = 10000
-                        else:
-                            q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
-                    else:
-                        q = 0
-
+                    q = mity_qual(AO, DP, p=p)
                     q_idx = FORMAT_names.index('q')
                     temp_format[q_idx] = str(q)
 
@@ -644,12 +634,7 @@ def combine_lines(variant_list, p=0.0001):
                 # update QUAL
                 cohort_AO = sum(AO_vector)
                 cohort_DP = sum(DP_vector)
-                cohort_QUAL = 0.0
-                if cohort_DP != 0:
-                    if cohort_DP == cohort_AO:
-                        cohort_QUAL = 10000
-                    else:
-                        cohort_QUAL = round(abs(-10 * log10(1 - binom.cdf(float(cohort_AO), float(cohort_DP), p))), 2)
+                cohort_QUAL = mity_qual(cohort_AO, cohort_DP, p=p)
                 new_line[5] = str(round(cohort_QUAL, 1))
                 logging.debug("Cohort QUAL score: {} := {} vs {}".format(new_line[5], ",".join(str(x) for x in AO_vector), ",".join(str(x) for x in DP_vector)))
 
@@ -803,15 +788,8 @@ def combine_lines(variant_list, p=0.0001):
                     VAF.append(str(samp_VAF))
                     # print(VAF)
 
-                    if new_DP != 0:
-                        if new_DP == AO:
-                            samp_q = 10000
-                        else:
-                            samp_q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(new_DP), p))), 2)
-                    else:
-                        samp_q = 0.0
+                    samp_q = mity_qual(AO, new_DP, p=p)
                     samp_q = str(samp_q)
-                    # q.append(str(samp_q))
 
                     # update GT
                     if int(new_AO) < 4:
@@ -965,12 +943,7 @@ def combine_lines(variant_list, p=0.0001):
 
                 cohort_AO = sum(new_AO_vector)
                 cohort_DP = sum(new_DP_vector)
-                cohort_QUAL = 0.0
-                if cohort_DP != 0:
-                    if cohort_DP == cohort_AO:
-                        cohort_QUAL = 10000
-                    else:
-                        cohort_QUAL = round(abs(-10 * log10(1 - binom.cdf(float(cohort_AO), float(cohort_DP), p))), 2)
+                cohort_QUAL = mity_qual(cohort_AO, cohort_DP, p=p)
                 logging.debug("Cohort QUAL score: {} := {} vs {}".format(new_line[5], ",".join(str(x) for x in new_AO_vector), ",".join(str(x) for x in new_DP_vector)))
                 replacement_line[5] = str(round(cohort_QUAL, 1))
                 replacement_line[7] = new_info
@@ -981,6 +954,22 @@ def combine_lines(variant_list, p=0.0001):
                 new_vcf.append(replacement_line)
     # print(new_vcf)
     return (new_vcf)
+
+
+def mity_qual(AO, DP, p=0.002):
+    """
+    Compute variant quality
+    :param AO: (int) number of alternative reads
+    :param DP: (int) total read depth
+    :param p: (float) noise parameter. default=0.002
+    :return: (float) phred-scaled quality score
+    """
+    q = 0.0
+    if DP > 0:
+        if DP == AO:
+            DP = DP + 1
+        q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
+    return q
 
 
 def add_filter(variant_list, min_DP=15, SB_range=[0.2, 0.8], min_MQMR=30, min_AQR=20):
@@ -1245,23 +1234,22 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/r
     Normalise and FILTER a mity VCF file.
 
     This function splits multi-allelic variants and MNPs, whilst taking care to
-    split the
-    VCF header properly. After normalising, it also updates the FILTER,
-    to remove poor quality variants.
+    split the VCF header properly. After normalising, it also updates the FILTER,
+    to remove poor quality variants, and calculates QUAL and GENOTYPE:QUAL scores.
 
     :param vcf: the path to a vcf.gz file. It can be single-sample,
     or multi-sample, and
          should have been generated by mity call, or FreeBayes
     :type vcf: str
-    :parm out_file: The name of the normalised vcf.gz file
+
+    :param out_file: The name of the normalised vcf.gz file
     :type out_file: str
 
-    :param p: The minimum noise threshold. CURRENTLY UNUSED
+    :param p: The minimum noise threshold.
     :type p: float
 
     :param chromosome: discard variants not on this chromosome. If None,
-    then all variants
-        will be processed.
+    then all variants will be processed.
     :type chromosome: str
 
     :returns: Nothing. This creates a vcf.gz named out_file
