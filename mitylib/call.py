@@ -6,13 +6,14 @@ import os.path
 from .util import tabix, check_missing_file, create_prefix, bam_get_mt_contig, bam_has_RG
 from .normalise import do_normalise as vcfnorm
 
-def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
+def do_call(bam_files, reference, genome=None, prefix=None, min_mq=30, min_bq=24,
             min_af=0.01, min_ac=4, p=0.002, normalise=True, 
             out_folder_path=".", region=None):
     """
     Run mity call.
     :param bam_files: a list of bam_files
     :param reference: the path to the reference genome file (fasta format)
+    :param genome: the path to the reference genome file for gsort (genome format). Required if normalise=True
     :param prefix: The result filename prefix. If None, then the first bam_file prefix
     will be used
     :param min_mq: minimum mapping quality threshold. default: 30
@@ -40,6 +41,10 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
 
     if not all(map(bam_has_RG, bam_files)):
         logging.error("At least one BAM file lacks an @RG header")
+        exit(1)
+
+    if normalise and genome is None:
+        logging.error("A genome file should be supplied if mity call normalize=True")
         exit(1)
 
     if not os.path.exists(out_folder_path):
@@ -98,7 +103,7 @@ def do_call(bam_files, reference, prefix=None, min_mq=30, min_bq=24,
     if normalise:
         logging.debug("Normalising and Filtering variants")
         try:
-            vcfnorm(vcf=unnormalised_vcf_path, out_file=output_file_name, p=p)
+            vcfnorm(vcf=unnormalised_vcf_path, out_file=output_file_name, p=p, genome=genome)
         finally:
             os.remove(unnormalised_vcf_path)
     else:
