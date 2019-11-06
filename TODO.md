@@ -12,20 +12,8 @@
 
 # report
 * mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
-* CRITICAL: currently broken:
-    File "/usr/local/lib/python3.7/site-packages/mitylib/report.py", line 353, in split_header_variants
-        col_names = header[-1]
-    IndexError: list index out of range
->> This is because the mity-report code assumes certain fields are in the VCF, which aren't there if mity-normalise hasnt been run. I think the best way to fix this is to rewrite the code so that it doesn't assume fields in the VCF. This could then be a more useful script as it would work with all VCFs. But I'm going to leave it for now, and we can say that mity-report only works with normalised VCFs.
-
-* L63-L104 is repetitive
-* VEP splitting should be in a function
-* L195-228 is repetitive
-* some more examples in here that could be streamlined and processed over a list of keys
-* L823-891 could just be saved in a text file and loaded in as a one-liner
-* L903-906 is too repetitive: iterate over an array of fields for int64 vs float64
+* doubles up some lines in the report. i've noticed this happen if the same chr-pos-ref-alt is in `phylotree_haplotype` twice
 * Check if report works with multiple VCFs
-* need to add output folder - currently saves in current directory - Done
 
 # misc
 * use logging.info, logging.debug, logging.warning, logging.error where possible
@@ -34,8 +22,10 @@ uses annotations with GRCh37 coordinates, and thus should fail. How much do we t
 to support hg19 then? GRCh38 and GRCh37 are the same length.
 
 # installation (pre-submission)
-* use distutils to create a package, and register this with pip install - to finalise
+* use distutils to create a package, and register this with pip install dev - DONE
+* register package with main pip repo - PENDING
 * create a docker image - DONE
+* update docker image once in main pip repo - PENDING
 
 # GitHub (pre-submission)
 * CRITICAL: improve documentation
