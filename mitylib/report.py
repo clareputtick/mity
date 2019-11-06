@@ -263,13 +263,7 @@ def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
                 
                 if vep_headers != "":
                     new_line = new_line + vep_annotations
-                
-                # print(new_line)
-                # sys.exit()
-                # print(len(new_line))
-                # print(new_line)
-                # sys.exit()
-                # print(new_line)
+
                 table.append(new_line)
     
     return (table)
@@ -677,15 +671,15 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     # otherwise dont
     if is_vepped:
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
-                'variant_heteroplasmy', 'variant_quality',
-                'ref_depth', 'alt_depth', 'total_sample_depth',
+                'variant_heteroplasmy', 'alt_depth',
+                'ref_depth', 'total_sample_depth', 'variant_quality',
                 'total_locus_depth', 'COHORT_COUNT', 'tier',
                 'baylor_panel', 'common_22_panel', 'common_58_panel',
-                'MGRB_frequency', 'phylotree_haplotype', 'MitoTip_score',
+                'phylotree_haplotype', 'MitoTip_score',
                 'MitoTip_score_percentile', 'anticodon',
                 'allele_frequency_mitomap',
                 'highest_vep_impact', 'Consequence_VEP', 'disease_mitomap',
-                'MGRB_FILTER', 'MGRB_AN', 'MGRB_AC', 'phylotree_mut',
+                'MGRB_frequency', 'MGRB_FILTER', 'MGRB_AC', 'MGRB_AN', 'phylotree_mut',
                 'Codons_VEP', 'Amino_acids_VEP', 'Gene_VEP', 'SYMBOL_VEP',
                 'Feature_VEP', 'EXON_VEP', 'PolyPhen_VEP', 'SIFT_VEP',
                 'Protein_position_VEP', 'BIOTYPE_VEP', 'CANONICAL_VEP',
@@ -694,8 +688,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'CLIN_SIG_VEP', 'LoF_flags_VEP', 'LoF_filter_VEP', 'LoF_VEP',
                 'RadialSVM_score_VEP', 'RadialSVM_pred_VEP', 'LR_score_VEP',
                 'LR_pred_VEP', 'CADD_raw_VEP', 'CADD_phred_VEP',
-                'Reliability_index_VEP',
-                'HGVSc_VEP', 'HGVSp_VEP',
+                'Reliability_index_VEP', 'HGVSc_VEP', 'HGVSp_VEP',
                 'locus_mitomap', 'variant_references_mitomap',
                 'variant_amino_acid_change_mitomap', 'codon_position_mitomap',
                 'codon_number_mitomap',
@@ -711,14 +704,15 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'INFO', 'FORMAT']
     else:
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
-                'variant_heteroplasmy', 'variant_quality',
-                'ref_depth', 'alt_depth', 'total_sample_depth',
+                'variant_heteroplasmy', 'alt_depth',
+                'ref_depth', 'total_sample_depth', 'variant_quality',
                 'total_locus_depth', 'COHORT_COUNT', 'tier',
                 'baylor_panel', 'common_22_panel', 'common_58_panel',
-                'MGRB_frequency', 'phylotree_haplotype', 'MitoTip_score',
+                'phylotree_haplotype', 'MitoTip_score',
                 'MitoTip_score_percentile', 'anticodon',
                 'allele_frequency_mitomap',
-                'disease_mitomap', 'MGRB_FILTER', 'MGRB_AN', 'MGRB_AC',
+                'disease_mitomap',
+                'MGRB_frequency', 'MGRB_FILTER', 'MGRB_AC', 'MGRB_AN',
                 'phylotree_mut',
                 'locus_mitomap', 'variant_references_mitomap',
                 'variant_amino_acid_change_mitomap', 'codon_position_mitomap',
