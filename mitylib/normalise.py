@@ -965,7 +965,7 @@ def mity_qual(AO, DP, p=0.002):
     :return: (float) phred-scaled quality score
     """
     q = 0.0
-    if DP > 0:
+    if AO > 0 and DP > 0:
         if DP == AO:
             DP = DP + 1
         q = round(abs(-10 * log10(1 - binom.cdf(float(AO), float(DP), p))), 2)
