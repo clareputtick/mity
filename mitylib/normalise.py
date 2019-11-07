@@ -995,7 +995,7 @@ def mity_qual(AO, DP, p=0.002):
         q = 3220
     return q
 
-def add_filter(variant_list, min_DP=15, SB_range=[0.2, 0.8], min_MQMR=30, min_AQR=20):
+def add_filter(variant_list, min_DP=15, SB_range=[0.1, 0.9], min_MQMR=30, min_AQR=20):
     """
     FILTER out poor quality variants in a VCF.
     If one samples in the vcf passes, then they all pass in the FILTER column.
@@ -1127,7 +1127,7 @@ def add_filter(variant_list, min_DP=15, SB_range=[0.2, 0.8], min_MQMR=30, min_AQ
     return (new_vcf)
 
 
-def update_header(col_names, header_lines, p):
+def update_header(col_names, header_lines, p, SB_range=[0.1, 0.9], min_MQMR=30, min_AQR=20):
     ##############################
     ####### Process Header lines
     header_lines.append([
@@ -1197,14 +1197,14 @@ def update_header(col_names, header_lines, p):
         'MT:3105-3108">'])
     header_lines.append([
         '##FILTER=<ID=SBR,Description="For all alleles RO '
-        '> 15 and (SBR > 0.8 or SBR < 0.2)">'])
+        '> 15 and (SBR > ' + SB_range[1] + ' or SBR < ' + SB_range[0] + ')">'])
     header_lines.append([
         '##FILTER=<ID=SBA,Description="For all alleles AO '
-        '> 15 and (SBA > 0.8 or SBA < 0.2)">'])
+        '> 15 and (SBA > ' + SB_range[1] + ' or SBA < ' + SB_range[0] + ')">'])
     header_lines.append(
-        ['##FILTER=<ID=MQMR,Description="For all alleles MQMR<30">'])
+        ['##FILTER=<ID=MQMR,Description="For all alleles MQMR<' + min_MQMR + '">'])
     header_lines.append(
-        ['##FILTER=<ID=AQR,Description="For all alleles AQR<20">'])
+        ['##FILTER=<ID=AQR,Description="For all alleles AQR<' + min_AQR + '">'])
     # header_lines.append(['##FILTER=<ID=VAF,Number=A,Type=Float,
     # Description="Allele frequency in the range (0,1] - the ratio of the
     # number of alternate reads to reference reads">'])
@@ -1252,7 +1252,7 @@ def update_header(col_names, header_lines, p):
     header_lines.append([col_names])
 
 
-def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/reference/hs37d5.genome"):
+def do_normalise(vcf, out_file=None, p=0.002, SB_range=[0.1,0.9], min_MQMR=30, min_AQR=20, chromosome=None, genome="mitylib/reference/hs37d5.genome"):
     """
     Normalise and FILTER a mity VCF file.
 
@@ -1319,9 +1319,10 @@ def do_normalise(vcf, out_file=None, p=0.002, chromosome=None, genome="mitylib/r
     combined_variants = combine_lines(no_mnp, p=p)
     # debug_print_vcf_lines(combined_variants)
     logging.debug('Adding filter variants')
-    filtered_variants = add_filter(combined_variants)
+    sba_filter = []
+    filtered_variants = add_filter(combined_variants, SB_range=SB_range, min_MQMR=min_MQMR, min_AQR=min_AQR)
     # debug_print_vcf_lines(filtered_variants)
-    update_header(col_names, header_lines, p=p)
+    update_header(col_names, header_lines, p=p, SB_range=SB_range, min_MQMR=min_MQMR, min_AQR=min_AQR)
     # debug_print_vcf_lines(filtered_variants)
     logging.info('Writing normalised vcf: {}'.format(out_file))
 
