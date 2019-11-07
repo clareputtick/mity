@@ -3,6 +3,7 @@ import logging
 import gzip
 import pandas
 import os.path
+import xlsxwriter
 from .util import check_missing_file, create_prefix, make_hgvs, get_annot_file
 
 def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
