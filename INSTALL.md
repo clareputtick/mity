@@ -1,17 +1,17 @@
 # Docker
 The simplest way to run mity is via docker:
 
-    docker run drmjc/mity:0.0.1b15 -h
+    docker run drmjc/mity:0.0.1b40 -h
 
 # pip
-If you have freebayes >=1.2 and gsort installed, then pip should work well
+If you have freebayes >=1.2 and Brent Pederson's gsort installed, then pip should work well
 
-    VERSION=0.0.1b15
+    VERSION=0.0.1b40
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
 
 # manual installation 
 If you would prefer to install mity on a fresh Ubuntu installation, the following should work.
-We have tested this on a fresh Ubuntu 14.04 image; We use `pyenv` to install python 3.7.4 and there
+We have tested this on a fresh Ubuntu 14.04 image; We use `pyenv` to install python 3.7.4, though there
 are a number of alternatives. YMMV.
 
 # install dependencies 
@@ -39,7 +39,7 @@ are a number of alternatives. YMMV.
     # Python 3.7.4
     pip install --upgrade pip
     export PATH=$PATH:.local/bin:$HOME/.pyenv/versions/3.7.4/bin
-    # merge DNAnexus' PYTHONPATH with this from PYTHON3
+    # if running on a DNANexus cloud instance, then merge DNAnexus' PYTHONPATH with this from PYTHON3
     export PYTHONPATH=/home/linuxbrew/.linuxbrew/lib/python3.7/site-packages:/usr/share/dnanexus/lib/python2.7/site-packages
 
 
@@ -60,13 +60,15 @@ Then install the system dependencies: freebayes (>=1.2.0), htslib (tabix+bgzip),
 
 Either install mity globally:
 
-    export PYTHONPATH=/usr/share/dnanexus/lib/python2.7/site-packages
-    export PYTHONPATH=/usr/local/lib/python3.5/dist-packages:/usr/lib/python3/dist-packages:/usr/share/dnanexus/lib/python2.7/site-packages
+    # for most users
+    export PYTHONPATH=/usr/local/lib/python3.7/dist-packages:/usr/lib/python3/dist-packages
+    # for those using a DNANexus cloud instance
+    export PYTHONPATH=/usr/local/lib/python3.7/dist-packages:/usr/lib/python3/dist-packages:/usr/share/dnanexus/lib/python2.7/site-packages
     
     # fix a python version incompatibility bug in futures
     sudo perl -pi -e 's|raise exception_type, self._exception, self._traceback|raise Exception(self._exception).with_traceback(self._traceback)|' /usr/share/dnanexus/lib/python2.7/site-packages/concurrent/futures/_base.py
     
-    VERSION=0.0.1b15
+    VERSION=0.0.1b40
     pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
     
 Or install mity using a virtualenv
@@ -76,17 +78,17 @@ Or install mity using a virtualenv
     python3 -m venv .
     source bin/activate
     ./bin/pip install wheel
-    VERSION=0.0.1b15
+    VERSION=0.0.1b40
     ./bin/pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==$VERSION
 
-# test
+# test on example data
 (These URLs valid until 26/7/2020)
     wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
     wget https://dl.dnanex.us/F/D/qyV40Qgfj6Jgy3zZfJ07vkgXqZvJ6Fb2kXb24fyv/A1.dedup.realigned.recalibrated.chrMT.bam.bai
-    wget https://dl.dnanex.us/F/D/pVG7PjZy4qKBB6ZKbkkF0X6kB0kxf7ZzjpK7fXjY/hs37d5.fasta-index.tar.gz
-    tar -xzvf hs37d5.fasta-index.tar.gz; mv genome.dict hs37d5.dict; mv genome.fa hs37d5.fa; mv genome.fa.fai hs37d5.fa.fai
-
-# test post-docker
+    mity call --normalise A1.dedup.realigned.recalibrated.chrMT.bam
+    mity report A1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz
+ 
+# test using docker
 
     wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
     wget https://dl.dnanex.us/F/D/qyV40Qgfj6Jgy3zZfJ07vkgXqZvJ6Fb2kXb24fyv/A1.dedup.realigned.recalibrated.chrMT.bam.bai

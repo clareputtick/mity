@@ -1278,7 +1278,6 @@ def do_normalise(vcf, out_file=None, p=0.002, SB_range=[0.1,0.9], min_MQMR=30, m
     :returns: Nothing. This creates a vcf.gz named out_file
     :rtype: None
     """
-    print(p)
     if out_file is None:
         out_file = vcf.replace(".vcf.gz", ".norm.vcf.gz")
 

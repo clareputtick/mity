@@ -29,9 +29,8 @@ to support hg19 then? GRCh38 and GRCh37 are the same length.
 * update docker image once in main pip repo - PENDING
 
 # GitHub (pre-submission)
-* CRITICAL: improve documentation
-* CRITICAL: update INSTALL.md
-* CRITICAL: ensure there is example usage
+* merge branch back to master
+* push to KCCG
 
 # DNAnexus
 * migrate app code to use the latest mity. either via an asset, or Docker image.
