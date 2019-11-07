@@ -651,7 +651,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     # add in the GB percent
     # need to account for the fact that some entries will be "." and cant be 
     # converted to float
-    gb_freq = annotated_variants1['GB_frequency_mitomap'].tolist()
+    gb_freq = annotated_variants1['GenBank_frequency_mitomap'].tolist()
     gb_perc = gb_freq
     
     # only convert the entries that are not a "."
@@ -689,12 +689,12 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'RadialSVM_score_VEP', 'RadialSVM_pred_VEP', 'LR_score_VEP',
                 'LR_pred_VEP', 'CADD_raw_VEP', 'CADD_phred_VEP',
                 'Reliability_index_VEP', 'HGVSc_VEP', 'HGVSp_VEP',
-                'locus_mitomap', 'variant_references_mitomap',
+                'locus_mitomap', 'num_references_mitomap',
                 'variant_amino_acid_change_mitomap', 'codon_position_mitomap',
                 'codon_number_mitomap',
                 'disease_references_mitomap', 'RNA_mitomap',
                 'homoplasmy_mitomap', 'heteroplasmy_mitomap', 'status_mitomap',
-                'disease_amino_acid_change_mitomap', 'GB_frequency_mitomap',
+                'disease_amino_acid_change_mitomap', 'GenBank_frequency_mitomap',
                 'CHR', 'POS', 'REF', 'ALT', 'QUAL', 'FILTER',
                 'MQM_INFO', 'MQMR_INFO', 'QA_INFO', 'QR_INFO', 'SAF_INFO',
                 'SAR_INFO', 'SRF_INFO', 'SRR_INFO', 'SBR_INFO', 'SBA_INFO',
@@ -714,12 +714,12 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'disease_mitomap',
                 'MGRB_frequency', 'MGRB_FILTER', 'MGRB_AC', 'MGRB_AN',
                 'phylotree_mut',
-                'locus_mitomap', 'variant_references_mitomap',
+                'locus_mitomap', 'num_references_mitomap',
                 'variant_amino_acid_change_mitomap', 'codon_position_mitomap',
                 'codon_number_mitomap',
                 'disease_references_mitomap', 'RNA_mitomap',
                 'homoplasmy_mitomap', 'heteroplasmy_mitomap', 'status_mitomap',
-                'disease_amino_acid_change_mitomap', 'GB_frequency_mitomap',
+                'disease_amino_acid_change_mitomap', 'GenBank_frequency_mitomap',
                 'CHR', 'POS', 'REF', 'ALT', 'QUAL', 'FILTER',
                 'MQM_INFO', 'MQMR_INFO', 'QA_INFO', 'QR_INFO', 'SAF_INFO',
                 'SAR_INFO', 'SRF_INFO', 'SRR_INFO', 'SBR_INFO', 'SBA_INFO',
@@ -871,16 +871,16 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     if not os.path.exists(out_folder_path):
         os.makedirs(out_folder_path)
 
-    logging.info("saving xlsx report")
     xlsx_name = os.path.join(out_folder_path, prefix + ".annotated_variants.xlsx")
+    logging.info("saving xlsx report: " + xlsx_name)
     writer = pandas.ExcelWriter(xlsx_name, engine='xlsxwriter')
     documentation_df.to_excel(writer, sheet_name='Documentation', index=False,
                               header=False)
     annotated_variants1.to_excel(writer, sheet_name='Variants', index=False)
     writer.save()
     
-    logging.info("saving csv report")
     csv_name = os.path.join(out_folder_path, prefix + ".annotated_variants.csv")
+    logging.info("saving csv report: " + csv_name)
     annotated_variants1.to_csv(csv_name, index=False, )
     # numpy.savetxt('data.csv', delimiter=',', X = annotated_variants1)
     # with open("test.csv", "w", newline='') as csv_file:

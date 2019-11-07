@@ -118,7 +118,7 @@ def _cmd_normalise(args):
 
     genome = select_reference_genome(args.reference, None)
 
-    normalise.do_normalise(args.vcf, args.outfile, args.p, genome)
+    normalise.do_normalise(args.vcf, args.outfile, p=args.p, SB_range=[0.1, 0.9], genome=genome)
 
 
 P_normalise = AP_subparsers.add_parser('normalise', help=_cmd_normalise.__doc__)
