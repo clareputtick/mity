@@ -3,7 +3,6 @@ import logging
 import gzip
 import pandas
 import os.path
-import xlsxwriter
 from .util import check_missing_file, create_prefix, make_hgvs, get_annot_file
 
 def make_table(variants, samples, vep_headers, impact_dict, min_vaf):
@@ -577,8 +576,10 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     mitotip_annotations['POS'] = mitotip_annotations['POS'].astype('str')
     mitotip_annotations['MitoTip_score'] = mitotip_annotations[
         'MitoTip_score'].astype('str')
-    mitotip_annotations['MitoTip_score_percentile'] = mitotip_annotations[
-        'MitoTip_score_percentile'].astype('str')
+    mitotip_annotations['MitoTip_percentile'] = mitotip_annotations[
+        'MitoTip_percentile'].astype('str')
+    mitotip_annotations['MitoTip_interpretation'] = mitotip_annotations[
+        'MitoTip_interpretation'].astype('str')
     mitotip_trna_mito_locus_gtf_mitomap_panel_annotated_variants = pandas.merge(
         left=trna_mito_locus_gtf_mitomap_panel_annotated_variants,
         right=mitotip_annotations, how='left', on=['CHR', 'POS', 'REF', 'ALT'])
@@ -677,7 +678,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'ref_depth', 'total_sample_depth', 'variant_quality',
                 'total_locus_depth', 'COHORT_COUNT', 'tier', 'commercial_panels',
                 'phylotree_haplotype', 'MitoTip_score',
-                'MitoTip_score_percentile', 'anticodon',
+                'MitoTip_percentile', 'MitoTip_interpretation', 'anticodon',
                 'allele_frequency_mitomap',
                 'highest_vep_impact', 'Consequence_VEP', 'disease_mitomap',
                 'MGRB_frequency', 'MGRB_FILTER', 'MGRB_AC', 'MGRB_AN', 'phylotree_mut',
@@ -709,7 +710,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'ref_depth', 'total_sample_depth', 'variant_quality',
                 'total_locus_depth', 'COHORT_COUNT', 'tier', 'commercial_panels',
                 'phylotree_haplotype', 'MitoTip_score',
-                'MitoTip_score_percentile', 'anticodon',
+                'MitoTip_percentile', 'MitoTip_interpretation', 'anticodon',
                 'allele_frequency_mitomap',
                 'disease_mitomap',
                 'MGRB_frequency', 'MGRB_FILTER', 'MGRB_AC', 'MGRB_AN',
@@ -772,55 +773,105 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
         "tier: 1:=VAF>=1%. 2:= VAF<1% and alt_depth>=10, 3:=VAF<1% and "
         "alt_depth<10")
     documentation.append(
-        "baylor_panel: https://www.bcm.edu/research/medical-genetics-labs"
-        "/test_detail.cfm?testcode=2010")
-    documentation.append(
-        "common_22_panel: https://www.vcgs.org.au/order/tests/634")
-    documentation.append(
-        "common_58_panel: https://www.genedx.com/test-catalog/available-tests"
+        "commercial_panels: This indicates whether a variant is commonly tested "
+        "in a number of commercial/academic testing laboratories. "
+        "Baylor: https://www.bcm.edu/research/medical-genetics-labs/test_detail.cfm?testcode=2010; "
+        "Common22: https://www.vcgs.org.au/order/tests/634; "
+        "Common58: https://www.genedx.com/test-catalog/available-tests"
         "/58-confirmed-disease-causing-mtdna-point-mutations-and-deletion"
         "-testing/")
-    documentation.append("MGRB_frequency: The variant frequency in MGRB")
     documentation.append(
-        "phylotree_haplotype: The haplotypes this mutation contributes too. "
-        "See http://www.phylotree.org/index.htm")
+        "MGRB: The Medical Genomics Reference Bank (MGRB) "
+         "is a cohort of healthy older Ausrtralian's sequenced using "
+         "~30x Illumina HiSeq X at the Garvan Institute, Sydney. "
+         "See https://www.biorxiv.org/content/10.1101/473348v1. ")
     documentation.append(
-        "MitoTip_score: Only for variants in a tRNA. The score is a "
-        "preditction of the pathogenicity of variants in tRNAs, "
+        "MGRB_frequency: represents the frequency of this variant in the "
+        "MGRB cohort")
+    documentation.append(
+        "MGRB_FILTER: represents the FILTER status of the variant in the "
+        "MGRB cohort using GATK HaplotypeCaller")
+    documentation.append(
+        "MGRB_AC: the allele count in the MGRB cohort; ie the number of "
+        "individuals with this variant. "
+        "This is not accurate for the MT, as it assumes each individual is "
+        "diploid. Interpret this value as 2x the number of individuals "
+        "in the MGRB control cohort.")
+    documentation.append(
+        "MGRB_AN: the total number of alleles called in the MGRB cohort. "
+        "This is not accurate for the MT, as it assumes each individual is "
+        "diploid. Interpret this value as 2x the number of individuals "
+        "in the MGRB control cohort.")
+    documentation.append(
+        "phylotree_haplotype: The haplotypes that the variant is known "
+        "to contribute to. See http://www.phylotree.org/index.htm")
+    documentation.append(
+        "MitoTip_score: MitoTip is an in silico tool for predicting the "
+        "pathogenicity of novel mitochondrial tRNA variants, developed "
+        "by Neal Sondheimer and Sanjay Sonney (PMID: 29227991). "
+        "As such, it only scores variants in a tRNA. The score is a "
+        "prediction of the pathogenicity of variants in tRNAs, "
         "see https://www.mitomap.org/foswiki/bin/view/MITOMAP/MitoTipInfo. "
-        "The highest score is 21.8.")
+        "The highest score is 21.8. It is far from perfect, as m.3243A>G "
+        "is scored as likely benign. ")
     documentation.append(
-        "MitoTip_score_percentile: Where this variants MitoTip score sits in "
+        "MitoTip_percentile: Where this variants MitoTip score sits in "
         "relation to all of the possible variants in tRNA. 100% is the most "
         "pathogenic, 0% is a score of zero.")
     documentation.append(
+        "MitoTip_interpretation: Variants in the upper 25th percentile are "
+        "deemed likely pathogenic, 50-75th percentile as possibly "
+        "pathogenic; 25-50th percentile as possibly benign; "
+        "bottom 25th percentile as likely benign. see "
+        "https://mitomap.org/foswiki/bin/view/MITOMAP/MitoTipInfo")
+    documentation.append(
         "anticodon: TRUE if the variant falls in an anticodon of a tRNA.")
     documentation.append(
-        "allele_frequency_mitomap: Mitomap derives this from 32059 GenBank "
-        "sequences with size greater than 15.4kbp (range 0-1)")
+        "Columns suffix with _mitomap are annotations drawn from the MITOMAP "
+        "compendium of polymorphisms and mutations in human mitochondrial DNA. "
+        "see http://www.mitomap.org/MITOMAP. "
+        "Variants from the the 4 tables are included: 'Control Region Variants "
+        "(16024-576)', 'Coding & RNA Variants (577-16023, MTTF-MTTP)', 'rRNA/tRNA "
+        " Mutations' and 'Coding & Control Region Mutations' (obtained in 2018)")
     documentation.append(
-        "highest_vep_impact: Higest VEP impact from all the VEP annotations "
-        "for the variant. See "
-        "http://www.ensembl.org/info/docs/tools/vep/index.html")
+        "disease_mitomap: The disease annotation for a particular variant, "
+        "as annotated by MITOMAP")
     documentation.append(
-        "Columns suffix with _mitomap are annotations drawn from the mitomap "
-        "website http://www.mitomap.org/MITOMAP.")
+        "status_mitomap: an indication of the strength of evidence supporting "
+        "the MITOMAP annotation. The strongest evidence is Confirmed, which "
+        "MITMAP calls Cfrm. "
+        "See https://mitomap.org/foswiki/bin/view/MITOMAP/MutationsRNACfrm")
     documentation.append(
-        "In particular the 4 tables Control Region Variants (16024-576), "
-        "Coding & RNA Variants (577-16023, MTTF-MTTP), rRNA/tRNA Mutations "
-        "and Coding & Control Region Mutations")
+        "GenBank_frequency_mitomap: the frequency of GenBank records "
+        "containing this variant. This is a proxy for the population "
+        "frequency of the variant. "
+        "As expected, none of the confirmed pathogenic variants in MITOMAP "
+        "have GenBank frequency >0.0%")
+    documentation.append(
+        "allele_frequency_mitomap: MITOMAP derives this from 32,059 GenBank "
+        "full length sequences, with size greater than 15.4kbp (range 0-1)")
     documentation.append(
         "Columns suffix with _VEP come from Ensembl’s Variant Effect "
         "Predictor (VEP) annotations in the VCF")
     documentation.append(
-        "Entries separated with a semicolon mean that there are multiple "
-        "annotations, from either VEP or mitomap.")
+        "highest_vep_impact: Highest VEP impact from all the VEP annotations "
+        "for the variant. See http://www.ensembl.org/info/docs/tools/vep/index.html")
     documentation.append(
-        "For example if there are two entries in the mitomap columns, x;y all "
-        "the annotations before the ';'' are related, and all the annotations "
-        "after are related.")
-    documentation.append("Fields from VCF header:")
-    
+        "Entries separated with a semicolon mean that there are multiple "
+        "annotations, from either VEP or MITOMAP.")
+    documentation.append(
+        "Fields from VCF header: CHR, POS, REF, ALT, QUAL, FILTER, "
+        "INFO, FORMAT")
+    documentation.append(
+        "Additional fields from mity VCF INFO field: MQM_INFO, "
+        "MQMR_INFO, QA_INFO, QR_INFO, SAF_INFO, SAR_INFO, SRF_INFO, "
+        "SRR_INFO, SBR_INFO, SBA_INFO")
+    documentation.append(
+        "Additional fields from the mity VCF FILTER field: POS_FILTER, "
+        "SBR_FILTER, SBA_FILTER, MQMR_FILTER, AQR_FILTER")
+    documentation.append(
+        "Additional fields from the mity VCF FORMAT field: GT_FORMAT, "
+        "QR_FORMAT, AQR_FORMAT, QA_FORMAT, AQA_FORMAT")
     if dupe_header_warning:
         documentation.append(
             "Warning: VCF header IDs are not unique, so there might be a "
