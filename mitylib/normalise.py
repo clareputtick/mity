@@ -964,17 +964,13 @@ def mity_qual(AO, DP, p=0.002):
     :return: (float) phred-scaled quality score
 
     >>> [mity_qual(x,10) for x in [1,2,3,4,5,6,7,8,9,10]]
-    cdf:   '[37.49, 60.22, 84.78, 110.97, 138.75, 159.55, 159.55, 159.55, 159.55, 159.55]'
-    logsf: '[37.49, 60.22, 84.78, 110.97, 138.75, 168.16, 199.4, 232.92, 269.9, 296.89]'
+    '[37.49, 60.22, 84.78, 110.97, 138.75, 168.16, 199.4, 232.92, 269.9, 296.89]'
     >>> [mity_qual(x,100) for x in [5,10,15,20,25,30,35,40,45,50]]
-    cdf:   '[71.87, 156.54, 159.55, 159.55, 159.55, 159.55, 159.55, 159.55, 159.55, 159.55]'
-    logsf: '[71.87, 156.08, 251.23, 354.34, 463.9, 579.05, 699.21, 824.04, 953.32, 1086.94]'
+    '[71.87, 156.08, 251.23, 354.34, 463.9, 579.05, 699.21, 824.04, 953.32, 1086.94]'
     >>> [mity_qual(x,1000) for x in [5,10,15,20,25,30,35,40,45,50]]
-    cdf:   '[17.84, 50.97, 93.59, 142.92, 159.55, 159.55, 159.55, 159.55, 159.55, 159.55]'
-    logsf: '[17.84, 50.97, 93.59, 142.89, 197.36, 256.02, 318.25, 383.57, 451.61, 522.1]'
+    '[17.84, 50.97, 93.59, 142.89, 197.36, 256.02, 318.25, 383.57, 451.61, 522.1]'
     >>> [mity_qual(x,10000) for x in [5,10,15,20,25,30,35,40,45,50]]
-    cdf:   '[0.0, 0.05, 0.74, 3.56, 9.51, 18.73, 31.0, 46.04, 63.57, 83.37]'
-    logsf: '[0.0, 0.05, 0.74, 3.56, 9.51, 18.73, 31.0, 46.04, 63.57, 83.37]'
+    '[0.0, 0.05, 0.74, 3.56, 9.51, 18.73, 31.0, 46.04, 63.57, 83.37]'
     >>> mity_qual(118,118)
     '3211.76'
     >>> mity_qual(119,119)
@@ -989,9 +985,9 @@ def mity_qual(AO, DP, p=0.002):
         if DP == AO:
             # then penalise homoplasmic variants with low numbers of reads
             DP = DP + 1
-        # the cdf implementation caps at 159.55, due to the cdf capping at 0.9999999999999999
-        #q = round(abs(-10 * log10(1 - binom.cdf(AO, DP, p))), 2)
-        # the logsf implementation is identical to cdf for low values and continues to scale up
+        # v1: the cdf implementation caps at 159.55, due to the cdf capping at 0.9999999999999999
+        # q = round(abs(-10 * log10(1 - binom.cdf(AO, DP, p))), 2)
+        # v2: the logsf implementation is identical to cdf for low values and continues to scale up
         q = round(-4.342945 * binom.logsf(AO, DP, p), 2)
         q = float(q)
     if isinf(q):
