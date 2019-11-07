@@ -14,9 +14,7 @@
 * mity report fails if mity normalise hasn't been run, so consider making this mandatory & dropping `mity normalise` 
 * doubles up some lines in the report. i've noticed this happen if the same chr-pos-ref-alt is in `phylotree_haplotype` twice
 * Check if report works with multiple VCFs
-* mitomap csv has 405 records where ALT=del which need to be converted to VCF format (101-G-del = 100-GG-G) TODO
-* mitomap ConfirmedMutations has had updates in 2018.04.18 and 2019.08.23 (https://mitomap.org/foswiki/bin/view/MITOMAP/ConfirmedMutations) TODO
-* mitotip_score_fixed_del has out-by-one errors in the deletions. eg file has 15997-CT-C but >MT:15997-15998=TA 
+* update mitomap annotations 
 
 # misc
 * use logging.info, logging.debug, logging.warning, logging.error where possible
