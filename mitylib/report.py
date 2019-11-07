@@ -635,7 +635,11 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     del annotated_variants['GENE_BIOTYPE']
     del annotated_variants['Map_Locus']
     del annotated_variants['Description']
-    
+    del annotated_variants['baylor_panel']
+    del annotated_variants['common_22_panel']
+    del annotated_variants['common_58_panel']
+    #annotated_variants1.drop(columns=['baylor_panel','common_22_panel','common_58_panel'])
+
     # add the general locus and general locus description
     annotated_variants['gene/locus'] = general_locus
     annotated_variants['gene/locus description'] = general_biotype
@@ -664,8 +668,6 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
         gb_perc[x] = freq
     
     annotated_variants1['allele_frequency_mitomap'] = gb_perc
-    # sys.exit()
-    
     # TODO: to make this more general, choose some important cols to go first
     # if they are in the header then do this sorting
     # otherwise dont
@@ -673,8 +675,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
                 'variant_heteroplasmy', 'alt_depth',
                 'ref_depth', 'total_sample_depth', 'variant_quality',
-                'total_locus_depth', 'COHORT_COUNT', 'tier',
-                'baylor_panel', 'common_22_panel', 'common_58_panel',
+                'total_locus_depth', 'COHORT_COUNT', 'tier', 'commercial_panels',
                 'phylotree_haplotype', 'MitoTip_score',
                 'MitoTip_score_percentile', 'anticodon',
                 'allele_frequency_mitomap',
@@ -692,7 +693,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'locus_mitomap', 'num_references_mitomap',
                 'variant_amino_acid_change_mitomap', 'codon_position_mitomap',
                 'codon_number_mitomap',
-                'disease_references_mitomap', 'RNA_mitomap',
+                'num_disease_references_mitomap', 'RNA_mitomap',
                 'homoplasmy_mitomap', 'heteroplasmy_mitomap', 'status_mitomap',
                 'disease_amino_acid_change_mitomap', 'GenBank_frequency_mitomap',
                 'CHR', 'POS', 'REF', 'ALT', 'QUAL', 'FILTER',
@@ -706,8 +707,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
         cols = ['SAMPLE', 'HGVS', 'gene/locus', 'gene/locus description',
                 'variant_heteroplasmy', 'alt_depth',
                 'ref_depth', 'total_sample_depth', 'variant_quality',
-                'total_locus_depth', 'COHORT_COUNT', 'tier',
-                'baylor_panel', 'common_22_panel', 'common_58_panel',
+                'total_locus_depth', 'COHORT_COUNT', 'tier', 'commercial_panels',
                 'phylotree_haplotype', 'MitoTip_score',
                 'MitoTip_score_percentile', 'anticodon',
                 'allele_frequency_mitomap',
@@ -717,7 +717,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
                 'locus_mitomap', 'num_references_mitomap',
                 'variant_amino_acid_change_mitomap', 'codon_position_mitomap',
                 'codon_number_mitomap',
-                'disease_references_mitomap', 'RNA_mitomap',
+                'num_disease_references_mitomap', 'RNA_mitomap',
                 'homoplasmy_mitomap', 'heteroplasmy_mitomap', 'status_mitomap',
                 'disease_amino_acid_change_mitomap', 'GenBank_frequency_mitomap',
                 'CHR', 'POS', 'REF', 'ALT', 'QUAL', 'FILTER',
