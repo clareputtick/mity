@@ -1,22 +1,22 @@
 # Docker
 The simplest way to run `mity` is via `docker`:
 ```
-docker run drmjc/mity:0.1.0 -h
+docker run drmjc/mity -h
 ```
 
 # pip
-If you have freebayes >=1.2 and Brent Pederson's `gsort` installed, then `pip` should work well
+If you have `freebayes` >=1.2 and Brent Pederson's `gsort` installed, then `pip` should work well
 ```
 pip3 install mitywgs
 ```
 
 # manual installation 
-If you would prefer to install mity on a fresh Ubuntu installation, the following should work.
+If you would prefer to install `mity` on a fresh Ubuntu installation, the following should work.
 We have tested this on a fresh Ubuntu 14.04 image; We use `pyenv` to install python 3.7.4, though there
 are a number of alternatives. YMMV.
 
-# install dependencies 
-* install `homebrew` and `python3.7.4`
+## install dependencies 
+### install `homebrew` and `python3.7.4`
 * `pyenv` is a convenient way to manage multiple python distros: https://github.com/pyenv/pyenv
 ```
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
@@ -37,7 +37,7 @@ export PATH=$PATH:.local/bin:$HOME/.pyenv/versions/3.7.4/bin
 export PYTHONPATH=/home/linuxbrew/.linuxbrew/lib/python3.7/site-packages:/usr/share/dnanexus/lib/python2.7/site-packages
 ```
 
-Then install the system dependencies: freebayes (>=1.2.0), htslib (tabix+bgzip), gsort.     
+### install dependencies: `freebayes` (>=1.2.0), `htslib` (tabix+bgzip), `gsort`.     
 ```
 brew tap brewsci/bio
 brew install freebayes
@@ -52,9 +52,9 @@ chmod +x gsort
 export PATH=.:$PATH
 ```
 
-# install mity
+### install `mity`
 
-Either install mity globally:
+#### Either install `mity` globally:
 ```
 # for most users
 export PYTHONPATH=/usr/local/lib/python3.7/dist-packages:/usr/lib/python3/dist-packages
@@ -67,7 +67,7 @@ sudo perl -pi -e 's|raise exception_type, self._exception, self._traceback|raise
 pip3 install mitywgs
 ```
 
-Or install mity using a virtualenv
+#### Or install `mity` using a `virtualenv`
 ```
 sudo apt-get install python3-venv
 unset PYTHONPATH
@@ -76,7 +76,8 @@ source bin/activate
 ./bin/pip install wheel
 ./bin/pip install mitywgs
 ```
-# test on example data
+
+# test mity
 * These URLs valid until 26/7/2020
 ```
 wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
@@ -85,11 +86,11 @@ mity call --normalise A1.dedup.realigned.recalibrated.chrMT.bam
 mity report A1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz
 ```
 
-# test using docker
+## test using docker
 ```
 wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
 wget https://dl.dnanex.us/F/D/qyV40Qgfj6Jgy3zZfJ07vkgXqZvJ6Fb2kXb24fyv/A1.dedup.realigned.recalibrated.chrMT.bam.bai
-docker run --rm -it -v $(pwd):/home drmjc/mity:0.0.1b13 call --prefix A1 /home/A1.dedup.realigned.recalibrated.chrMT.bam
-docker run --rm -it -v $(pwd):/home drmjc/mity:0.0.1b13 normalise --outfile /home/A1.mity.norm.vcf.gz /data/A1.mity.vcf.gz
-docker run --rm -it -v $(pwd):/home drmjc/mity:0.0.1b13 report /home/A1.mity.norm.vcf.gz
+docker run --rm -it -v $(pwd):/home drmjc/mity call --prefix A1 /home/A1.dedup.realigned.recalibrated.chrMT.bam
+docker run --rm -it -v $(pwd):/home drmjc/mity normalise --outfile /home/A1.mity.norm.vcf.gz /data/A1.mity.vcf.gz
+docker run --rm -it -v $(pwd):/home drmjc/mity report /home/A1.mity.norm.vcf.gz
 ```
