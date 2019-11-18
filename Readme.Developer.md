@@ -115,9 +115,12 @@ based on kccg-freebayes/Readme.Developer.md: this could be v1.0.2-33-gdbb6160 or
     samtools faidx hg38.chrM.fa 
 
 # debug via DNAnexus
+```
 dx run cloud_workstation --ssh \
--imax_session_length=1h \
--ifids=file-BzF4G0j0QpzJP9931xpgKvv2 -ifids=file-BzF4G4Q0Qpz73J1BzVpJ41k4 --yes
+  -imax_session_length=1h \
+  -ifids=file-BzF4G0j0QpzJP9931xpgKvv2 -ifids=file-BzF4G4Q0Qpz73J1BzVpJ41k4 --yes
+```
+
 * see INSTALL.md
 
 # Get testing data
@@ -182,16 +185,16 @@ wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_referen
 samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.bam *cram chrM:1-16569
 
 # Docker
-* created a Dockerfile and this seemed to work really well
+```
+docker build --tag=mity .
+docker tag 0d53b5157b46 drmjc/mity:0.1.3
+docker login docker.io
+docker push drmjc/mity:0.1.3
 
-    docker build --tag=mity .
-    docker login
-    docker tag 070c31168c06 drmjc/mity:0.0.1b13
-    docker push drmjc/mity:0.0.1b13
-
-    # test mity
-    docker run mity call -h
-    docker run drmjc/mity:0.0.1b13 -h
+# test mity
+docker run mity call -h
+docker run drmjc/mity:0.1.3 -h
+```
 
 # Triple check that joint-calling agrees with single calling
 * all agree

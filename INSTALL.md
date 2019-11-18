@@ -31,17 +31,18 @@ pyenv install 3.7.4
 pyenv local 3.7.4
 python --version
 # Python 3.7.4
-pip install --upgrade pip
+pip3 install --upgrade pip
 export PATH=$PATH:.local/bin:$HOME/.pyenv/versions/3.7.4/bin
 # if running on a DNANexus cloud instance, then merge DNAnexus' PYTHONPATH with this from PYTHON3
 export PYTHONPATH=/home/linuxbrew/.linuxbrew/lib/python3.7/site-packages:/usr/share/dnanexus/lib/python2.7/site-packages
 ```
 
-### install dependencies: `freebayes` (>=1.2.0), `htslib` (tabix+bgzip), `gsort`.     
+### install dependencies: `freebayes` (>=1.2.0), `htslib` (tabix+bgzip), `gsort`, 'tabix'.
 ```
 brew tap brewsci/bio
 brew install freebayes
 brew install htslib
+sudo apt-get install -y tabix
 
 curl -s https://api.github.com/repos/brentp/gsort/releases/latest \
   | grep browser_download_url \
@@ -88,9 +89,10 @@ mity report A1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz
 
 ## test using docker
 ```
+docker run drmjc/mity:0.1.2 -h
 wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
 wget https://dl.dnanex.us/F/D/qyV40Qgfj6Jgy3zZfJ07vkgXqZvJ6Fb2kXb24fyv/A1.dedup.realigned.recalibrated.chrMT.bam.bai
-docker run --rm -it -v $(pwd):/home drmjc/mity call --prefix A1 /home/A1.dedup.realigned.recalibrated.chrMT.bam
-docker run --rm -it -v $(pwd):/home drmjc/mity normalise --outfile /home/A1.mity.norm.vcf.gz /data/A1.mity.vcf.gz
-docker run --rm -it -v $(pwd):/home drmjc/mity report /home/A1.mity.norm.vcf.gz
+docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.3 call --prefix A1 /home/A1.dedup.realigned.recalibrated.chrMT.bam
+docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.2 normalise --outfile /home/A1.mity.norm.vcf.gz /home/A1.mity.vcf.gz
+docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.2 report /home/A1.mity.norm.vcf.gz
 ```

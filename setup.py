@@ -44,7 +44,8 @@ setuptools.setup(
         'pysam',
         'pandas',
         'xlsxwriter',
-        'pyfastx'
+        'pyfastx',
+        'scipy'
     ],
     python_requires='>=3.5.3',
     package_data={'mitylib': ['verchew.ini', 'annot/*', 'reference/*']},

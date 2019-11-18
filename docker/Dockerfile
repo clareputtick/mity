@@ -2,30 +2,17 @@
 FROM python:3.7.4-slim
 
 # Install freebayes dependencies
-# RUN apt-get update -yqq && \
-#     apt-get install -yqq \
-#         bedtools \
-#         cmake \
-#         gcc \
-#         git \
-#         make \
-#         wget \
-#         zlib1g-dev \
-#         libreadline-dev \
-#         libbz2-dev \
-#         liblzma-dev && \
-#     apt-get clean
-
 RUN apt-get update -yqq && \
     apt-get install -yqq \
         make build-essential libssl-dev zlib1g-dev libbz2-dev \
         libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-        xz-utils tk-dev libffi-dev liblzma-dev python-openssl git && \
+        xz-utils tk-dev libffi-dev liblzma-dev python-openssl git tabix && \
     apt-get clean
 
 # Install freebayes
 RUN \
     # Clone and compile freebayes
+    git config --global url.https://github.com/.insteadOf git://github.com/ && \
     cd /opt && \
     git clone --recursive --branch v1.2.0 git://github.com/ekg/freebayes.git && \
     cd freebayes && \
@@ -65,7 +52,7 @@ RUN \
     chmod +x gsort
 
 # Install mity
-RUN pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple mity==0.0.1b13
+RUN pip install mitywgs==0.1.2
 
 WORKDIR /home
 

@@ -87,7 +87,7 @@ def do_call(bam_files, reference, genome=None, prefix=None, min_mq=30, min_bq=24
                       '--region {} '
                       ).format(reference, bam_str, min_mq, min_bq, min_af, min_ac, region)
 
-    freebayes_call = freebayes_call + ('| sed "s/##source/##freebayesSource/" | sed "s/##commandline/##freebayesCommandline/" | {} | gzip > {} ').format(sed_cmd, unnormalised_vcf_path)
+    freebayes_call = freebayes_call + ('| sed "s/##source/##freebayesSource/" | sed "s/##commandline/##freebayesCommandline/" | {} | bgzip > {} ').format(sed_cmd, unnormalised_vcf_path)
 
     logging.info("Running FreeBayes in sensitive mode")
     logging.debug(freebayes_call)
