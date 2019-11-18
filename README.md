@@ -1,5 +1,5 @@
 # mity
-mity is a bioinformatic analysis pipeline designed to call mitochondrial SNV and INDEL variants from Whole Genome Sequencing (WGS) data. mity can:
+`mity` is a bioinformatic analysis pipeline designed to call mitochondrial SNV and INDEL variants from Whole Genome Sequencing (WGS) data. `mity` can:
 * identify very low-heteroplasmy variants, even <1% heteroplasmy when there is sufficient read-depth (eg >1000x)
 * filter out common artefacts that arise from high-depth sequencing
 * easily integrate with existing nuclear DNA analysis pipelines (mity merge)
@@ -18,15 +18,15 @@ mity is a bioinformatic analysis pipeline designed to call mitochondrial SNV and
 * pandas
 
 # Installation
-Installation instructions via Docker, pip, or manually are available in INSTALL.md
+Installation instructions via Docker, pip, or manually are available in [INSTALL.md(INSTALL.md)]
 
 # Example Usage
 This is an example of calling variants in the Ashkenazim Trio.
 
-## mity-call
-First run mity-call on three MT BAMs provided in mity/test_in
+## mity call
+First run `mity call` on three MT BAMs provided in [mity/test_in].
 
-We can run it in normalised mode & recommend always using --normalise (or `mity report` won't work):
+We recommend always using `--normalise`, or `mity report` won't work:
 ```bash
 mity call \
 --prefix ashkenazim \
@@ -39,7 +39,7 @@ test_in/HG004.hs37d5.2x250.small.MT.RG.bam
 ```
 This will create `test_out/normalised/ashkenazim.mity.vcf.gz` (and tbi file).
 
-## mity-report
+## mity report
 
 We can create a `mity report` on the normalised VCF:
 ```bash
@@ -51,9 +51,9 @@ test_out/ashkenazim.mity.vcf.gz
 ```
 This will create: `test_out/ashkenazim.annotated_variants.csv` and `test_out/ashkenazim.annotated_variants.xlsx`.
 
-## mity-normalise
+## mity normalise
 High-depth sequencing and sensitive variant calling can create many variants with more than 2 alleles, and in some
-cases, joins two nearby variants separated by shared REF sequenced into a multi-nucleotide polymorphism 
+cases, joins two nearby variants separated by shared `REF` sequence into a multi-nucleotide polymorphism 
 as discussed in the manuscript. Here, variant normalisation relates to decomposing the multi-allelic variants and 
 where possible, splitting multi-nucleotide polymorphisms into their cognate smaller variants. At the time of writing,
 all variant decomposition tools we used failed to propagate the metadata in a multi-allelic variant to the split
@@ -62,10 +62,10 @@ variants which caused problems when reporting the quality scores associated with
 Technically you can run `mity call` and `mity normalise` separately, but since `mity report` requires a normalised 
 vcf file, we recommend running `mity call --normalise`. 
 
-## mity-merge
+## mity merge
 You can merge a nuclear vcf.gz file and a mity.vcf.gz file thereby replacing the MT calls from the nuclear VCF (
 presumably from a caller like HaplotypeCaller which is not able to sensitively call mitochondrial variants) with
-the calls from mity.
+the calls from `mity`.
 
 ```bash
 mity merge \
@@ -88,9 +88,9 @@ those that are annotated with Confirmed evidence in the 'status_mitomap' column
 disease burden 
 
 # Acknowledgements
-We would like to thank
-* The Kinghorn Centre for Clinical Genomics and collaborators, who helped with feedback for running mity.
+We would like to thank:
+* The Kinghorn Centre for Clinical Genomics and collaborators, who helped with feedback for running `mity`.
 * The Genome in a Bottle consortium for providing the test data used here 
-* Eric Talevich who's CNVkit helped us structure mity as a package
-* Erik Garrison for developing FreeBayes and his early feedback in optimising FreeBayes for sensitive variant detection.
-* Brent Pederson for developing gsort
+* Eric Talevich who's CNVkit helped us structure `mity` as a package
+* Erik Garrison for developing `FreeBayes` and his early feedback in optimising `FreeBayes` for sensitive variant detection.
+* Brent Pederson for developing `gsort`
