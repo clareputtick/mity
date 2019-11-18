@@ -7,7 +7,7 @@ with open("mitylib/_version.py", "r") as fh:
     version = fh.read().replace("__version__ = ", "").strip('""\n')
 
 setuptools.setup(
-    name="mity",
+    name="mitywgs",
     version=version,
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
