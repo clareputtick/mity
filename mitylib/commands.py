@@ -36,7 +36,7 @@ do_call = public(call.do_call)
 
 def _cmd_call(args):
     if args.debug:
-        logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+        logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
     """Call mitochondrial variants"""
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")

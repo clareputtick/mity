@@ -7,6 +7,7 @@ import logging
 from .util import write_vcf
 from scipy.stats import binom
 from math import isinf
+import numpy as np
 
 def unchanged(List):
     # check that all numbers in the list are the same
@@ -988,11 +989,11 @@ def mity_qual(AO, DP, p=0.002):
         # v1: the cdf implementation caps at 159.55, due to the cdf capping at 0.9999999999999999
         # q = round(abs(-10 * log10(1 - binom.cdf(AO, DP, p))), 2)
         # v2: the logsf implementation is identical to cdf for low values and continues to scale up
-        q = round(-4.342945 * binom.logsf(AO, DP, p), 2)
-        q = float(q)
+        with np.errstate(divide='ignore'):
+            q = float(round(-4.342945 * binom.logsf(AO, DP, p), 2))
     if isinf(q):
         # this is the maximum q that we observed looking at homoplastic variants around ~129x depth
-        q = 3220
+        q = float(3220)
     return q
 
 def add_filter(variant_list, min_DP=15, SB_range=[0.1, 0.9], min_MQMR=30, min_AQR=20):
@@ -1190,21 +1191,21 @@ def update_header(col_names, header_lines, p, SB_range=[0.1, 0.9], min_MQMR=30, 
     # vaf - will be one for each allele. it is very useful so its good to be in
     # the INFO field
     ##############################
-    ######## FILTER lines: @TODO, remove the  suffix
+    ######## FILTER lines:
     header_lines.append([
         '##FILTER=<ID=POS,Description="Variant falls in '
         'the blacklist of positions: MT:302-319, '
         'MT:3105-3108">'])
     header_lines.append([
         '##FILTER=<ID=SBR,Description="For all alleles RO '
-        '> 15 and (SBR > ' + SB_range[1] + ' or SBR < ' + SB_range[0] + ')">'])
+        '> 15 and (SBR > ' + str(SB_range[1]) + ' or SBR < ' + str(SB_range[0]) + ')">'])
     header_lines.append([
         '##FILTER=<ID=SBA,Description="For all alleles AO '
-        '> 15 and (SBA > ' + SB_range[1] + ' or SBA < ' + SB_range[0] + ')">'])
+        '> 15 and (SBA > ' + str(SB_range[1]) + ' or SBA < ' + str(SB_range[0]) + ')">'])
     header_lines.append(
-        ['##FILTER=<ID=MQMR,Description="For all alleles MQMR<' + min_MQMR + '">'])
+        ['##FILTER=<ID=MQMR,Description="For all alleles MQMR<' + str(min_MQMR) + '">'])
     header_lines.append(
-        ['##FILTER=<ID=AQR,Description="For all alleles AQR<' + min_AQR + '">'])
+        ['##FILTER=<ID=AQR,Description="For all alleles AQR<' + str(min_AQR) + '">'])
     # header_lines.append(['##FILTER=<ID=VAF,Number=A,Type=Float,
     # Description="Allele frequency in the range (0,1] - the ratio of the
     # number of alternate reads to reference reads">'])
