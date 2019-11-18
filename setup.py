@@ -15,7 +15,7 @@ setuptools.setup(
     url="https://github.com/KCCG/mity",
     author="Clare Puttick",
     author_email="clare.puttick@gmail.com",
-    license="see LICENSE.txt",
+    license="MIT",
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
