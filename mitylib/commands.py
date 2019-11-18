@@ -5,8 +5,7 @@ Mity: a sensitive variant analysis pipeline optimised for WGS data
 
 Usage: See the online manual for details: http://github.com/KCCG/mity
 Authors: Clare Puttick, Mark Cowley
-License: Open source for research use: see LICENSE.txt
-
+License: MIT
 """
 import argparse
 import logging
@@ -23,9 +22,11 @@ def public(fn):
     __all__.append(fn.__name__)
     return fn
 
-usage = __doc__.split('\n\n\n')
 
-AP = argparse.ArgumentParser(description=usage[0], epilog=usage[1])
+usage = __doc__.split('\n\n\n', maxsplit=1)
+usage[-1] += "Version: " + __version__
+
+AP = argparse.ArgumentParser(description=usage[0], epilog=usage[1], formatter_class=argparse.RawTextHelpFormatter)
 AP_subparsers = AP.add_subparsers(
         help="mity sub-commands (use with -h for more info)")
 

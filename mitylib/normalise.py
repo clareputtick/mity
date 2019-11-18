@@ -31,7 +31,7 @@ def weighted_mean(mean_list, count_list):
     return (numerator / denominator)
 
 
-# this will split multiallelic lines in a vcf so that each allele is on a seperate line
+# this will split multiallelic lines in a vcf so that each allele is on a separate line
 # variants is a list, each element is a line from the vcf
 # eg variants = ['MT\t3103\t.\tCTACN\tCTAC,CTACT\t68191.9\t.\tAB=0,0;ABP=0,0;AC=2,4;AF=0.333333,0.666667;AN=6;;...,'MT\t3108\t.\tTT\tTC\t0\t.\tAB=0;ABP=0;AC=0;AF=0;AN=6;...]
 def split_multi_allelic(variants):
