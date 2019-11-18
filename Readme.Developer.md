@@ -187,7 +187,7 @@ samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.b
 # Docker
 ```
 docker build --tag=mity .
-docker tag 0d53b5157b46 drmjc/mity:0.1.3
+docker tag f4361f08ac5e drmjc/mity:0.1.3
 docker login docker.io
 docker push drmjc/mity:0.1.3
 

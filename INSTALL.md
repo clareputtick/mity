@@ -92,7 +92,7 @@ mity report A1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz
 docker run drmjc/mity:0.1.2 -h
 wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
 wget https://dl.dnanex.us/F/D/qyV40Qgfj6Jgy3zZfJ07vkgXqZvJ6Fb2kXb24fyv/A1.dedup.realigned.recalibrated.chrMT.bam.bai
-docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.3 call --prefix A1 /home/A1.dedup.realigned.recalibrated.chrMT.bam
-docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.2 normalise --outfile /home/A1.mity.norm.vcf.gz /home/A1.mity.vcf.gz
-docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.2 report /home/A1.mity.norm.vcf.gz
+docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.3 call --prefix A1 A1.dedup.realigned.recalibrated.chrMT.bam
+docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.3 normalise --outfile A1.mity.norm.vcf.gz A1.mity.vcf.gz
+docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.3 report A1.mity.norm.vcf.gz
 ```
