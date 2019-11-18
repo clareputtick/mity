@@ -18,13 +18,13 @@
 * pandas
 
 # Installation
-Installation instructions via Docker, pip, or manually are available in [INSTALL.md(INSTALL.md)]
+Installation instructions via Docker, pip, or manually are available in [INSTALL.md](https://github.com/KCCG/mity/blob/master/INSTALL.md)
 
 # Example Usage
 This is an example of calling variants in the Ashkenazim Trio.
 
 ## mity call
-First run `mity call` on three MT BAMs provided in [mity/test_in].
+First run `mity call` on three MT BAMs provided in [mity/test_in](https://github.com/KCCG/mity/blob/master/test_in).
 
 We recommend always using `--normalise`, or `mity report` won't work:
 ```bash
