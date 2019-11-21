@@ -7,7 +7,7 @@ with open("mitylib/_version.py", "r") as fh:
     version = fh.read().replace("__version__ = ", "").strip('""\n')
 
 setuptools.setup(
-    name="mity",
+    name="mitywgs",
     version=version,
     description="A sensitive Mitochondrial variant detection pipeline from WGS data",
     long_description=long_description,
@@ -15,7 +15,7 @@ setuptools.setup(
     url="https://github.com/KCCG/mity",
     author="Clare Puttick",
     author_email="clare.puttick@gmail.com",
-    license="see LICENSE.txt",
+    license="MIT",
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
@@ -44,7 +44,8 @@ setuptools.setup(
         'pysam',
         'pandas',
         'xlsxwriter',
-        'pyfastx'
+        'pyfastx',
+        'scipy'
     ],
     python_requires='>=3.5.3',
     package_data={'mitylib': ['verchew.ini', 'annot/*', 'reference/*']},
