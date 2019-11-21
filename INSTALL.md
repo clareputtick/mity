@@ -89,7 +89,7 @@ mity report A1.dedup.realigned.recalibrated.chrMT.mity.vcf.gz
 
 ## test using docker
 ```
-docker run drmjc/mity:0.1.2 -h
+docker run drmjc/mity:0.1.3 -h
 wget https://dl.dnanex.us/F/D/XJfjx2X139ZkzY7b29QQKBppzfj9p5V794Bfqf4G/A1.dedup.realigned.recalibrated.chrMT.bam
 wget https://dl.dnanex.us/F/D/qyV40Qgfj6Jgy3zZfJ07vkgXqZvJ6Fb2kXb24fyv/A1.dedup.realigned.recalibrated.chrMT.bam.bai
 docker run --rm -it -v $(pwd):/home drmjc/mity:0.1.3 call --prefix A1 A1.dedup.realigned.recalibrated.chrMT.bam
