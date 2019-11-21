@@ -1,7 +1,7 @@
 # Docker
 The simplest way to run `mity` is via `docker`:
 ```
-docker run drmjc/mity -h
+docker run drmjc/mity:0.1.3 -h
 ```
 
 # pip
