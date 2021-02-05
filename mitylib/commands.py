@@ -36,7 +36,8 @@ do_call = public(call.do_call)
 
 def _cmd_call(args):
     if args.debug:
-        logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
+        # TODO: why does this not turn on debugging output? It needs to be turned on in `mity:L20` to work
+        logging.basicConfig(level=logging.DEBUG, format="%(message)s")
     """Call mitochondrial variants"""
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")

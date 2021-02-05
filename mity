@@ -16,12 +16,13 @@ import sys
 assert sys.version_info >= (3, 5, 3)
 
 if __name__ == '__main__':
-    # logging.basicConfig(level=logging.INFO, format="%(message)s")
-    logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    # logging.basicConfig(level=logging.DEBUG, format="%(message)s")
 
     util.check_dependencies()
 
     args = commands.parse_args()
+
     if len(vars(args)) == 0:
         logging.info("usage: mity -h")
     else:
