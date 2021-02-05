@@ -523,7 +523,11 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     variant_df = pandas.DataFrame(variant_table, columns=vcf_headers)
     # print(variant_df)
     # variant_df.to_csv("test_variants.csv", index = False)
-    
+
+    # The annotations use contig name = 'MT', so if the vcf uses contig name = 'chrM', then swap this.
+    contig_name = variant_df['CHR'][0]
+    if contig_name != "MT":
+        variant_df['CHR'] = "MT"
     ########## Merge with mitomap and panel annotation table
     # this depends on chrom, pos, ref, alt
     mitomap_panel_annotations = pandas.read_csv(get_annot_file("mitomap_panel_annotations.csv"))
@@ -601,7 +605,7 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
     # sys.exit()
     
     ########## Merge with haplotype data
-    # TODO: why does this add two lines for some variants?
+    # TODO: why does this add two lines for some variants? (there are no pos-ref-alt dups)
     haplotype_annotations = pandas.read_csv(get_annot_file("haplotype_data.csv"))
     haplotype_annotations['POS'] = haplotype_annotations['POS'].astype('str')
     haplotype_mgrb_mitotip_trna_mito_locus_gtf_mitomap_panel_annotated_variants = pandas.merge(
@@ -617,7 +621,11 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
         '.')
     # print(annotated_variants)
     # sys.exit()
-    
+
+    # The annotations use contig name = 'MT', so if the vcf uses contig name = 'chrM', then swap this.
+    if contig_name != "MT":
+        annotated_variants["CHR"] = contig_name
+
     # now we make the general gene/locus and gene/locus description cols
     gene = annotated_variants['GENE'].tolist()
     gene_biotype = annotated_variants['GENE_BIOTYPE'].tolist()
