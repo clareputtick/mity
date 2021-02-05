@@ -105,6 +105,12 @@ P_call.add_argument('--region', action='store', type=str,
                     dest="region")
 P_call.add_argument('--debug', action='store_true',
                     help='Verbose output for debugging?')
+P_call.add_argument('--bam-file-list', action='store', type=str,
+                    default=None,
+                    help='A text file of BAM files to be processed. The path to each file should be on one row per Region of MT genome to call variants in. '
+                         'If unset will call variants in entire MT genome as specified in BAM header. '
+                         "Default: Entire MT genome. ",
+                    dest="region")
 P_call.set_defaults(func=_cmd_call)
 
 # normalise --------------------------------------------------------------------
