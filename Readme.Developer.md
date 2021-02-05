@@ -223,3 +223,17 @@ docker run drmjc/mity:0.1.3 -h
     #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG004
     MT      301     .       A       C       0       SBA_FIL DP=13343;MQM=70;MQMR=70;QA=1035;QR=442379;SAF=4;SAR=40;SRF=5829;SRR=7470;SBR=0.438;SBA=0.091    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/1:13343:13299,44:13299:442379:33.264:44:1035:23.523:0.0033:31.28
     MT      302     .       ACCCCCCCTCCCCCGCTTCTG   CCCCCCCCCTCCCCCCGCTTCTG 1.10729e+06     SBA_FIL;POS_FIL DP=47;MQM=70;MQMR=0;QA=1064;QR=0;SAF=0;SAR=47;SRF=0;SRR=0;TYPE=complex;SBR=0;SBA=0.0    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      1/1:47:0,47:0:0:0:47:1064:22.638:1.0:10000
+
+# setup dev environment
+
+    pip install --upgrade pip
+    # install pip-compile
+    pip install wheel
+    pip install pip-tools
+    pip install twine
+    brew install twine
+    pip install -r requirements.txt
+
+    python3 -m venv env
+    source env/bin/activate
+    pip install -r requirements.txt
