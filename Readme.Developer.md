@@ -187,13 +187,26 @@ samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.b
 # Docker
 ```
 docker build --tag=mity .
-docker tag f4361f08ac5e drmjc/mity:0.1.3
+docker tag 01cc067e8454 drmjc/mity:0.2.0 
+docker tag 01cc067e8454 drmjc/mity:latest
 docker login docker.io
-docker push drmjc/mity:0.1.3
+docker push drmjc/mity:0.2.0
+docker push drmjc/mity:latest
+
+# all three are equivalent
+docker run drmjc/mity:latest version
+docker run drmjc/mity version
+docker run drmjc/mity:0.2.0 version
 
 # test mity
-docker run mity call -h
-docker run drmjc/mity:0.1.3 -h
+docker run -w "$PWD" -v "$PWD":"$PWD" mity call \
+--prefix ashkenazim \
+--out-folder-path test_out \
+--region MT:1-500 \
+--normalise \
+test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
 ```
 
 # Triple check that joint-calling agrees with single calling
@@ -237,3 +250,7 @@ docker run drmjc/mity:0.1.3 -h
     python3 -m venv env
     source env/bin/activate
     pip install -r requirements.txt
+
+    # store your twine password in the keychain
+    keyring set https://test.pypi.org/legacy/ drmjc
+    keyring set https://upload.pypi.org/legacy/ drmjc

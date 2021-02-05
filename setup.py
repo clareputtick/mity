@@ -47,7 +47,7 @@ setuptools.setup(
         'pyfastx',
         'scipy'
     ],
-    python_requires='>=3.5.3',
+    python_requires='>=3.5.4',
     package_data={'mitylib': ['verchew.ini', 'annot/*', 'reference/*']},
     include_package_data=True,
     scripts=["mity"]

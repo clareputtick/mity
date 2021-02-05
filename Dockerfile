@@ -52,7 +52,7 @@ RUN \
     chmod +x gsort
 
 # Install mity
-RUN pip install mitywgs==0.1.3
+RUN pip install mitywgs==0.2.0
 
 WORKDIR /home
 
