@@ -187,16 +187,16 @@ samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.b
 # Docker
 ```
 docker build --tag=mity .
-docker tag 01cc067e8454 drmjc/mity:0.2.0 
+docker tag 01cc067e8454 drmjc/mity:0.2.1 
 docker tag 01cc067e8454 drmjc/mity:latest
 docker login docker.io
-docker push drmjc/mity:0.2.0
+docker push drmjc/mity:0.2.1
 docker push drmjc/mity:latest
 
 # all three are equivalent
 docker run drmjc/mity:latest version
 docker run drmjc/mity version
-docker run drmjc/mity:0.2.0 version
+docker run drmjc/mity:0.2.1 version
 
 # test mity
 docker run -w "$PWD" -v "$PWD":"$PWD" mity call \
@@ -254,3 +254,7 @@ test_in/HG004.hs37d5.2x250.small.MT.RG.bam
     # store your twine password in the keychain
     keyring set https://test.pypi.org/legacy/ drmjc
     keyring set https://upload.pypi.org/legacy/ drmjc
+
+# update version in a few places
+* mitylib/_version.py
+* Docker section above
