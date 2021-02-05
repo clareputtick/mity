@@ -5,7 +5,7 @@
     a sensitive variant analysis pipeline optimised for WGS data
 
 Authors: Clare Puttick, Mark Cowley
-License: Open source for research use: see LICENSE.txt
+License: MIT
 """
 
 import logging
