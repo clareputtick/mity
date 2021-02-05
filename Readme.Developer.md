@@ -258,3 +258,4 @@ test_in/HG004.hs37d5.2x250.small.MT.RG.bam
 # update version in a few places
 * mitylib/_version.py
 * Docker section above
+* Dockerfile
