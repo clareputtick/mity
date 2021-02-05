@@ -65,6 +65,8 @@ def do_call(bam_files, reference, genome=None, prefix=None, min_mq=30, min_bq=24
                ' --min-base-quality ' + str(min_bq) + ' --min-alternate-fraction ' + \
                str(min_af) + ' --min-alternate-count ' + str(min_ac) + \
                ' --out-folder-path ' + str(out_folder_path) + ' --region ' + region
+    logging.debug("mity commandline: " + str(mity_cmd))
+
     if normalise:
         mity_cmd = mity_cmd + ' --normalise --p ' + str(p)
 
@@ -78,7 +80,7 @@ def do_call(bam_files, reference, genome=None, prefix=None, min_mq=30, min_bq=24
     sed_cmd = "sed 's/^##phasing=none/{}/g'".format(mity_cmd)
     logging.debug(sed_cmd)
 
-    freebayes_call = ('freebayes -f {} {} '
+    freebayes_call = ('set -o pipefail && freebayes -f {} {} '
                       '--min-mapping-quality {} '
                       '--min-base-quality {} '
                       '--min-alternate-fraction {} '
@@ -86,12 +88,12 @@ def do_call(bam_files, reference, genome=None, prefix=None, min_mq=30, min_bq=24
                       '--ploidy 2 '
                       '--region {} '
                       ).format(reference, bam_str, min_mq, min_bq, min_af, min_ac, region)
-
     freebayes_call = freebayes_call + ('| sed "s/##source/##freebayesSource/" | sed "s/##commandline/##freebayesCommandline/" | {} | bgzip > {} ').format(sed_cmd, unnormalised_vcf_path)
 
     logging.info("Running FreeBayes in sensitive mode")
     logging.debug(freebayes_call)
     res = subprocess.run(freebayes_call, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    logging.debug("Freebayes result code: {}".format(res.returncode))
 
     if res.returncode != 0:
         logging.error("FreeBayes failed: {}".format(res.stderr))

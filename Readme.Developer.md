@@ -187,13 +187,30 @@ samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.b
 # Docker
 ```
 docker build --tag=mity .
-docker tag f4361f08ac5e drmjc/mity:0.1.3
+docker tag 324ade81b6ec drmjc/mity:0.2.1 
+docker tag 324ade81b6ec drmjc/mity:latest
+docker tag 324ade81b6ec mity:latest
+docker tag 324ade81b6ec mity:0.2.1
 docker login docker.io
-docker push drmjc/mity:0.1.3
+docker push drmjc/mity:0.2.1
+docker push drmjc/mity:latest
+docker push mity:0.2.1  # denied: requested access to the resource is denied
+docker push mity:latest  # denied: requested access to the resource is denied
+
+# all three are equivalent
+docker run drmjc/mity:latest version
+docker run drmjc/mity version
+docker run drmjc/mity:0.2.1 version
 
 # test mity
-docker run mity call -h
-docker run drmjc/mity:0.1.3 -h
+docker run -w "$PWD" -v "$PWD":"$PWD" mity call \
+--prefix ashkenazim \
+--out-folder-path test_out \
+--region MT:1-500 \
+--normalise \
+test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
+test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
 ```
 
 # Triple check that joint-calling agrees with single calling
@@ -223,3 +240,26 @@ docker run drmjc/mity:0.1.3 -h
     #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG004
     MT      301     .       A       C       0       SBA_FIL DP=13343;MQM=70;MQMR=70;QA=1035;QR=442379;SAF=4;SAR=40;SRF=5829;SRR=7470;SBR=0.438;SBA=0.091    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      0/1:13343:13299,44:13299:442379:33.264:44:1035:23.523:0.0033:31.28
     MT      302     .       ACCCCCCCTCCCCCGCTTCTG   CCCCCCCCCTCCCCCCGCTTCTG 1.10729e+06     SBA_FIL;POS_FIL DP=47;MQM=70;MQMR=0;QA=1064;QR=0;SAF=0;SAR=47;SRF=0;SRR=0;TYPE=complex;SBR=0;SBA=0.0    GT:DP:AD:RO:QR:AQR:AO:QA:AQA:VAF:q      1/1:47:0,47:0:0:0:47:1064:22.638:1.0:10000
+
+# setup dev environment
+
+    pip install --upgrade pip
+    # install pip-compile
+    pip install wheel
+    pip install pip-tools
+    pip install twine
+    brew install twine
+    pip install -r requirements.txt
+
+    python3 -m venv env
+    source env/bin/activate
+    pip install -r requirements.txt
+
+    # store your twine password in the keychain
+    keyring set https://test.pypi.org/legacy/ drmjc
+    keyring set https://upload.pypi.org/legacy/ drmjc
+
+# update version in a few places
+* mitylib/_version.py
+* Docker section above
+* Dockerfile

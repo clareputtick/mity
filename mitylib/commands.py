@@ -36,7 +36,8 @@ do_call = public(call.do_call)
 
 def _cmd_call(args):
     if args.debug:
-        logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
+        # TODO: why does this not turn on debugging output? It needs to be turned on in `mity:L20` to work
+        logging.basicConfig(level=logging.DEBUG, format="%(message)s")
     """Call mitochondrial variants"""
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")
@@ -52,7 +53,7 @@ def _cmd_call(args):
 P_call = AP_subparsers.add_parser('call', help=_cmd_call.__doc__)
 P_call.add_argument('bam', action='append', nargs='+',
                     help='BAM files to run the analysis on.')
-P_call.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
+P_call.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38', 'mm10'],
                     default="hs37d5", required=False,
                     help='reference genome version to use. default: hs37d5')
 # P_call.add_argument('--custom_reference', action='store',
@@ -105,6 +106,12 @@ P_call.add_argument('--region', action='store', type=str,
                     dest="region")
 P_call.add_argument('--debug', action='store_true',
                     help='Verbose output for debugging?')
+P_call.add_argument('--bam-file-list', action='store', type=str,
+                    default=None,
+                    help='A text file of BAM files to be processed. The path to each file should be on one row per Region of MT genome to call variants in. '
+                         'If unset will call variants in entire MT genome as specified in BAM header. '
+                         "Default: Entire MT genome. ",
+                    dest="region")
 P_call.set_defaults(func=_cmd_call)
 
 # normalise --------------------------------------------------------------------
@@ -132,7 +139,7 @@ P_normalise.add_argument('--p', action='store', type=float,
                          help='Minimum noise level. This is used to calculate QUAL score'
                               'Default: 0.002, range = [0,1]',
                          dest="p")
-P_normalise.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
+P_normalise.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38', 'mm10'],
                     default="hs37d5", required=False,
                     help='reference genome version to use. default: hs37d5')
 P_normalise.set_defaults(func=_cmd_normalise)
@@ -187,7 +194,7 @@ P_merge.add_argument('--nuclear_vcf', action='store', required=True,
 P_merge.add_argument('--prefix', action='store',
                      help='Output files will be named with PREFIX. '
                      'The default is to use the nuclear vcf name')
-P_merge.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38'],
+P_merge.add_argument('--reference', choices=['hs37d5', 'hg19', 'hg38', 'mm10'],
                      default="hs37d5", required=False,
                      help='reference genome version to use. default: hs37d5')
 # P_merge.add_argument('--custom_reference', action='store',

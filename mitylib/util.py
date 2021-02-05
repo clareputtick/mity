@@ -247,14 +247,14 @@ def make_hgvs(pos, ref, alt):
         hgvs = "m." + str(pos) + str(ref) + ">" + str(alt)
     return hgvs
 
-def select_reference_fasta(reference, custom_genome=None):
+def select_reference_fasta(reference, custom_reference_fa=None):
     """
     Allow the user to select one of the pre-loaded reference genome fasta files, via --reference,
     or supply their own via --custom_reference. This function will return the path to
     the reference genome fasta file.
 
-    :param reference: one of the inbuilt reference genomes. hs37d5, hg19, hg38.
-    :param custom_genome: the path to a custom reference genome, or None. If this
+    :param reference: one of the inbuilt reference genomes: hs37d5, hg19, hg38, mm10.
+    :param custom_reference_fa: the path to a custom reference genome, or None. If this
     file exists, then it will override the option provided by 'reference'.
     :return the path to the reference genome as a str.
 
@@ -266,8 +266,8 @@ def select_reference_fasta(reference, custom_genome=None):
     'reference/hg19.chrM.fa'
 
     """
-    if custom_genome is not None and os.path.exists(custom_genome):
-        res = custom_genome
+    if custom_reference_fa is not None and os.path.exists(custom_reference_fa):
+        res = custom_reference_fa
     else:
         ref_dir = os.path.join(get_mity_dir(), 'reference')
         res = glob('{}/{}.*.fa'.format(ref_dir, reference))
@@ -276,16 +276,17 @@ def select_reference_fasta(reference, custom_genome=None):
         res = res[0]
     return res
 
-def select_reference_genome(reference, custom_fasta=None):
+def select_reference_genome(reference, custom_reference_genome=None):
     """
-    Allow the user to select one of the pre-loaded reference '.genome' files, via --reference,
-    or supply their own via --custom_reference. This function will return the path to
-    the reference '.genome' file.
+    This function returns the path to a '.genome' file [1], which is needed for `gsort` to order the chromosomes
+    properly.
 
-    :param reference: one of the inbuilt reference genomes. hs37d5, hg19, hg38.
-    :param custom_fasta: the path to a custom reference genome, or None. If this
+    [1]: https://bedtools.readthedocs.io/en/latest/content/general-usage.html#genome-file-format
+
+    :param reference: one of the inbuilt reference genomes: hs37d5, hg19, hg38, mm10
+    :param custom_reference_genome: the path to a custom reference .genome file, or None. If this
     file exists, then it will override the option provided by 'reference'.
-    :return the path to the reference genome as a str.
+    :return the path to the reference .genome file as a str.
 
     >>> select_reference_genome('hg19', None)
     'reference/hg19.genome'
@@ -295,8 +296,8 @@ def select_reference_genome(reference, custom_fasta=None):
     'reference/hg19.genome'
 
     """
-    if custom_fasta is not None and os.path.exists(custom_fasta):
-        res = custom_fasta
+    if custom_reference_genome is not None and os.path.exists(custom_reference_genome):
+        res = custom_reference_genome
     else:
         ref_dir = os.path.join(get_mity_dir(), 'reference')
         res = glob('{}/{}.genome'.format(ref_dir, reference))
