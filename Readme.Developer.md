@@ -187,11 +187,15 @@ samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.b
 # Docker
 ```
 docker build --tag=mity .
-docker tag 01cc067e8454 drmjc/mity:0.2.1 
-docker tag 01cc067e8454 drmjc/mity:latest
+docker tag 324ade81b6ec drmjc/mity:0.2.1 
+docker tag 324ade81b6ec drmjc/mity:latest
+docker tag 324ade81b6ec mity:latest
+docker tag 324ade81b6ec mity:0.2.1
 docker login docker.io
 docker push drmjc/mity:0.2.1
 docker push drmjc/mity:latest
+docker push mity:0.2.1  # denied: requested access to the resource is denied
+docker push mity:latest  # denied: requested access to the resource is denied
 
 # all three are equivalent
 docker run drmjc/mity:latest version
