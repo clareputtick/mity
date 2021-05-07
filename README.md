@@ -1,3 +1,11 @@
+# THIS REPOSITORY IS NO LONGER SUPPORTED
+
+You should use https://github.com/KCCG/mity/
+
+
+
+
+
 # mity
 `mity` is a bioinformatic analysis pipeline designed to call mitochondrial SNV and INDEL variants from Whole Genome Sequencing (WGS) data. `mity` can:
 * identify very low-heteroplasmy variants, even <1% heteroplasmy when there is sufficient read-depth (eg >1000x)
