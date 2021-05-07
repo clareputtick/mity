@@ -186,31 +186,31 @@ samtools view -b -o NA12878.alt_bwamem_GRCh38DH.20150718.CEU.low_coverage.chrM.b
 
 # Docker
 ```
-docker build --tag=mity .
-docker tag 324ade81b6ec drmjc/mity:0.2.1 
-docker tag 324ade81b6ec drmjc/mity:latest
-docker tag 324ade81b6ec mity:latest
-docker tag 324ade81b6ec mity:0.2.1
-docker login docker.io
-docker push drmjc/mity:0.2.1
-docker push drmjc/mity:latest
-docker push mity:0.2.1  # denied: requested access to the resource is denied
-docker push mity:latest  # denied: requested access to the resource is denied
+version=0.3.0
+docker build --tag=latest --tag=$version --tag=drmjc/mity:latest --tag=drmjc/mity:$version .
+docker push drmjc/mity            # equivalent to docker push drmjc/mity:latest
+docker push drmjc/mity:$version
 
-# all three are equivalent
-docker run drmjc/mity:latest version
 docker run drmjc/mity version
-docker run drmjc/mity:0.2.1 version
+docker run drmjc/mity:latest version
+docker run drmjc/mity:$version version
 
-# test mity
-docker run -w "$PWD" -v "$PWD":"$PWD" mity call \
---prefix ashkenazim \
---out-folder-path test_out \
---region MT:1-500 \
---normalise \
-test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
-test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
-test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
+# test mity via Docker
+docker run -w "$PWD" -v "$PWD":"$PWD" drmjc/mity call \
+  --prefix ashkenazim \
+  --out-folder-path test_out2 \
+  --region MT:1-500 \
+  --normalise \
+  --reference hs37d5 \
+  test_in/HG002.hs37d5.2x250.small.MT.RG.bam \
+  test_in/HG003.hs37d5.2x250.small.MT.RG.bam \
+  test_in/HG004.hs37d5.2x250.small.MT.RG.bam 
+
+docker run -w "$PWD" -v "$PWD":"$PWD" drmjc/mity report \
+  --prefix ashkenazim \
+  --min_vaf 0.01 \
+  --out-folder-path test_out2 \
+  test_out2/ashkenazim.mity.vcf.gz
 ```
 
 # Triple check that joint-calling agrees with single calling

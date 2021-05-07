@@ -51,8 +51,12 @@ RUN \
       | wget -O gsort -qi - && \
     chmod +x gsort
 
+# Install mity from dev server (but first install the previous version to get the dependencies from pypi)
+#RUN pip install mitywgs==0.2.2
+#RUN pip install -i https://test.pypi.org/simple/ mitywgs==0.2.2rc2
+
 # Install mity
-RUN pip install mitywgs==0.2.1
+RUN pip install mitywgs==0.3.0
 
 WORKDIR /home
 

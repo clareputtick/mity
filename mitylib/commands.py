@@ -35,12 +35,15 @@ AP_subparsers = AP.add_subparsers(
 do_call = public(call.do_call)
 
 def _cmd_call(args):
-    if args.debug:
+    if True:
         # TODO: why does this not turn on debugging output? It needs to be turned on in `mity:L20` to work
         logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+        #logging.getLogger('mitylib').setLevel(level=logging.DEBUG)
+
     """Call mitochondrial variants"""
     logging.info("mity version %s", __version__)
     logging.info("Calling mitochondrial variants")
+    logging.debug("Debugging mode activated")
 
     genome = select_reference_genome(args.reference, None)
     args.reference = select_reference_fasta(args.reference, None)

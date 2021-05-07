@@ -300,6 +300,7 @@ def select_reference_genome(reference, custom_reference_genome=None):
         res = custom_reference_genome
     else:
         ref_dir = os.path.join(get_mity_dir(), 'reference')
+        logging.debug("Looking for .genome file in " + ref_dir)
         res = glob('{}/{}.genome'.format(ref_dir, reference))
         logging.debug(",".join(res))
         assert len(res) == 1

@@ -41,7 +41,7 @@ This will create `test_out/normalised/ashkenazim.mity.vcf.gz` (and tbi file).
 
 or, if using Docker:
 ```
-docker run -w "$PWD" -v "$PWD":"$PWD" mity call \
+docker run -w "$PWD" -v "$PWD":"$PWD" drmjc/mity call \
 --prefix ashkenazim \
 --out-folder-path test_out \
 --region MT:1-500 \
