@@ -17,8 +17,16 @@ function test {
     -u drmjc \
     dist/mitywgs-${version}*
 }
+
 function public {
   twine upload --verbose --non-interactive -u drmjc dist/mitywgs-${version}*
 }
+
+function docker {
+  docker build --tag=latest --tag=${version} --tag=drmjc/mity:latest --tag=drmjc/mity:${version} .
+  docker push drmjc/mity            # equivalent to docker push drmjc/mity:latest
+  docker push drmjc/mity:${version}
+  docker run drmjc/mity version
+}
 #test
-public
+public && docker

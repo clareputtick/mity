@@ -56,7 +56,7 @@ RUN \
 #RUN pip install -i https://test.pypi.org/simple/ mitywgs==0.2.2rc2
 
 # Install mity
-RUN pip install mitywgs==0.3.0
+RUN pip install mitywgs==0.3.1
 
 WORKDIR /home
 
