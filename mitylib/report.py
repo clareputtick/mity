@@ -831,7 +831,11 @@ def do_report(vcf, prefix=None, min_vaf=0.0, out_folder_path = "."):
         "MitoTip_interpretation: Variants in the upper 25th percentile are "
         "deemed likely pathogenic, 50-75th percentile as possibly "
         "pathogenic; 25-50th percentile as possibly benign; "
-        "bottom 25th percentile as likely benign. see "
+        "bottom 25th percentile as likely benign. "
+        "Variants reported as Confirmed pathogenic in MITOMAP have additional lines " 
+        "of experimental evidence which led to confirmation of pathogenicity "
+        "regardless of which percentile category the variant may belong to. "
+        "see "
         "https://mitomap.org/foswiki/bin/view/MITOMAP/MitoTipInfo")
     documentation.append(
         "anticodon: TRUE if the variant falls in an anticodon of a tRNA.")
