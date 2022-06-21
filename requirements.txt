@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-numpy==1.16.4             # via pandas, scipy
+numpy==1.22.0             # via pandas, scipy
 pandas==0.24.2
 pyfastx==0.2.2
 pysam==0.15.3
